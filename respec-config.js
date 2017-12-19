@@ -1,6 +1,6 @@
 var respecConfig = {
   specStatus: "ED",
-  prevED: "https://rawgit.com/aboba/webrtc-quic/master/index.html",
+  prevED: "",
   // if there a publicly available Editor's Draft, this is the link
   edDraftURI: "https://w3c.github.io/webrtc-quic/",
   shortName: "webrtc-quic",

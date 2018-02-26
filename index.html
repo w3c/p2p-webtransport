@@ -451,8 +451,8 @@ interface RTCQuicTransport : RTCStatsProvider {
       name <var>e</var>, which does not bubble (except where otherwise stated) and is not
       cancelable (except where otherwise stated), and which uses the
       <code><a>RTCQuicStreamEvent</a></code> interface with the
-      <code><a>stream</a></code> attribute set to <var>stream</var>,
-      MUST be created and dispatched at the given target.</p>
+      <code><a href="#dom-quicstreamevent-stream">stream</a></code> attribute
+      set to <var>stream</var>, MUST be created and dispatched at the given target.</p>
       <div>
         <pre class="idl">
         [ Constructor (DOMString type, RTCQuicStreamEventInit eventInitDict), Exposed=Window]
@@ -1107,8 +1107,7 @@ interface RTCQuicStream {
     <section id="rtcquicstreamstate*">
       <h2><dfn>RTCQuicStreamState</dfn> Enum</h2>
       <p>The <code>RTCQuicStreamState</code> provides information
-      on the state of the QUIC stream. On getting, it returns the
-      value of the <a>[[\QuicStreamState]]</a> slot.</p>
+      on the state of the QUIC stream.</p>
       <div>
         <pre class="idl">enum RTCQuicStreamState {
     "new",

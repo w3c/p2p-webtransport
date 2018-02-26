@@ -5,7 +5,7 @@ var respecConfig = {
   edDraftURI: "https://w3c.github.io/webrtc-quic/",
   shortName: "webrtc-quic",
   editors: [
-    { name: "Peter Thatcher", company: "Google", w3cid: "" },
+    { name: "Peter Thatcher", company: "Google", w3cid: "68236" },
     { name: "Bernard Aboba", company: "Microsoft Corporation", w3cid: "65611" } 
   ],
   authors: [

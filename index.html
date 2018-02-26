@@ -223,7 +223,7 @@ interface RTCQuicTransport : RTCStatsProvider {
             <dt><dfn><code>onstream</code></dfn> of type <span class=
             "idlAttrType"><a>EventHandler</a></span></dt>
             <dd>
-              <p>This event handler, of event handler event type <code>quicstream</code>,
+              <p>This event handler, of event handler event type <code><a>quicstream</a></code>,
               <em class="rfc2119" title="MUST">MUST</em> be fired on when a remote
               <code><a>RTCQuicStream</a></code> is created.</p>
             </dd>
@@ -444,9 +444,9 @@ interface RTCQuicTransport : RTCStatsProvider {
     </section>
     <section>
       <h3><dfn>RTCQuicStreamEvent</dfn></h3>
-      <p>The <code><a href="#event-quicstream">quicstream</a></code> event uses the
+      <p>The <code><a>quicstream</a></code> event uses the
       <code><a>RTCQuicStreamEvent</a></code> interface.</p>
-      <p>Firing a quicstream event named <var>e</var> with a
+      <p>Firing a <code><a>quicstream</a></code> event named <var>e</var> with a
       <code><a>RTCQuicStream</a></code> <var>stream</var> means that an event with the
       name <var>e</var>, which does not bubble (except where otherwise stated) and is not
       cancelable (except where otherwise stated), and which uses the

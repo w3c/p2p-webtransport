@@ -1,0 +1,29 @@
+language: python
+
+dist: trusty
+
+branches:
+  only:
+    - /.*/
+
+sudo: false
+
+addons:
+  apt:
+    packages:
+      - libwww-perl
+      - libcss-dom-perl
+  chrome: stable
+
+cache:
+  directories:
+    - node_modules # NPM packages
+
+before_install:
+  - nvm install lts/*
+
+install:
+ - make travissetup
+
+script:
+ - make check

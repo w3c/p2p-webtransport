@@ -6,7 +6,6 @@
   <title>QUIC API for WebRTC</title>
   <script src="https://www.w3.org/Tools/respec/respec-w3c-common" async class="remove"></script>
   <script src="respec-config.js" class="remove"></script>
-  </script>
 </head>
 <body>
   <section id="abstract">
@@ -1061,7 +1060,7 @@ interface RTCQuicStream {
               the <a>user agent</a> MUST run the following steps:</p>
               <ol>
                <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code>
-               on which <code>setTargetReadBufferedAmount</code> is invoked.</p>
+               on which <code>setTargetReadBufferedAmount</code> is invoked.</li>
                <li>Let <var>amount</var> be the first argument.</li>
                <li>If <var>amount</var> is greater than the <var>stream</var>'s
                <a>[[\MaxReadBufferedAmount]]</a> slot, <a>throw</a> an
@@ -1407,5 +1406,6 @@ interface RTCQuicStreamReceivedEvent : Event {
     <p>The <code><a>RTCQuicTransport</a></code> and <code><a>RTCQuicStream</a></code> objects
     were initially described in the <a href="https://www.w3.org/community/ortc/">W3C ORTC CG</a>,
     and have been adapted for use in this specification.</p>
+ </section>
 </body>
 </html>

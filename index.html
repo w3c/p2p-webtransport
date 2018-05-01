@@ -1066,14 +1066,10 @@ interface RTCQuicStream {
                <code>OperationError</code> and abort these steps.</li>
                <li>Set <var>stream</var>'s <a>[[\TargetReadBufferedAmount]]</a> slot to 
                <var>amount</var>.</li>
-               <li>If <var>amount</var> is greater than or equal to <var>stream</var>'s
-               <a>[[\ReadBufferedAmount]]</a> slot, set <var>stream</var>'s maximum
-               receive window to <var>amount</var>.</li>
                <li>If <var>amount</var> is less than <var>stream</var>'s
-               <a>[[\ReadBufferedAmount]]</a> slot, set <var>stream</var>'s receive
-               window to zero until <a>[[\ReadBufferedAmount]]</a> becomes less than
-               or equal to <var>amount</var> and then set the maximum receive window
-               to <var>amount</var>.</li>
+               <a>[[\ReadBufferedAmount]]</a> slot, stop increasing <var>stream</var>'s
+               MAX_STREAM_DATA offset until <a>[[\ReadBufferedAmount]]</a> becomes less than
+               or equal to <var>amount</var>.</li>
               </ol>
               <table class="parameters">
                 <tbody>

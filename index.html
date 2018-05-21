@@ -1067,8 +1067,8 @@ interface RTCQuicStream {
                <li>Set <var>stream</var>'s <a>[[\TargetReadBufferedAmount]]</a> slot to 
                <var>amount</var>.</li>
                <li>If <var>amount</var> is less than <var>stream</var>'s
-               <a>[[\ReadBufferedAmount]]</a> slot, stop increasing <var>stream</var>'s
-               MAX_STREAM_DATA offset until <a>[[\ReadBufferedAmount]]</a> becomes less than
+               <a>[[\ReadBufferedAmount]]</a> slot, apply backpressure
+               until <a>[[\ReadBufferedAmount]]</a> becomes less than
                or equal to <var>amount</var>.</li>
               </ol>
               <table class="parameters">

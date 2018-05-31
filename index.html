@@ -760,8 +760,8 @@ interface RTCQuicStream {
             <dd>
               <p>The
               <dfn id="dom-quicstream-targetreadbufferedamount"><code>targetReadBufferedAmount</code></dfn>
-              attribute represents the target number of bytes in the read buffer, which enables
-              control of back-pressure on the sender via the maximum receive window. On getting,
+              attribute represents the target number of bytes in the read buffer, which enables control
+              of back-pressure on the sender when the target number of bytes is read. On getting,
               it <em class="rfc2119" title="MUST">MUST</em> return the value of the
               <code><a>RTCQuicStream</a></code>'s <a>[[\TargetReadBufferedAmount]]</a> internal slot.</p>
             </dd>

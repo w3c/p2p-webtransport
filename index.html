@@ -10,7 +10,7 @@
 <body>
   <section id="abstract">
     <p>This document defines a set of ECMAScript APIs in WebIDL to allow data to be sent
-    and received from another browser or device implementing the QUIC 
+    and received from another browser or device implementing the QUIC
     protocol. This specification is being developed in conjunction with a protocol
     specification developed by the IETF QUIC Working Group.</p>
   </section>
@@ -75,7 +75,7 @@
       <dfn data-lt="resolve|resolves">resolved</dfn>, <dfn>pending</dfn> and
       <dfn>settled</dfn> used in the context of Promises are defined in
       [[!ECMASCRIPT-6.0]].</p>
-      <p>The <dfn><code>RTCIceTransport</code></dfn> and <dfn><code>RTCCertificate</code></dfn> interfaces 
+      <p>The <dfn><code>RTCIceTransport</code></dfn> and <dfn><code>RTCCertificate</code></dfn> interfaces
       and the <dfn><code>RTCDtlsFingerprint</code></dfn> dictionary are defined in [[!WEBRTC]].</p>
   </section>
   <section id="quic-transport*">
@@ -122,7 +122,7 @@
       the selected remote certificate using the signature digest algorithm, and compare
       it against <code><var>remoteParameters</var>.fingerprints</code>. If the selected
       remote certificate <code>RTCDtlsFingerprint.value</code> matches
-      <code><var>remoteParameters</var>.fingerprints[j].value</code> and  
+      <code><var>remoteParameters</var>.fingerprints[j].value</code> and
       <code>RTCDtlsFingerprint.algorithm</code> matches
       <code><var>remoteParameters</var>.fingerprints[j].algorithm</code> for any value of
       <var>j</var>, the remote fingerprint is verified. After the QUIC handshake exchange
@@ -476,7 +476,7 @@ interface RTCQuicStreamEvent : Event {
                   <tr>
                     <td class="prmName">type</td>
                     <td class="prmType"><code>DOMString</code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=  
+                    <td class="prmNullFalse"><span role="img" aria-label=
                     "False">&#10008;</span></td>
                     <td class="prmOptFalse"><span role="img" aria-label=
                     "False">&#10008;</span></td>
@@ -734,16 +734,16 @@ interface RTCQuicStream {
             long</a></span>, readonly</dt>
             <dd>
               <p>The <dfn id="dom-quicstream-readbufferedamount"><code>readBufferedAmount</code></dfn>
-              attribute represents the number of bytes buffered for access by 
+              attribute represents the number of bytes buffered for access by
               <code>readInto</code> but that, as of the last time the event loop
               started executing a task, had not yet been read. This does not include
               framing overhead incurred by the protocol, or buffers associated with
-              the network hardware. On getting, it <em class="rfc2119" title="MUST">MUST</em> 
-              return the value of the <code><a>RTCQuicStream</a></code>'s 
+              the network hardware. On getting, it <em class="rfc2119" title="MUST">MUST</em>
+              return the value of the <code><a>RTCQuicStream</a></code>'s
               <a>[[\ReadBufferedAmount]]</a> internal slot.
               If the <code><a>RTCQuicStream</a></code> is in the <code>closed</code> state,
-              this attribute's value will only decrease with each call to the 
-              <code>readInto</code> method (the attribute does not reset to zero once the 
+              this attribute's value will only decrease with each call to the
+              <code>readInto</code> method (the attribute does not reset to zero once the
               <code><a>RTCQuicStream</a></code> closes).</p>
             </dd>
             <dt><code>maxReadBufferedAmount</code> of type <span class="idlAttrType"><a>unsigned
@@ -789,7 +789,7 @@ interface RTCQuicStream {
             <dd>
               <p>The <dfn id="dom-quicstream-maxwritebufferedamount"><code>maxWriteBufferedAmount</code></dfn>
               attribute represents the maximum number of bytes that the implementation allows
-              to be buffered by <code>write</code>. On getting, it <em class="rfc2119" title="MUST">MUST</em> 
+              to be buffered by <code>write</code>. On getting, it <em class="rfc2119" title="MUST">MUST</em>
               return the value of the <code><a>RTCQuicStream</a></code>'s
               <a>[[\MaxWriteBufferedAmount]]</a> internal slot.</p>
             </dd>
@@ -814,7 +814,7 @@ interface RTCQuicStream {
                <a>throw</a> an <code>InvalidStateError</code>, then abort these steps.</li>
                <li>Let <var>data</var> be the first argument.</li>
                <li>If the read buffer is empty and end-of-file has been encountered, return
-               a negative number, set <var>stream</var>'s <a>[[\Readable]]</a> slot to 
+               a negative number, set <var>stream</var>'s <a>[[\Readable]]</a> slot to
                <code>false</code> and abort these steps.</li>
                <li>Transfer data from the read buffer into <var>data</var>.</li>
                <li>Decrease the value of <var>stream</var>'s <a>[[\ReadBufferedAmount]]</a>
@@ -953,8 +953,12 @@ interface RTCQuicStream {
             <dd>
               <p><code>waitForReadable</code> resolves the promise
               when the data queued in the read buffer increases above
-              the amount provided as an argument.
-              When the <code>waitForReadable</code> method is called,
+              the amount provided as an argument. If <code>waitForReadable</code>
+              is called multiple times, multiple promises could be resolved when
+              the read buffer increases above the amount provided for each promise.
+              Promises won't be rejected, and a promise might never be resolved
+              in the case that the read buffer never increases above the amount
+              specified. When the <code>waitForReadable</code> method is called,
               the <a>user agent</a> MUST run the following steps:</p>
               <ol>
                 <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code>
@@ -996,7 +1000,11 @@ interface RTCQuicStream {
             <dd>
               <p><code>waitForWritable</code> resolves the promise when
               the data queued in the write buffer falls below a threshold
-              computed from the arguments to the method.
+              computed from the arguments to the method. If <code>waitForWritable</code>
+              is called multiple times, multiple promises could be resolved when the
+              write buffer falls below the threshold for each promise. Promises won't
+              be rejected, and a promise might never be resolved in the case that the
+              write buffer never falls below the threshold.
               When the <code>waitForWritable</code> method is called,
               the <a>user agent</a> MUST run the following steps:</p>
               <ol>
@@ -1012,7 +1020,7 @@ interface RTCQuicStream {
                 <a>reject</a> <var>p</var> with a newly created <code>OperationError</code>.</li>
                 <li>Let <var>threshold</var> be <var>target</var> minus <var>amount</var>.</li>
                 <li>When <var>stream</var>'s <a>[[\WriteBufferedAmount]]</a> slot decreases
-                from above <var>threshold</var> to less than or equal to it, 
+                from above <var>threshold</var> to less than or equal to it,
                 <a>resolve</a> <var>p</var> with <code>undefined</code>.</li>
               </ol>
               <table class="parameters">
@@ -1063,7 +1071,7 @@ interface RTCQuicStream {
                <li>If <var>amount</var> is greater than the <var>stream</var>'s
                <a>[[\MaxReadBufferedAmount]]</a> slot, <a>throw</a> an
                <code>OperationError</code> and abort these steps.</li>
-               <li>Set <var>stream</var>'s <a>[[\TargetReadBufferedAmount]]</a> slot to 
+               <li>Set <var>stream</var>'s <a>[[\TargetReadBufferedAmount]]</a> slot to
                <var>amount</var>.</li>
                <li>If <var>amount</var> is greater than or equal to <var>stream</var>'s
                <a>[[\ReadBufferedAmount]]</a> slot, set <var>stream</var>'s maximum

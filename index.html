@@ -959,8 +959,10 @@ interface RTCQuicStream {
               <ol>
                 <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code>
                 on which <code>waitForReadable</code> is invoked.</li>
-                <li>Let <var>amount</var> be the first argument.</li>
                 <li>Let <var>p</var> be a new promise.</li>
+                <li>If <var>stream</var>'s <a>[[\Readable]]</a> slot is <code>false</code>,
+                <a>reject</a> with an <code>InvalidStateError</code> and abort these steps.</li>  
+                <li>Let <var>amount</var> be the first argument.</li>
                 <li>If <var>amount</var> is larger than the value of
                 <var>stream</var>'s <a>[[\TargetReadBufferedAmount]]</a> slot,
                 <a>reject</a> <var>p</var> with a newly created <code>OperationError</code>.</li>
@@ -1002,12 +1004,14 @@ interface RTCQuicStream {
               <ol>
                 <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code>
                 object on which <code>waitForWritable</code> was invoked.</li>
+                <li>Let <var>p</var> be a new promise.</li>
+                <li>If <var>stream</var>'s <a>[[\Writeable]]</a> slot is <code>false</code>,
+                <a>reject</a> with an <code>InvalidStateError</code> and abort these steps.</li>  
                 <li>Let <var>amount</var> be the first argument.</li>
                 <li>Let <var>target</var> be the second argument, if provided.
                 If the second argument is not provided, let <var>target</var>
                 be the value of <var>stream</var>'s <a>[[\MaxWriteBufferedAmount]]</a>
                 slot.</li>
-                <li>Let <var>p</var> be a new promise.</li>
                 <li>If <var>amount</var> is larger than <var>target</var> then
                 <a>reject</a> <var>p</var> with a newly created <code>OperationError</code>.</li>
                 <li>Let <var>threshold</var> be <var>target</var> minus <var>amount</var>.</li>

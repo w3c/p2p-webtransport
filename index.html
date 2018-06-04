@@ -895,8 +895,8 @@ interface RTCQuicStream {
             </dd>
             <dt><dfn><code>finish</code></dfn></dt>
             <dd>
-              <p>Intitiates the closing procedure for the
-              <code><a>RTCQuicStream</a></code>. It may be called
+              <p>Intitiates the closing procedure for the local
+              <code><a>RTCQuicStream</a></code> to stop writing. It may be called
               regardless of whether the <code><a>RTCQuicStream</a></code> object
               was created by the local or remote peer. When the <code>finish()</code>
               method is called, the user agent <em class="rfc2119" title="MUST">MUST</em>
@@ -910,7 +910,21 @@ interface RTCQuicStream {
                 <li>If <var>stream</var>'s  <a>[[\QuicStreamState]]</a> is <code>closed</code>,
                 then abort these steps.</li>
                 <li>Set <var>stream</var>'s <a>[[\Writeable]]</a> slot to <code>false</code>.</li>
-                <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to <code>closing</code>.</li>
+                <li> If <var>stream</var>'s  <a>[[\QuicStreamState]]</a> is <code>closing</code> and
+                the stream has received a STREAM frame with the FIN bit set, run the following steps:
+                  <ol>
+                    <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to
+                    <code>false</code>.</li>
+                    <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
+                    <code>closed</code>.</li>
+                  </ol>
+                </li>
+                <li>Else, run the following step:
+                  <ol>
+                    <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
+                    <code>closing</code>.</li>
+                  </ol>
+                </li>
                 <li>If the closing procedure has not started yet, start it by sending a STREAM
                 frame with the FIN bit set.</li>
               </ol>
@@ -936,9 +950,23 @@ interface RTCQuicStream {
                 and abort these steps.</li>
                 <li>If <var>stream</var>'s  <a>[[\QuicStreamState]]</a> slot is <code>closed</code>,
                 then abort these steps.</li>
+                <li>If <var>stream</var>'s  <a>[[\QuicStreamState]]</a> slot is <code>closing</code>
+                and the stream has received a RST_STREAM frame, then abort these steps.
                 <li>Set <var>stream</var>'s <a>[[\Writeable]]</a> and <a>[[\Readable]]</a>
                 slots to <code>false</code>.</li>
-                <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to <code>closing</code>.</li>
+                <li> If <var>stream</var>'s  <a>[[\QuicStreamState]]</a> is <code>closing</code> and
+                the stream has received a STREAM frame with the FIN bit set, run the following step:
+                  <ol>
+                    <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
+                    <code>closed</code>.</li>
+                  </ol>
+                </li>
+                <li>Else, run the following step:
+                  <ol>
+                    <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
+                    <code>closing</code>.</li>
+                  </ol>
+                </li>
                 <li>If the closing procedure has not started yet, start it by sending a RST_STREAM
                 frame.</li>
               </ol>
@@ -1019,7 +1047,7 @@ interface RTCQuicStream {
                 <li>If <var>stream</var>'s <a>[[\Writeable]]</a> slot is
                 <code>false</code>, <a>reject</a> <var>p</var> with a
                 newly created <code>InvalidStateError</code> and abort
-                these steps.</li> 
+                these steps.</li>
                 <li>Let <var>amount</var> be the first argument.</li>
                 <li>Let <var>target</var> be the second argument, if provided.
                 If the second argument is not provided, let <var>target</var>
@@ -1171,16 +1199,23 @@ interface RTCQuicStream {
               "idl-def-RTCQuicStreamState.closing">closing</code></dfn></td>
               <td>
                 <p>The procedure to close down the QUIC stream has started.
-                The <code>reset</code> method has been called, causing a
-                RST_STREAM frame to be queued for transmission and the
-                read and write buffers to be cleared.  Alternatively, the
-                <code>finish</code> method has been called, causing a
-                STREAM frame with the FIN flag set to be queued for transmission.
-                However, a RST_STREAM frame or STREAM frame with the FIN flag
-                set has not yet been received. Alternatively, the QUIC stream
-                has received a RST_STREAM frame (causing the read and write
-                buffers to be cleared) or a STREAM frame with the
-                FIN flag set.</p>
+                This can happen in multiple ways:</p>
+                  <ol>
+                     <li>A RST_STREAM frame or STREAM frame with the FIN flag
+                     set has not yet been received and the <code>reset</code>
+                     method has been called. This causes a RST_STREAM frame to be
+                     queued for transmission, the read and write buffers to be
+                     cleared and the <a>[[\Readable]]</a> and <a>[[\Writeable]]</a>
+                     slots are set to <code>false</code>.</li>
+                     <li>A RST_STREAM frame or STREAM frame with the FIN flag
+                     set has not yet been received and the <code>finish</code>
+                     method has been called. This causes a STREAM frame with the
+                     FIN flag set to be queued for transmission.</li>
+                     <li> The QUIC stream has received a RST_STREAM frame. This causes
+                     the read and write buffers to be cleared and the <a>[[\Readable]]</a>
+                     and <a>[[\Writeable]]</a> slots are set to <code>false</code>.</li>
+                     <li> The QUIC stream has received STREAM frame with the FIN flag set.</li>
+                  </ol>
               </td>
             </tr>
             <tr>
@@ -1195,7 +1230,7 @@ interface RTCQuicStream {
                 Alternatively:</p>
                   <ol>
                      <li>A RST_STREAM frame has been sent and a RST_STREAM
-                     frame or a STREAM frame within the FIN flag set has been
+                     frame or a STREAM frame with the FIN flag set has been
                      received, OR</li>
                      <li>A STREAM frame with the FIN flag set has been sent
                      and a RST_STREAM frame has been received, OR</li>

@@ -671,7 +671,11 @@ interface RTCQuicStreamEvent : Event {
   <section id="quicstream*">
     <h2><dfn>RTCQuicStream</dfn> Interface</h2>
     <p>The <code>RTCQuicStream</code> includes information relating
-    to a QUIC stream.</p>
+    to a QUIC stream. The RTCQuicStream provides a target read buffered
+    amount in the case that the application can't process incoming data
+    as fast as it is received. This allows the data to be buffered while
+    the application is busy, while not requiring the application to buffer
+    data indefinitely.</p>
     <section id="rtcquicstream-overview*">
       <h3>Overview</h3>
       <p>An <code><a>RTCQuicStream</a></code> instance is associated to
@@ -1019,7 +1023,7 @@ interface RTCQuicStream {
                 <li>If <var>stream</var>'s <a>[[\Writeable]]</a> slot is
                 <code>false</code>, <a>reject</a> <var>p</var> with a
                 newly created <code>InvalidStateError</code> and abort
-                these steps.</li> 
+                these steps.</li>
                 <li>Let <var>amount</var> be the first argument.</li>
                 <li>Let <var>target</var> be the second argument, if provided.
                 If the second argument is not provided, let <var>target</var>

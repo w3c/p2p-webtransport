@@ -979,7 +979,7 @@ interface RTCQuicStream {
                 <a>resolve</a> <var>p</var> with <code>undefined</code>.</li>
                 <li>If the <var>stream</var> receives a STREAM frame with the
                 FIN bit set and the <a>[[\ReadBufferedAmount]]</a> is not greater or
-                equal to the value of <var>amount</var>, p will be <a>rejected</a>
+                equal to the value of <var>amount</var>, <var>p</var> will be <a>rejected</a>
                 with a newly created <code>OperationError</code>.</li>
               </ol>
               <table class="parameters">

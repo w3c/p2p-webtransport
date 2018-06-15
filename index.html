@@ -951,11 +951,12 @@ interface RTCQuicStream {
             </dd>
            <dt><dfn><code>waitForReadable</code></dfn></dt>
             <dd>
-              <p><code>waitForReadable</code> <a>resolves</a> the promise
-              when the data queued in the read buffer increases above
-              the amount provided as an argument. If <code>waitForReadable</code>
-              is called multiple times, multiple promises could be resolved when
-              the read buffer increases above the amount provided for each promise.
+              <p><code>waitForReadable</code> waits for data to become available, or
+              for the <code><a>RTCQuicStream</a></code> to be finished reading.  It
+              <a>resolves</a> the promise when the data queued in the read buffer
+              increases above the amount provided as an argument or when a STREAM frame
+              with the FIN bit set has been received. If <code>waitForReadable</code>
+              is called multiple times, multiple promises could be resolved.
               The Promise will be <a>rejected</a> with a newly created
               <code>InvalidStateError</code> if the <var>stream</var>'s
               <a>[[\Readable]]</a> slot transitions from true to false and the promise
@@ -974,13 +975,17 @@ interface RTCQuicStream {
                 <var>stream</var>'s <a>[[\TargetReadBufferedAmount]]</a> slot,
                 <a>reject</a> <var>p</var> with a newly created
                 <code>OperationError</code>.</li>
-                <li>When <a>[[\ReadBufferedAmount]]</a> increases from below the
-                value of <var>amount</var> to greater than or equal to it,
-                <a>resolve</a> <var>p</var> with <code>undefined</code>.</li>
-                <li>If the <var>stream</var> receives a STREAM frame with the
-                FIN bit set and the <a>[[\ReadBufferedAmount]]</a> is not greater or
-                equal to the value of <var>amount</var>, <var>p</var> will be <a>rejected</a>
-                with a newly created <code>OperationError</code>.</li>
+                <li><a>Resolve</a> <var>p</var> with <code>undefined</code> when
+                any of the following conditions are met:
+                  <ol>
+                    <li>The <a>[[\ReadBufferedAmount]]</a> increases from
+                    below the value of <var>amount</var> to greater than or equal
+                    to it.</li>
+                    <li>The <var>stream</var> receives a STREAM frame with the
+                    FIN bit set and <a>[[\ReadBufferedAmount]]</a> is less than
+                    <var>amount</var>.</li>
+                  </ol>
+                </li>
               </ol>
               <table class="parameters">
                 <tbody>

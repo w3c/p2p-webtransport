@@ -71,9 +71,9 @@
       "https://www.w3.org/TR/WebIDL-1/#dfn-create-exception">create</a></dfn> are
       defined in [[!WEBIDL-1]].</p>
       <p>The terms <dfn data-lt="fulfill|fulfillment">fulfilled</dfn>, <dfn
-      data-lt="reject|rejection|rejecting">rejected</dfn>,
+      data-lt="reject|rejection|rejecting|rejected">rejected</dfn>,
       <dfn data-lt="resolve|resolves">resolved</dfn>, <dfn>pending</dfn> and
-      <dfn>settled</dfn> used in the context of Promises are defined in
+      <dfn data-lt="settled">settled</dfn> used in the context of Promises are defined in
       [[!ECMASCRIPT-6.0]].</p>
       <p>The <dfn><code>RTCIceTransport</code></dfn> and <dfn><code>RTCCertificate</code></dfn> interfaces
       and the <dfn><code>RTCDtlsFingerprint</code></dfn> dictionary are defined in [[!WEBRTC]].</p>
@@ -950,15 +950,17 @@ interface RTCQuicStream {
             </dd>
            <dt><dfn><code>waitForReadable</code></dfn></dt>
             <dd>
-              <p><code>waitForReadable</code> resolves the promise
-              when the data queued in the read buffer increases above
-              the amount provided as an argument. If <code>waitForReadable</code>
-              is called multiple times, multiple promises could be resolved when
-              the read buffer increases above the amount provided for each promise.
-              Promises won't be rejected, and a promise might never be resolved
-              in the case that the read buffer never increases above the amount
-              specified. When the <code>waitForReadable</code> method is called,
-              the <a>user agent</a> MUST run the following steps:</p>
+              <p><code>waitForReadable</code> waits for data to become available, or
+              for the <code><a>RTCQuicStream</a></code> to be finished reading.  It
+              <a>resolves</a> the promise when the data queued in the read buffer
+              increases above the amount provided as an argument or when a STREAM frame
+              with the FIN bit set has been received. If <code>waitForReadable</code>
+              is called multiple times, multiple promises could be resolved.
+              The Promise will be <a>rejected</a> with a newly created
+              <code>InvalidStateError</code> if the <var>stream</var>'s
+              <a>[[\Readable]]</a> slot transitions from true to false and the promise
+              isn't <a>settled</a>. When the <code>waitForReadable</code> method is
+              called, the <a>user agent</a> MUST run the following steps:</p>
               <ol>
                 <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code>
                 on which <code>waitForReadable</code> is invoked.</li>
@@ -972,9 +974,17 @@ interface RTCQuicStream {
                 <var>stream</var>'s <a>[[\TargetReadBufferedAmount]]</a> slot,
                 <a>reject</a> <var>p</var> with a newly created
                 <code>OperationError</code>.</li>
-                <li>When <a>[[\ReadBufferedAmount]]</a> increases from below the
-                value of <var>amount</var> to greater than or equal to it,
-                <a>resolve</a> <var>p</var> with <code>undefined</code>.</li>
+                <li><a>Resolve</a> <var>p</var> with <code>undefined</code> when
+                any of the following conditions are met:
+                  <ol>
+                    <li>The <a>[[\ReadBufferedAmount]]</a> increases from
+                    below the value of <var>amount</var> to greater than or equal
+                    to it.</li>
+                    <li>The <var>stream</var> receives a STREAM frame with the
+                    FIN bit set and <a>[[\ReadBufferedAmount]]</a> is less than
+                    <var>amount</var>.</li>
+                  </ol>
+                </li>
               </ol>
               <table class="parameters">
                 <tbody>
@@ -1002,15 +1012,15 @@ interface RTCQuicStream {
             </dd>
             <dt><dfn><code>waitForWritable</code></dfn></dt>
             <dd>
-              <p><code>waitForWritable</code> resolves the promise when
+              <p><code>waitForWritable</code> <a>resolves</a> the promise when
               the data queued in the write buffer falls below a threshold
               computed from the arguments to the method. If <code>waitForWritable</code>
               is called multiple times, multiple promises could be resolved when the
-              write buffer falls below the threshold for each promise. Promises won't
-              be rejected, and a promise might never be resolved in the case that the
-              write buffer never falls below the threshold.
-              When the <code>waitForWritable</code> method is called,
-              the <a>user agent</a> MUST run the following steps:</p>
+              write buffer falls below the threshold for each promise. The Promise will
+              be <a>rejected</a> with a newly created <code>InvalidStateError</code> if the
+              <var>stream</var>'s <a>[[\Writeable]]</a> slot transitions from true to false
+              and the promise isn't <a>settled</a>. When the <code>waitForWritable</code> method
+              is called, the <a>user agent</a> MUST run the following steps:</p>
               <ol>
                 <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code>
                 object on which <code>waitForWritable</code> was invoked.</li>
@@ -1018,7 +1028,7 @@ interface RTCQuicStream {
                 <li>If <var>stream</var>'s <a>[[\Writeable]]</a> slot is
                 <code>false</code>, <a>reject</a> <var>p</var> with a
                 newly created <code>InvalidStateError</code> and abort
-                these steps.</li> 
+                these steps.</li>
                 <li>Let <var>amount</var> be the first argument.</li>
                 <li>Let <var>target</var> be the second argument, if provided.
                 If the second argument is not provided, let <var>target</var>

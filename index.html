@@ -435,7 +435,8 @@ interface RTCQuicTransport : RTCStatsProvider {
             <dt><dfn><code>fingerprints</code></dfn> of type <span class=
             "idlMemberType">sequence&lt;<a>RTCDtlsFingerprint</a>&gt;</span></dt>
             <dd>
-              <p>Sequence of fingerprints, one fingerprint for each certificate.</p>
+              <p>Sequence of fingerprints, one fingerprint for each certificate,
+              computed with the digest algorithm used in the certificate signature.</p>
             </dd>
           </dl>
         </section>

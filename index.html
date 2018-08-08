@@ -917,8 +917,7 @@ interface RTCQuicStream {
                 <li>Set <var>stream</var>'s <a>[[\Writeable]]</a> slot to <code>false</code>.</li>
                 <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
                 <code>closing</code>.</li>
-                <li> If the <var>stream</var> has received a STREAM frame with the FIN bit set,
-                run the following steps:
+                <li> If the <var>stream</var> has <a>finished reading</a>, run the following steps:
                   <ol>
                     <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to
                     <code>false</code>.</li>
@@ -955,7 +954,7 @@ interface RTCQuicStream {
                 slots to <code>false</code>.</li>
                 <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
                 <code>closing</code>.</li>
-                <li> If the <var>stream</var> has received a STREAM frame with the FIN bit set,
+                <li> If the <var>stream</var> has <a>finished reading</a>,
                 set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to <code>closed</code>.</li>
                 <li>If the closing procedure has not started yet, start it by sending a RST_STREAM
                 frame.</li>
@@ -1201,18 +1200,18 @@ interface RTCQuicStream {
                 <p>The procedure to close down the QUIC stream has started.
                 This can happen in multiple ways:</p>
                   <ol>
-                     <li>A STREAM frame with the FIN flag set has not yet been
-                     received and the <code>reset</code> method has been called.
+                     <li>The stream has not <a>finished reading</a> and the
+                     <code>reset</code> method has been called.
                      This causes a RST_STREAM frame to be queued for transmission,
                      the read and write buffers to be cleared and the
                      <a>[[\Readable]]</a> and <a>[[\Writeable]]</a> slots are set
                      to <code>false</code>.</li>
-                     <li>A STREAM frame with the FIN flag set has not yet been
-                     received and the <code>finish</code> method has been called.
+                     <li>The stream has not <a>finished reading</a> and the
+                     <code>finish</code> method has been called.
                      This causes a STREAM frame with the FIN flag set to be queued
                      for transmission, the write buffer to be cleared and the
                      <a>[[\Writeable]]</a> slot is set to <code>false</code>.</li>
-                     <li> The QUIC stream has received STREAM frame with the FIN flag set.</li>
+                     <li> The QUIC stream has <a>finished reading</a>.</li>
                   </ol>
               </td>
             </tr>
@@ -1227,7 +1226,7 @@ interface RTCQuicStream {
                      <li>A RST_STREAM frame has been sent and a STREAM frame
                      with the FIN flag set has been received.</li>
                      <li>A STREAM frame with the FIN flag set has been sent
-                     and a STREAM frame with the FIN flag set has been received.
+                     and the stream has <a>finished reading</a>.
                      </li>
                   </ol>
                 <p>On transitioning to the <code>closed</code> state, the

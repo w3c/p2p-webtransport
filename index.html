@@ -111,7 +111,7 @@
       If <code>certificates</code> is non-empty,
       check that the <code>expires</code> attribute of each
       <code><a>RTCCertificate</a></code> object is in the future.
-      If a certificate has expired, <a>throw</a> an <code>InvalidParameter</code>;
+      If a certificate has expired, <a>throw</a> an <code>InvalidAccessError</code>;
       otherwise, store the certificates.</p>
       <p>A newly constructed <code><a>RTCQuicTransport</a></code> <em class="rfc2119"
       title="MUST">MUST</em> listen and respond to incoming QUIC packets before

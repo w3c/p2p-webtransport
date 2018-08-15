@@ -954,7 +954,7 @@ interface RTCQuicStream {
                 slots to <code>false</code>.</li>
                 <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
                 <code>closing</code>.</li>
-                <li>If <var>stream</var> has <a>finished reading</a>,
+                <li>If the <var>stream</var> has received a STREAM frame with the FIN bit set,
                 set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to <code>closed</code>.</li>
                 <li>If the closing procedure has not started yet, start it by sending a RST_STREAM
                 frame.</li>

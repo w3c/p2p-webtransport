@@ -1208,16 +1208,18 @@ interface RTCQuicStream {
                      <a>[[\Readable]]</a> and <a>[[\Writeable]]</a> slots to be set
                      to <code>false</code>.</li>
                      <li><var>stream</var> has not <a>finished reading</a> and the
-                     <code>finish</code> method has been called.
-                     This causes a STREAM frame with the FIN flag set to be queued
-                     for transmission, the write buffer to be cleared and <var>stream</var>'s
+                     <code>finish</code> method has been called. This causes a
+                     STREAM frame with the FIN flag set to be queued for transmission,
+                     the write buffer to be cleared and <var>stream</var>'s
                      <a>[[\Writeable]]</a> slot to be set to <code>false</code>.</li>
-                     <li><var>stream</var> has <a>finished reading</a>.</li>
+                     <li><var>stream</var> has <a>finished reading</a>. This causes
+                     <var>stream</var>'s <a>[[\Readable]]</a> slot to be set to
+                     <code>false</code>.</li>                     
                   </ol>
               </td>
             </tr>
             <tr>
-              <td><dfn><code id=
+              <td><dfn><code id=men
               "idl-def-RTCQuicStreamState.closed">closed</code></dfn></td>
               <td>
                 <p>The <code><a>RTCQuicStream</a></code> <var>stream</var> has been

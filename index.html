@@ -148,7 +148,7 @@ interface RTCQuicTransport : RTCStatsProvider {
     RTCQuicStream         createStream ();
                     attribute EventHandler             onstatechange;
                     attribute EventHandler             onerror;
-                    attribute EventHandler             onstream;
+                    attribute EventHandler             onquicstream;
 };</pre>
         <section>
           <h2>Constructors</h2>
@@ -220,7 +220,7 @@ interface RTCQuicTransport : RTCStatsProvider {
               "SHOULD">SHOULD</em> include QUIC error information in
               <var>error.message</var> (defined in [[!HTML51]] Section 7.1.3.8.2).</p>
             </dd>
-            <dt><dfn><code>onstream</code></dfn> of type <span class=
+            <dt><dfn><code>onquicstream</code></dfn> of type <span class=
             "idlAttrType"><a>EventHandler</a></span></dt>
             <dd>
               <p>This event handler, of event handler event type <code><a>quicstream</a></code>,

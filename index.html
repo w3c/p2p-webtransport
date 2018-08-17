@@ -116,16 +116,12 @@
       <p>A newly constructed <code><a>RTCQuicTransport</a></code> <em class="rfc2119"
       title="MUST">MUST</em> listen and respond to incoming QUIC packets before
       <code>start()</code> is called. However, to complete the negotiation it is
-      necessary to verify the remote fingerprint, which is an attribute of the
-      <code><var>remoteParameters</var></code> argument passed to <code>start()</code>.
-      To verify the remote fingerprint, compute the fingerprint <var>value</var> for
-      the selected remote certificate using the signature digest algorithm, and compare
-      it against <code><var>remoteParameters</var>.fingerprints</code>. If the selected
-      remote certificate <code>RTCDtlsFingerprint.value</code> matches
-      <code><var>remoteParameters</var>.fingerprints[j].value</code> and
-      <code>RTCDtlsFingerprint.algorithm</code> matches
-      <code><var>remoteParameters</var>.fingerprints[j].algorithm</code> for any value of
-      <var>j</var>, the remote fingerprint is verified. After the QUIC handshake exchange
+      necessary to verify the remote fingerprint by computing the fingerprint <var>value</var> for
+      the selected remote certificate using the signature digest algorithms provided
+      in <code><var>remoteParameters</var>.fingerprints</code>. If a calculated fingerprint
+      and algorithm matches a fingerprint and algorithm included in
+      <code><var>remoteParameters</var>.fingerprints[]</code>
+      the remote fingerprint is verified. After the QUIC handshake exchange
       completes (but before the remote fingerprint is verified) incoming media packets
       may be received. A modest buffer <em class="rfc2119" title="MUST">MUST</em> be
       provided to avoid loss of media prior to remote fingerprint validation (which can
@@ -435,9 +431,9 @@ interface RTCQuicTransport : RTCStatsProvider {
             <dt><dfn><code>fingerprints</code></dfn> of type <span class=
             "idlMemberType">sequence&lt;<a>RTCDtlsFingerprint</a>&gt;</span></dt>
             <dd>
-              <p>Sequence of fingerprints, at least one fingerprint for each certificate (
-              with one computed with the digest algorithm used in the certificate signature
-              required).</p>
+              <p>Sequence of fingerprints, at least one fingerprint for each certificate
+              (one of which is computed with the digest algorithm used in the certificate
+              signature).</p>
             </dd>h 
           </dl>
         </section>

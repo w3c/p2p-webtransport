@@ -428,16 +428,17 @@ interface RTCQuicTransport : RTCStatsProvider {
           "dictionary-members">
             <dt><dfn><code>role</code></dfn> of type <span class=
             "idlMemberType"><a>RTCQuicRole</a></span>, defaulting to
-            <code>"auto"</code></dt>
+            <code>"auto"</code></d
             <dd>
               <p>The QUIC role, with a default of <code>auto</code>.</p>
             </dd>
             <dt><dfn><code>fingerprints</code></dfn> of type <span class=
             "idlMemberType">sequence&lt;<a>RTCDtlsFingerprint</a>&gt;</span></dt>
             <dd>
-              <p>Sequence of fingerprints, one fingerprint for each certificate,
-              computed with the digest algorithm used in the certificate signature.</p>
-            </dd>
+              <p>Sequence of fingerprints, at least one fingerprint for each certificate (
+              with one computed with the digest algorithm used in the certificate signature
+              required).</p>
+            </dd>h 
           </dl>
         </section>
       </div>

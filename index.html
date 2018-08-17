@@ -61,7 +61,8 @@
       "http://dev.w3.org/html5/spec/webappapis.html#networking-task-source">networking
       task source</a></dfn> are defined in [[!HTML51]].</p>
       <p>The term <dfn>finished reading</dfn> means that the application has read all
-      available data up to the STREAM frame with the FIN bit set.</p>
+      available data up to the STREAM frame with the FIN bit set, which causes
+      the <a>[[\Readable]]</a> slot to be set to <code>false</code>.</p> 
       <p>The terms <dfn>event</dfn>, <dfn><a href=
       "http://dev.w3.org/html5/spec/webappapis.html#event-handlers">event
       handlers</a></dfn> and <dfn><a href=
@@ -917,14 +918,9 @@ interface RTCQuicStream {
                 <li>Set <var>stream</var>'s <a>[[\Writeable]]</a> slot to <code>false</code>.</li>
                 <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
                 <code>closing</code>.</li>
-                <li>If <var>stream</var> has <a>finished reading</a>, run the following steps:
-                  <ol>
-                    <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to
-                    <code>false</code>.</li>
-                    <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
-                    <code>closed</code>.</li>
-                  </ol>
-                </li>
+                <li>If <var>stream</var> has <a>finished reading</a>, set
+                <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
+                <code>closed</code>.</li>
                 <li>If the closing procedure has not started yet, start it by sending a STREAM
                 frame with the FIN bit set.</li>
               </ol>

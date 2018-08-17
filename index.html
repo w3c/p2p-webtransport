@@ -116,11 +116,11 @@
       <p>A newly constructed <code><a>RTCQuicTransport</a></code> <em class="rfc2119"
       title="MUST">MUST</em> listen and respond to incoming QUIC packets before
       <code>start()</code> is called. However, to complete the negotiation it is
-      necessary to verify the remote fingerprint by computing the fingerprint <var>value</var> for
-      the selected remote certificate using the signature digest algorithms provided
-      in <code><var>remoteParameters</var>.fingerprints</code>. If a calculated fingerprint
-      and algorithm matches a fingerprint and algorithm included in
-      <code><var>remoteParameters</var>.fingerprints[]</code>
+      necessary to verify the remote fingerprint by computing fingerprints for
+      the selected remote certificate using the digest algorithms provided
+      in <code><var>remoteParameters</var>.fingerprints[].algorithm</code>. If a
+      calculated fingerprint and algorithm matches a fingerprint and algorithm
+      included in <code><var>remoteParameters</var>.fingerprints[]</code>,
       the remote fingerprint is verified. After the QUIC handshake exchange
       completes (but before the remote fingerprint is verified) incoming media packets
       may be received. A modest buffer <em class="rfc2119" title="MUST">MUST</em> be

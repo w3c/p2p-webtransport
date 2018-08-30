@@ -126,7 +126,7 @@
       <h3>Interface Definition</h3>
       <div>
         <pre class="idl">
-        [ Constructor (RTCIceTransport transport, sequence&lt;RTCCertificate&gt; certificates), Exposed=Window]
+        [ Constructor (RTCIceTransport transport, optional sequence&lt;RTCCertificate&gt; certificates), Exposed=Window]
 interface RTCQuicTransport : RTCStatsProvider {
     readonly        attribute RTCIceTransport          transport;
     readonly        attribute RTCQuicTransportState    state;
@@ -154,14 +154,19 @@ interface RTCQuicTransport : RTCStatsProvider {
             <code><a>RTCQuicTransport</a></code> whose <a>[[\QuicTransportState]]</a> slot
             is not <code>"closed"</code>, <a>throw</a> an <code>InvalidStateError</code>
             and abort these steps.</li>
-            <li>If the <code>certificates</code> argument is non-empty, check that the
+            <li>If the <code>certificates</code> argument is provided and is non-empty, check that the
             <code>expires</code> attribute of each <code><a>RTCCertificate</a></code> object
             is in the future. If a certificate has expired, <a>throw</a> an <code>InvalidAccessError</code>.</li>
             <li>Let <var>quictransport</var> be a newly constructed <code><a>RTCQuicTransport</a></code> object.</li>
             <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportState]]</dfn> internal slot, initialized to
             <code>"new"</code>.</li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\Certificates]]</dfn> internal slot, initialized to
+            <li>Let <var>quictransport</var> have a <dfn>[[\Certificates]]</dfn> internal slot.</li>
+            <li>If the <code>certificates</code> argument is provided and is non-empty,
+            initialize the <a>[[\Certificates]]</a> internal slot to the
             the <var>certificates</var> argument passed in the constructor.</li>
+            <li>If the <code>certificates</code> argument is not provided or is empty,
+            generate a certificate using the default ciphersuite and store this in the
+            the <a>[[\Certificates]]</a> internal slot.</li>  
             <li>Return <var>quictransport</var>.</li>
           </ol>          
           <dl data-link-for="RTCQuicTransport" data-dfn-for="RTCQuicTransport" class=

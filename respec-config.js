@@ -1,5 +1,5 @@
 var respecConfig = {
-  specStatus: "ED",
+  specStatus: "CG-DRAFT",
   // if there a publicly available Editor's Draft, this is the link
   edDraftURI: "https://w3c.github.io/webrtc-quic/",
   shortName: "webrtc-quic",
@@ -9,8 +9,8 @@ var respecConfig = {
   ],
   authors: [
   ],
-  wg: "Web Real-Time Communications Working Group",
-  wgURI: "https://www.w3.org/2011/04/webrtc/",
+  wg: "Object-RTC API Community Group",
+  wgURI: "https://www.w3.org/community/ortc/",
   wgPublicList: "public-webrtc",
   wgPatentURI:  "https://www.w3.org/2004/01/pp-impl/47318/status",
   issueBase: "https://github.com/w3c/webrtc-quic/issues",

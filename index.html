@@ -382,7 +382,7 @@ interface RTCQuicTransport : RTCStatsProvider {
                   slot initialized to <code>false</code>.</p>
                 </li>
                 <li>
-                  <p>Let <var>stream</var> have a <dfn>[[\Writeable]]</dfn> internal
+                  <p>Let <var>stream</var> have a <dfn>[[\Writable]]</dfn> internal
                   slot initialized to <code>false</code>.</p>
                 </li>
                 <li>
@@ -870,7 +870,7 @@ interface RTCQuicStream {
                <li>Let <var>data</var> be the first argument.</li>
                <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code>
                object on which <var>data</var> is to be sent.</li>
-               <li>If <var>stream</var>'s <a>[[\Writeable]]</a> slot is <code>false</code>,
+               <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is <code>false</code>,
                <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>
                <li>If the length of <var>data</var> added to <a>[[\WriteBufferedAmount]]</a>
                exceeds <a>[[\MaxWriteBufferedAmount]]</a>, <a>throw</a> an
@@ -926,7 +926,7 @@ interface RTCQuicStream {
                 and abort these steps.</li>
                 <li>If <var>stream</var>'s  <a>[[\QuicStreamState]]</a> is <code>closed</code>,
                 then abort these steps.</li>
-                <li>Set <var>stream</var>'s <a>[[\Writeable]]</a> slot to <code>false</code>.</li>
+                <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to <code>false</code>.</li>
                 <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
                 <code>closing</code>.</li>
                 <li>If <var>stream</var> has <a>finished reading</a>, set
@@ -957,7 +957,7 @@ interface RTCQuicStream {
                 and abort these steps.</li>
                 <li>If <var>stream</var>'s  <a>[[\QuicStreamState]]</a> slot is <code>closed</code>,
                 then abort these steps.</li>
-                <li>Set <var>stream</var>'s <a>[[\Writeable]]</a> and <a>[[\Readable]]</a>
+                <li>Set <var>stream</var>'s <a>[[\Writable]]</a> and <a>[[\Readable]]</a>
                 slots to <code>false</code>.</li>
                 <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
                 <code>closing</code>.</li>
@@ -1043,14 +1043,14 @@ interface RTCQuicStream {
               is called multiple times, multiple promises could be resolved when the
               write buffer falls below the threshold for each promise. The Promise will
               be <a>rejected</a> with a newly created <code>InvalidStateError</code> if the
-              <var>stream</var>'s <a>[[\Writeable]]</a> slot transitions from true to false
+              <var>stream</var>'s <a>[[\Writable]]</a> slot transitions from true to false
               and the promise isn't <a>settled</a>. When the <code>waitForWritable</code> method
               is called, the <a>user agent</a> MUST run the following steps:</p>
               <ol>
                 <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code>
                 object on which <code>waitForWritable</code> was invoked.</li>
                 <li>Let <var>p</var> be a new promise.</li>
-                <li>If <var>stream</var>'s <a>[[\Writeable]]</a> slot is
+                <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is
                 <code>false</code>, <a>reject</a> <var>p</var> with a
                 newly created <code>InvalidStateError</code> and abort
                 these steps.</li>
@@ -1185,7 +1185,7 @@ interface RTCQuicStream {
                 <p>The underlying QUIC stream has queued a STREAM frame for
                 transmission, but has not yet received an acknowledgement.
                 On transitioning to the <code>opening</code> state, the
-                <a>[[\Writeable]]</a> slot is set to <code>true</code>.</p>
+                <a>[[\Writable]]</a> slot is set to <code>true</code>.</p>
               </td>
             </tr>
             <tr>
@@ -1196,7 +1196,7 @@ interface RTCQuicStream {
                 as described in [[QUIC-TRANSPORT]] Section 10.2. This is the initial state of an
                 <code><a>RTCQuicStream</a></code> object dispatched as a part of an
                 <code>RTCQuicStreamEvent</code>. On transitioning to the <code>open</code>
-                state, the <a>[[\Readable]]</a> and <a>[[\Writeable]]</a> slots are set to
+                state, the <a>[[\Readable]]</a> and <a>[[\Writable]]</a> slots are set to
                 <code>true</code>.</p>
               </td>
             </tr>
@@ -1212,13 +1212,13 @@ interface RTCQuicStream {
                      <code>reset</code> method has been called. This causes a
                      RST_STREAM frame to be queued for transmission, the read
                      and write buffers to be cleared and <var>stream</var>'s
-                     <a>[[\Readable]]</a> and <a>[[\Writeable]]</a> slots to be set
+                     <a>[[\Readable]]</a> and <a>[[\Writable]]</a> slots to be set
                      to <code>false</code>.</li>
                      <li><var>stream</var> has not <a>finished reading</a> and the
                      <code>finish</code> method has been called. This causes a
                      STREAM frame with the FIN flag set to be queued for transmission,
                      the write buffer to be cleared and <var>stream</var>'s
-                     <a>[[\Writeable]]</a> slot to be set to <code>false</code>.</li>
+                     <a>[[\Writable]]</a> slot to be set to <code>false</code>.</li>
                      <li><var>stream</var> has <a>finished reading</a>. This causes
                      <var>stream</var>'s <a>[[\Readable]]</a> slot to be set to
                      <code>false</code>.</li>                     
@@ -1240,7 +1240,7 @@ interface RTCQuicStream {
                      </li>
                   </ol>
                 <p>On transitioning to the <code>closed</code> state, <var>stream</var>'s
-                <a>[[\Readable]]</a> and <a>[[\Writeable]]</a> slots are set to
+                <a>[[\Readable]]</a> and <a>[[\Writable]]</a> slots are set to
                 <code>false</code>.</p>
               </td>
             </tr>

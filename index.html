@@ -398,6 +398,10 @@ interface RTCQuicTransport : RTCStatsProvider {
                   slot initialized to the maximum read buffer size.</p>
                 </li>
                 <li>
+                  <p>Let <var>stream</var> have a <dfn>[[\TargetWriteBufferedAmount]]</dfn> internal
+                  slot initialized to the maximum write buffer size.</p>
+                </li>
+                <li>
                   <p>Let <var>stream</var> have a <dfn>[[\WriteBufferedAmount]]</dfn> internal
                   slot initialized to zero.</p>
                 </li>
@@ -712,13 +716,15 @@ interface RTCQuicStream {
     readonly        attribute unsigned long       targetReadBufferedAmount;
     readonly        attribute unsigned long       writeBufferedAmount;
     readonly        attribute unsigned long       maxWriteBufferedAmount;
+    readonly        attribute unsigned long       targetWriteBufferedAmount;
     long                  readInto (Uint8Array data);
     void                  write (Uint8Array data);
     void                  finish ();
     void                  reset ();
     Promise&lt;void&gt;   waitForReadable(unsigned long amount);
-    Promise&lt;void&gt;   waitForWritable(unsigned long amount, optional unsigned long targetWriteBufferedAmount);
+    Promise&lt;void&gt;   waitForWritable(unsigned long amount);
     void                  setTargetReadBufferedAmount(unsigned long amount);
+    void                  setTargetWriteBufferedAmount(unsigned long amount);
                     attribute EventHandler        onstatechange;
 };</pre>
         <section>
@@ -777,10 +783,19 @@ interface RTCQuicStream {
             <dd>
               <p>The
               <dfn id="dom-quicstream-targetreadbufferedamount"><code>targetReadBufferedAmount</code></dfn>
-              attribute represents the target number of bytes in the read buffer, which enables control
-              of back-pressure on the sender when the target number of bytes is read. On getting,
+              attribute represents the target number of bytes in the read buffer. Once the target number of
+              bytes is in the read buffer, back-pressure is applied to the sender.  On getting,
               it <em class="rfc2119" title="MUST">MUST</em> return the value of the
               <code><a>RTCQuicStream</a></code>'s <a>[[\TargetReadBufferedAmount]]</a> internal slot.</p>
+            </dd>
+            <dt><code>targetWriteBufferedAmount</code> of type <span class="idlAttrType"><a>unsigned
+            long</a></span>, readonly</dt>
+            <dd>
+              <p>The
+              <dfn id="dom-quicstream-targetwritebufferedamount"><code>targetWriteBufferedAmount</code></dfn>
+              attribute represents the maximum number of bytes that the application allows to be buffered by
+              <code>write</code>. On getting, it <em class="rfc2119" title="MUST">MUST</em> return the value
+              of the <code><a>RTCQuicStream</a></code>'s <a>[[\TargetWriteBufferedAmount]]</a> internal slot.</p>
             </dd>
             <dt><code>writeBufferedAmount</code> of type <span class="idlAttrType"><a>unsigned
             long</a></span>, readonly</dt>
@@ -796,10 +811,7 @@ interface RTCQuicStream {
               by the operating system or network hardware. On getting, it
               <em class="rfc2119" title="MUST">MUST</em> return the value of the
               <code><a>RTCQuicStream</a></code>'s <a>[[\WriteBufferedAmount]]</a> internal slot.
-              If the <code><a>RTCQuicStream</a></code> is in the <code>closed</code>
-              state, this attribute's value will only increase with each call to the
-              <code>write</code> method (the attribute does not reset to zero once the
-              <code><a>RTCQuicStream</a></code> closes).</p>
+              </p>
             </dd>
             <dt><code>maxWriteBufferedAmount</code> of type <span class="idlAttrType"><a>unsigned
             long</a></span>, readonly</dt>
@@ -873,7 +885,7 @@ interface RTCQuicStream {
                <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is <code>false</code>,
                <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>
                <li>If the length of <var>data</var> added to <a>[[\WriteBufferedAmount]]</a>
-               exceeds <a>[[\MaxWriteBufferedAmount]]</a>, <a>throw</a> an
+               exceeds <a>[[\TargetWriteBufferedAmount]]</a>, <a>throw</a> an
                <code>OperationError</code> and abort these steps.</li>
                <li>Increase the value of <var>stream</var>'s
                <a>[[\WriteBufferedAmount]]</a> slot by the length of
@@ -999,6 +1011,8 @@ interface RTCQuicStream {
                 <var>stream</var>'s <a>[[\TargetReadBufferedAmount]]</a> slot,
                 <a>reject</a> <var>p</var> with a newly created
                 <code>OperationError</code>.</li>
+                <li>If <var>amount</var> is less than 0, <a>reject</a> <var>p</var>
+                with a newly created <code>RangeErorr</code>.</li>
                 <li><a>Resolve</a> <var>p</var> with <code>undefined</code> when
                 any of the following conditions are met:
                   <ol>
@@ -1055,14 +1069,13 @@ interface RTCQuicStream {
                 newly created <code>InvalidStateError</code> and abort
                 these steps.</li>
                 <li>Let <var>amount</var> be the first argument.</li>
-                <li>Let <var>target</var> be the second argument, if provided.
-                If the second argument is not provided, let <var>target</var>
-                be the value of <var>stream</var>'s <a>[[\MaxWriteBufferedAmount]]</a>
-                slot.</li>
-                <li>If <var>amount</var> is larger than <var>target</var> then
+                <li>If <var>amount</var> is larger than <a>[[\TargetWriteBufferedAmount]]</a> then
                 <a>reject</a> <var>p</var> with a newly created
                 <code>OperationError</code>.</li>
-                <li>Let <var>threshold</var> be <var>target</var> minus <var>amount</var>.</li>
+                <li>If <var>amount</var> is less than 0, <a>reject</a> <var>p</var>
+                with a newly created <code>RangeError</code>.</li>
+                <li>Let <var>threshold</var> be <a>[[\TargetWriteBufferedAmount]]</a> minus
+                <var>amount</var>.</li>
                 <li>When <var>stream</var>'s <a>[[\WriteBufferedAmount]]</a> slot decreases
                 from above <var>threshold</var> to less than or equal to it,
                 <a>resolve</a> <var>p</var> with <code>undefined</code>.</li>
@@ -1083,15 +1096,6 @@ interface RTCQuicStream {
                     "False">&#10008;</span></td>
                     <td class="prmOptFalse"><span role="img" aria-label=
                     "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                  <tr>
-                    <td class="prmName">targetWriteBufferedAmount</td>
-                    <td class="prmType"><code>unsigned long</code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptTrue"><span role="img" aria-label=
-                    "True">&#10004;</span></td>
                     <td class="prmDesc"></td>
                   </tr>
                 </tbody>
@@ -1115,12 +1119,58 @@ interface RTCQuicStream {
                <li>If <var>amount</var> is greater than the <var>stream</var>'s
                <a>[[\MaxReadBufferedAmount]]</a> slot, <a>throw</a> an
                <code>OperationError</code> and abort these steps.</li>
+               <li>If <var>amount</var> is less than 0, <a>throw</a> a
+               <code>RangeError</code> and abort these steps.</li>
                <li>Set <var>stream</var>'s <a>[[\TargetReadBufferedAmount]]</a> slot to
                <var>amount</var>.</li>
                <li>If <var>amount</var> is less than <var>stream</var>'s
                <a>[[\ReadBufferedAmount]]</a> slot, apply backpressure
                until <a>[[\ReadBufferedAmount]]</a> becomes less than
                or equal to <var>amount</var>.</li>
+              </ol>
+              <table class="parameters">
+                <tbody>
+                  <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Nullable</th>
+                    <th>Optional</th>
+                    <th>Description</th>
+                  </tr>
+                  <tr>
+                    <td class="prmName">amount</td>
+                    <td class="prmType"><code>unsigned long</code></td>
+                    <td class="prmNullFalse"><span role="img" aria-label=
+                    "False">&#10008;</span></td>
+                    <td class="prmOptFalse"><span role="img" aria-label=
+                    "False">&#10008;</span></td>
+                    <td class="prmDesc"></td>
+                  </tr>
+                </tbody>
+              </table>
+              <div>
+                <em>Return type:</em> <code>void</code>
+              </div>
+            </dd>
+            <dt><dfn><code>setTargetWriteBufferedAmount</code></dfn></dt>
+            <dd>
+              <p><code>setTargetWriteBufferedAmount</code> sets the value
+              of the <code><a>RTCQuicStream</a></code>'s <a>[[\TargetWriteBufferedAmount]]</a>
+              internal slot, which represents the maximum number of bytes in the
+              <code><a>RTCQuicStream</a></code>'s write buffer.
+              When the <code>setTargetWriteBufferedAmount</code> method is called,
+              the <a>user agent</a> MUST run the following steps:</p>
+              <ol>
+               <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code>
+               on which <code>setTargetWriteBufferedAmount</code> is invoked.</li>
+               <li>Let <var>amount</var> be the first argument.</li>
+               <li>If <var>amount</var> is greater than the <var>stream</var>'s
+               <a>[[\MaxWriteBufferedAmount]]</a> slot, <a>throw</a> an
+               <code>OperationError</code> and abort these steps.</li>
+               <li>If <var>amount</var> is less than 0, <a>throw</a> a
+               <code>RangeError</code> and abort these steps.</li>
+               <li>Set <var>stream</var>'s <a>[[\TargetWriteBufferedAmount]]</a> slot to
+               <var>amount</var>.</li>
               </ol>
               <table class="parameters">
                 <tbody>

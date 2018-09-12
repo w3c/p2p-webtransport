@@ -404,7 +404,7 @@ interface RTCQuicTransport : RTCStatsProvider {
                   if <var>parameters</var> is non-null, <code>"sendrecv"</code> otherwise.</p>
                </li>
                <li>
-                  <p>If <var>direction</var> is <code>read</code> <a>throw</a> an
+                  <p>If <var>direction</var> is <code>"recv"</code> <a>throw</a> an
                   <code>OperationError</code> and abort these steps.</p>
                <li>
                   <p>Let <var>stream</var> be a newly created

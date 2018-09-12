@@ -401,7 +401,7 @@ interface RTCQuicTransport : RTCStatsProvider {
                </li>
                <li>
                   <p>Let <var>direction</var> be <code><var>parameters</var>.direction</code>
-                  if <var>parameters</var> is non-null, <code>"bidirectional"</code> otherwise.</p>
+                  if <var>parameters</var> is non-null, <code>"sendrecv"</code> otherwise.</p>
                </li>
                <li>
                   <p>If <var>direction</var> is <code>read</code> <a>throw</a> an
@@ -488,7 +488,7 @@ interface RTCQuicTransport : RTCStatsProvider {
       relating to QUIC stream configuration.</p>
       <div>
         <pre class="idl">dictionary RTCQuicStreamParameters {
-             RTCQuicStreamDirection                  direction = "bidirectional";
+             RTCQuicStreamDirection                  direction = "sendrecv";
 };</pre>
         <section>
           <h2>Dictionary <a class="idlType">RTCQuicStreamParameters</a> Members</h2>
@@ -496,9 +496,9 @@ interface RTCQuicTransport : RTCStatsProvider {
           "dictionary-members">
             <dt><dfn><code>direction</code></dfn> of type <span class=
             "idlMemberType"><a>RTCQuicStreamDirection</a></span>, defaulting to
-            <code>"bidirectional"</code></dt>
+            <code>"sendrecv"</code></dt>
             <dd>
-              <p>The QUIC stream direction, with a default of <code>"bidirectional"</code>.</p>
+              <p>The QUIC stream direction, with a default of <code>"sendrecv"</code>.</p>
             </dd>
           </dl>
         </section>
@@ -642,9 +642,9 @@ interface RTCQuicStreamEvent : Event {
       <p><code>RTCQuicStreamDirection</code> indicates the direction of the QUIC stream.</p>
       <div>
         <pre class="idl">enum RTCQuicStreamDirection {
-    "bidirectional",
-    "read",
-    "write"
+    "sendrecv",
+    "recv",
+    "send"
 };</pre>
         <table data-link-for="RTCQuicStreamDirection" data-dfn-for="RTCQuicStreamDirection" class="simple">
           <tbody>
@@ -652,19 +652,19 @@ interface RTCQuicStreamEvent : Event {
               <th colspan="2">Enumeration description</th>
             </tr>
             <tr>
-              <td><dfn><code id="idl-def-RTCQuicStreamDirection.bidirectional">bidirectional</code></dfn></td>
+              <td><dfn><code id="idl-def-RTCQuicStreamDirection.sendrecv">sendrecv</code></dfn></td>
               <td>
                 <p>A bi-directional QUIC stream.</p>
               </td>
             </tr>
             <tr>
-              <td><dfn><code id="idl-def-RTCQuicStreamDirection.read">read</code></dfn></td>
+              <td><dfn><code id="idl-def-RTCQuicStreamDirection.recv">recv</code></dfn></td>
               <td>
                 <p>A receive-only QUIC stream.</p>
               </td>
             </tr>
             <tr>
-              <td><dfn><code id="idl-def-RTCQuicStreamDirection.write">write</code></dfn></td>
+              <td><dfn><code id="idl-def-RTCQuicStreamDirection.send">send</code></dfn></td>
               <td>
                 <p>A send-only QUIC stream.</p>
               </td>
@@ -1324,8 +1324,8 @@ interface RTCQuicStream {
                 transmission, but has not yet received an acknowledgement.
                 On transitioning to the <code>opening</code> state, the
                 <a>[[\Writable]]</a> slot is set to <code>true</code> if
-                the <a>[[\Direction]]</a> slot is set to <code>"write"</code>
-                or <code>"bidirectional"</code>.</p>
+                the <a>[[\Direction]]</a> slot is set to <code>"send"</code>
+                or <code>"sendrecv"</code>.</p>
               </td>
             </tr>
             <tr>
@@ -1339,8 +1339,8 @@ interface RTCQuicStream {
                 state, the <a>[[\Readable]]</a> slot is set to <code>true</code> if
                 the <a>[[\Direction]]</a> slot is set to <code>"read"</code>
                 or <code>"birectional"</code>. The <a>[[\Writable]]</a> slot is set to
-                <code>true</code> if the <a>[[\Direction]]</a> slot is set to <code>"write"</code>
-                or <code>"birectional"</code>.</p>
+                <code>true</code> if the <a>[[\Direction]]</a> slot is set to <code>"send"</code>
+                or <code>"sendrecv"</code>.</p>
               </td>
             </tr>
             <tr>

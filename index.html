@@ -127,7 +127,7 @@
       <h3>Interface Definition</h3>
       <div>
         <pre class="idl">
-        [ Constructor (RTCIceTransport transport, sequence&lt;RTCCertificate&gt; certificates), Exposed=Window]
+        [ Constructor (RTCIceTransport transport, optional sequence&lt;RTCCertificate&gt; certificates), Exposed=Window]
 interface RTCQuicTransport : RTCStatsProvider {
     readonly        attribute RTCIceTransport          transport;
     readonly        attribute RTCQuicTransportState    state;
@@ -148,25 +148,53 @@ interface RTCQuicTransport : RTCStatsProvider {
           the user agent <em class="rfc2119" title="MUST">MUST</em> run the
           following steps:
           <ol>
-            <li>If the <code><a>RTCIceTransport</a></code> <var>transport</var>
-            provided in the first argument is in the <code>closed</code>
+            <li>Let <var>transport</var> be the first argument.</li>
+            <li>If <var>transport</var> is in the <code>"closed"</code>
             state, <a>throw</a> an <code>InvalidStateError</code> and abort
             these steps.</li>
             <li>If <var>transport</var> has been used to construct another
             <code><a>RTCQuicTransport</a></code> whose <a>[[\QuicTransportState]]</a> slot
             is not <code>"closed"</code>, <a>throw</a> an <code>InvalidStateError</code>
             and abort these steps.</li>
-            <li>If the <code>certificates</code> argument is non-empty, check that the
-            <code>expires</code> attribute of each <code><a>RTCCertificate</a></code> object
-            is in the future. If a certificate has expired, <a>throw</a> an <code>InvalidAccessError</code>.</li>
-            <li>Let <var>quictransport</var> be a newly constructed <code><a>RTCQuicTransport</a></code> object.</li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportStreams]]</dfn> internal slot representing a
-            sequence of <code><a>RTCQuicStream</a></code> objects, initialized to empty.</li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportState]]</dfn> internal slot, initialized to
-            <code>"new"</code>.</li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\Certificates]]</dfn> internal slot, initialized to
-            the <var>certificates</var> argument passed in the constructor.</li>
-            <li>Return <var>quictransport</var>.</li>
+            <li>
+              Let <var>certificates</var> be the second argument if provided,
+              <code>null</code> otherwise.
+            </li>
+            <li>
+              If <var>certificates</var> is non-null and is non-empty, check that the
+              <code>expires</code> attribute of each <code><a>RTCCertificate</a></code>
+              object is in the future. If a certificate has expired, <a>throw</a> an
+              <code>InvalidAccessError</code> and abort these steps.
+            </li>
+            <li>
+              Let <var>quictransport</var> be a newly constructed
+              <code><a>RTCQuicTransport</a></code> object.
+            </li>
+            <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportStreams]]</dfn>
+            internal slot representing a sequence of <code><a>RTCQuicStream</a></code>
+            objects, initialized to empty.
+            </li>
+            <li>
+              Let <var>quictransport</var> have a <dfn>[[\QuicTransportState]]</dfn>
+              internal slot, initialized to <code>"new"</code>.
+            </li>
+            <li>
+              Let <var>quictransport</var> have a <dfn>[[\Certificates]]</dfn>
+              internal slot.
+            </li>
+            <li>
+              If <var>certificates</var> is non-null and is non-empty,
+              initialize the <a>[[\Certificates]]</a> internal slot to
+              <var>certificates</var>.
+            </li>
+            <li>
+              If <var>certificates</var> is <code>null</code> or is empty,
+              generate a certificate using the default ciphersuite and store
+              it in the <a>[[\Certificates]]</a> internal slot.
+            </li> 
+            <li>
+              Return <var>quictransport</var>.
+            </li>
           </ol>          
           <dl data-link-for="RTCQuicTransport" data-dfn-for="RTCQuicTransport" class=
           "constructors">
@@ -196,8 +224,8 @@ interface RTCQuicTransport : RTCStatsProvider {
                     <code>sequence</code>&lt;<code><a>RTCCertificate</a></code>&gt;</td>
                     <td class="prmNullFalse"><span role="img" aria-label=
                     "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
+                    <td class="prmOptTrue"><span role="img" aria-label=
+                    "True">&#10004;</span></td>
                     <td class="prmDesc"></td>
                   </tr>
                 </tbody>
@@ -997,9 +1025,7 @@ interface RTCQuicStream {
                 <li>Set <var>stream</var>'s <a>[[\Writable]]</a> and <a>[[\Readable]]</a>
                 slots to <code>false</code>.</li>
                 <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
-                <code>closing</code>.</li>
-                <li>If the <var>stream</var> has received a STREAM frame with the FIN bit set,
-                set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to <code>closed</code>.</li>
+                <code>closed</code>.</li>
                 <li>If the closing procedure has not started yet, start it by sending a RST_STREAM
                 frame.</li>
               </ol>
@@ -1249,12 +1275,6 @@ interface RTCQuicStream {
                 This can happen in multiple ways:</p>
                   <ol>
                      <li><var>stream</var> has not <a>finished reading</a> and the
-                     <code>reset</code> method has been called. This causes a
-                     RST_STREAM frame to be queued for transmission, the read
-                     and write buffers to be cleared and <var>stream</var>'s
-                     <a>[[\Readable]]</a> and <a>[[\Writable]]</a> slots to be set
-                     to <code>false</code>.</li>
-                     <li><var>stream</var> has not <a>finished reading</a> and the
                      <code>finish</code> method has been called. This causes a
                      STREAM frame with the FIN flag set to be queued for transmission,
                      the write buffer to be cleared and <var>stream</var>'s
@@ -1273,8 +1293,7 @@ interface RTCQuicStream {
                 closed or could not be established. This can happen in multiple ways:</p>
                   <ol>
                      <li>A RST_STREAM frame has been received.</li>
-                     <li>A RST_STREAM frame has been sent and a STREAM frame
-                     with the FIN flag set has been received.</li>
+                     <li>The <code>reset</code> method has been called.</li>
                      <li>A STREAM frame with the FIN flag set has been sent
                      and <var>stream</var> has <a>finished reading</a>.
                      </li>

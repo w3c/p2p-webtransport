@@ -161,7 +161,7 @@ interface RTCQuicTransport : RTCStatsProvider {
             is in the future. If a certificate has expired, <a>throw</a> an <code>InvalidAccessError</code>.</li>
             <li>Let <var>quictransport</var> be a newly constructed <code><a>RTCQuicTransport</a></code> object.</li>
             <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportStreams]]</dfn> internal slot representing a
-            list of <code><a>RTCQuicStream</a></code> objects, initialized to empty.</li>
+            sequence of <code><a>RTCQuicStream</a></code> objects, initialized to empty.</li>
             <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportState]]</dfn> internal slot, initialized to
             <code>"new"</code>.</li>
             <li>Let <var>quictransport</var> have a <dfn>[[\Certificates]]</dfn> internal slot, initialized to

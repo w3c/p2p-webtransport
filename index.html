@@ -395,10 +395,6 @@ interface RTCQuicTransport : RTCStatsProvider {
                   slot initialized to the maximum write buffer size.</p>
                 </li>
                 <li>
-                  <p>Let <var>stream</var> have a <dfn>[[\MaxReadBufferedAmount]]</dfn> internal
-                  slot initialized to the maximum read buffer size.</p>
-                </li>
-                <li>
                   <p>Let <var>stream</var> have a <dfn>[[\WriteBufferedAmount]]</dfn> internal
                   slot initialized to zero.</p>
                 </li>
@@ -705,7 +701,6 @@ interface RTCQuicStream {
     readonly        attribute RTCQuicTransport    transport;
     readonly        attribute RTCQuicStreamState  state;
     readonly        attribute unsigned long       readBufferedAmount;
-    readonly        attribute unsigned long       maxReadBufferedAmount;
     readonly        attribute unsigned long       writeBufferedAmount;
     readonly        attribute unsigned long       maxWriteBufferedAmount;
     long                  readInto (Uint8Array data);
@@ -757,15 +752,6 @@ interface RTCQuicStream {
               this attribute's value will only decrease with each call to the
               <code>readInto</code> method (the attribute does not reset to zero once the
               <code><a>RTCQuicStream</a></code> closes).</p>
-            </dd>
-            <dt><code>maxReadBufferedAmount</code> of type <span class="idlAttrType"><a>unsigned
-            long</a></span>, readonly</dt>
-            <dd>
-              <p>The <dfn id="dom-quicstream-maxreadbufferedamount"><code>maxReadBufferedAmount</code></dfn>
-              attribute represents the maximum number of bytes that the implementation allows
-              to be buffered for access by <code>readInto</code>. On getting, it
-              <em class="rfc2119" title="MUST">MUST</em> return the value of the
-              <code><a>RTCQuicStream</a></code>'s <a>[[\MaxReadBufferedAmount]]</a> internal slot.</p>
             </dd>
             <dt><code>writeBufferedAmount</code> of type <span class="idlAttrType"><a>unsigned
             long</a></span>, readonly</dt>

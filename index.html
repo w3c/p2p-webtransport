@@ -146,28 +146,49 @@ interface RTCQuicTransport : RTCStatsProvider {
           When the <code><a>RTCQuicTransport</a></code> constructor is invoked,
           the user agent MUST run the following steps:
           <ol>
-            <li>If the <code><a>RTCIceTransport</a></code> <var>transport</var>
-            provided in the first argument is in the <code>closed</code>
+            <li>Let <var>transport</var> be the first argument.</li>
+            <li>If <var>transport</var> is in the <code>"closed"</code>
             state, <a>throw</a> an <code>InvalidStateError</code> and abort
             these steps.</li>
             <li>If <var>transport</var> has been used to construct another
             <code><a>RTCQuicTransport</a></code> whose <a>[[\QuicTransportState]]</a> slot
             is not <code>"closed"</code>, <a>throw</a> an <code>InvalidStateError</code>
             and abort these steps.</li>
-            <li>If the <code>certificates</code> argument is provided and is non-empty, check that the
-            <code>expires</code> attribute of each <code><a>RTCCertificate</a></code> object
-            is in the future. If a certificate has expired, <a>throw</a> an <code>InvalidAccessError</code>.</li>
-            <li>Let <var>quictransport</var> be a newly constructed <code><a>RTCQuicTransport</a></code> object.</li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportState]]</dfn> internal slot, initialized to
-            <code>"new"</code>.</li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\Certificates]]</dfn> internal slot.</li>
-            <li>If the <code>certificates</code> argument is provided and is non-empty,
-            initialize the <a>[[\Certificates]]</a> internal slot to the
-            the <var>certificates</var> argument passed in the constructor.</li>
-            <li>If the <code>certificates</code> argument is not provided or is empty,
-            generate a certificate using the default ciphersuite and store this in the
-            the <a>[[\Certificates]]</a> internal slot.</li>  
-            <li>Return <var>quictransport</var>.</li>
+            <li>
+              Let <var>certificates</var> be the second argument if provided,
+              <code>null</code> otherwise.
+            </li>
+            <li>
+              If <var>certificates</var> is non-null and is non-empty, check that the
+              <code>expires</code> attribute of each <code><a>RTCCertificate</a></code>
+              object is in the future. If a certificate has expired, <a>throw</a> an
+              <code>InvalidAccessError</code> and abort these steps.
+            </li>
+            <li>
+              Let <var>quictransport</var> be a newly constructed
+              <code><a>RTCQuicTransport</a></code> object.
+            </li>
+            <li>
+              Let <var>quictransport</var> have a <dfn>[[\QuicTransportState]]</dfn>
+              internal slot, initialized to <code>"new"</code>.
+            </li>
+            <li>
+              Let <var>quictransport</var> have a <dfn>[[\Certificates]]</dfn>
+              internal slot.
+            </li>
+            <li>
+              If <var>certificates</var> is non-null and is non-empty,
+              initialize the <a>[[\Certificates]]</a> internal slot to
+              <var>certificates</var>.
+            </li>
+            <li>
+              If <var>certificates</var> is <code>null</code> or is empty,
+              generate a certificate using the default ciphersuite and store
+              it in the <a>[[\Certificates]]</a> internal slot.
+            </li> 
+            <li>
+              Return <var>quictransport</var>.
+            </li>
           </ol>          
           <dl data-link-for="RTCQuicTransport" data-dfn-for="RTCQuicTransport" class=
           "constructors">

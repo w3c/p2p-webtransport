@@ -399,10 +399,6 @@ interface RTCQuicTransport : RTCStatsProvider {
                   slot initialized to the maximum read buffer size.</p>
                 </li>
                 <li>
-                  <p>Let <var>stream</var> have a <dfn>[[\TargetReadBufferedAmount]]</dfn> internal
-                  slot initialized to the maximum read buffer size.</p>
-                </li>
-                <li>
                   <p>Let <var>stream</var> have a <dfn>[[\WriteBufferedAmount]]</dfn> internal
                   slot initialized to zero.</p>
                 </li>
@@ -689,11 +685,7 @@ interface RTCQuicStreamEvent : Event {
   <section id="quicstream*">
     <h2><dfn>RTCQuicStream</dfn> Interface</h2>
     <p>The <code>RTCQuicStream</code> includes information relating
-    to a QUIC stream. The RTCQuicStream provides a target read buffered
-    amount in the case that the application can't process incoming data
-    as fast as it is received. This allows the data to be buffered while
-    the application is busy, while not requiring the application to buffer
-    data indefinitely.</p>
+    to a QUIC stream. </p>
     <section id="rtcquicstream-overview*">
       <h3>Overview</h3>
       <p>An <code><a>RTCQuicStream</a></code> instance is associated to
@@ -714,7 +706,6 @@ interface RTCQuicStream {
     readonly        attribute RTCQuicStreamState  state;
     readonly        attribute unsigned long       readBufferedAmount;
     readonly        attribute unsigned long       maxReadBufferedAmount;
-    readonly        attribute unsigned long       targetReadBufferedAmount;
     readonly        attribute unsigned long       writeBufferedAmount;
     readonly        attribute unsigned long       maxWriteBufferedAmount;
     long                  readInto (Uint8Array data);
@@ -723,7 +714,6 @@ interface RTCQuicStream {
     void                  reset ();
     Promise&lt;void&gt;   waitForReadable(unsigned long amount);
     Promise&lt;void&gt;   waitForWritable(unsigned long amount, optional unsigned long targetWriteBufferedAmount);
-    void                  setTargetReadBufferedAmount(unsigned long amount);
                     attribute EventHandler        onstatechange;
 };</pre>
         <section>
@@ -776,16 +766,6 @@ interface RTCQuicStream {
               to be buffered for access by <code>readInto</code>. On getting, it
               <em class="rfc2119" title="MUST">MUST</em> return the value of the
               <code><a>RTCQuicStream</a></code>'s <a>[[\MaxReadBufferedAmount]]</a> internal slot.</p>
-            </dd>
-            <dt><code>targetReadBufferedAmount</code> of type <span class="idlAttrType"><a>unsigned
-            long</a></span>, readonly</dt>
-            <dd>
-              <p>The
-              <dfn id="dom-quicstream-targetreadbufferedamount"><code>targetReadBufferedAmount</code></dfn>
-              attribute represents the target number of bytes in the read buffer, which enables control
-              of back-pressure on the sender when the target number of bytes is read. On getting,
-              it <em class="rfc2119" title="MUST">MUST</em> return the value of the
-              <code><a>RTCQuicStream</a></code>'s <a>[[\TargetReadBufferedAmount]]</a> internal slot.</p>
             </dd>
             <dt><code>writeBufferedAmount</code> of type <span class="idlAttrType"><a>unsigned
             long</a></span>, readonly</dt>
@@ -1000,10 +980,6 @@ interface RTCQuicStream {
                 newly created <code>InvalidStateError</code> and abort
                 these steps.</li>
                 <li>Let <var>amount</var> be the first argument.</li>
-                <li>If <var>amount</var> is larger than the value of
-                <var>stream</var>'s <a>[[\TargetReadBufferedAmount]]</a> slot,
-                <a>reject</a> <var>p</var> with a newly created
-                <code>OperationError</code>.</li>
                 <li><a>Resolve</a> <var>p</var> with <code>undefined</code> when
                 any of the following conditions are met:
                   <ol>
@@ -1103,52 +1079,6 @@ interface RTCQuicStream {
               </table>
               <div>
                 <em>Return type:</em> <code>Promise&lt;void&gt;</code>
-              </div>
-            </dd>
-            <dt><dfn><code>setTargetReadBufferedAmount</code></dfn></dt>
-            <dd>
-              <p><code>setTargetReadBufferedAmount</code> sets the value
-              of the <code><a>RTCQuicStream</a></code>'s <a>[[\TargetReadBufferedAmount]]</a>
-              internal slot, which represents the target number of bytes in the
-              <code><a>RTCQuicStream</a></code>'s receive buffer.
-              When the <code>setTargetReadBufferedAmount</code> method is called,
-              the <a>user agent</a> MUST run the following steps:</p>
-              <ol>
-               <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code>
-               on which <code>setTargetReadBufferedAmount</code> is invoked.</li>
-               <li>Let <var>amount</var> be the first argument.</li>
-               <li>If <var>amount</var> is greater than the <var>stream</var>'s
-               <a>[[\MaxReadBufferedAmount]]</a> slot, <a>throw</a> an
-               <code>OperationError</code> and abort these steps.</li>
-               <li>Set <var>stream</var>'s <a>[[\TargetReadBufferedAmount]]</a> slot to
-               <var>amount</var>.</li>
-               <li>If <var>amount</var> is less than <var>stream</var>'s
-               <a>[[\ReadBufferedAmount]]</a> slot, apply backpressure
-               until <a>[[\ReadBufferedAmount]]</a> becomes less than
-               or equal to <var>amount</var>.</li>
-              </ol>
-              <table class="parameters">
-                <tbody>
-                  <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Nullable</th>
-                    <th>Optional</th>
-                    <th>Description</th>
-                  </tr>
-                  <tr>
-                    <td class="prmName">amount</td>
-                    <td class="prmType"><code>unsigned long</code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                </tbody>
-              </table>
-              <div>
-                <em>Return type:</em> <code>void</code>
               </div>
             </dd>
         </dl>

@@ -965,9 +965,7 @@ interface RTCQuicStream {
                 <li>Set <var>stream</var>'s <a>[[\Writable]]</a> and <a>[[\Readable]]</a>
                 slots to <code>false</code>.</li>
                 <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
-                <code>closing</code>.</li>
-                <li>If the <var>stream</var> has received a STREAM frame with the FIN bit set,
-                set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to <code>closed</code>.</li>
+                <code>closed</code>.</li>
                 <li>If the closing procedure has not started yet, start it by sending a RST_STREAM
                 frame.</li>
               </ol>
@@ -1214,12 +1212,6 @@ interface RTCQuicStream {
                 This can happen in multiple ways:</p>
                   <ol>
                      <li><var>stream</var> has not <a>finished reading</a> and the
-                     <code>reset</code> method has been called. This causes a
-                     RST_STREAM frame to be queued for transmission, the read
-                     and write buffers to be cleared and <var>stream</var>'s
-                     <a>[[\Readable]]</a> and <a>[[\Writable]]</a> slots to be set
-                     to <code>false</code>.</li>
-                     <li><var>stream</var> has not <a>finished reading</a> and the
                      <code>finish</code> method has been called. This causes a
                      STREAM frame with the FIN flag set to be queued for transmission,
                      the write buffer to be cleared and <var>stream</var>'s
@@ -1238,8 +1230,7 @@ interface RTCQuicStream {
                 closed or could not be established. This can happen in multiple ways:</p>
                   <ol>
                      <li>A RST_STREAM frame has been received.</li>
-                     <li>A RST_STREAM frame has been sent and a STREAM frame
-                     with the FIN flag set has been received.</li>
+                     <li>The <code>reset</code> method has been called.</li>
                      <li>A STREAM frame with the FIN flag set has been sent
                      and <var>stream</var> has <a>finished reading</a>.
                      </li>

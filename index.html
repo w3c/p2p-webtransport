@@ -1061,17 +1061,17 @@ interface RTCQuicStream {
               <ol>
                 <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code> object
                 which is about to be closed.</li>
-                <li>If <var>stream</var>'s  <a>[[\State]]</a> slot is <code>new</code>,
-                set <var>stream</var>'s  <a>[[\State]]</a> slot to <code>closed</code>,
+                <li>If <var>stream</var>'s  <a>[[\State]]</a> slot is <code>"new"</code>,
+                set <var>stream</var>'s  <a>[[\State]]</a> slot to <code>"closed"</code>,
                 and abort these steps.</li>
-                <li>If <var>stream</var>'s  <a>[[\State]]</a> slot is <code>closed</code>,
+                <li>If <var>stream</var>'s  <a>[[\State]]</a> slot is <code>"closed"</code>,
                 then abort these steps.</li>
                 <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to <code>false</code>.</li>
                 <li>Set <var>stream</var>'s <a>[[\State]]</a> slot to
-                <code>closing</code>.</li>
+                <code>"closing"</code>.</li>
                 <li>If <var>stream</var> has <a>finished reading</a>, set
                 <var>stream</var>'s <a>[[\State]]</a> slot to
-                <code>closed</code>.</li>
+                <code>"closed"</code>.</li>
                 <li>If the closing procedure has not started yet, start it by sending a STREAM
                 frame with the FIN bit set.</li>
               </ol>
@@ -1092,15 +1092,15 @@ interface RTCQuicStream {
               <ol>
                 <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code> object
                 which is about to be reset.</li>
-                <li>If <var>stream</var>'s  <a>[[\State]]</a> is <code>new</code>,
-                set <var>stream</var>'s  <a>[[\State]]</a> to <code>closed</code>,
+                <li>If <var>stream</var>'s  <a>[[\State]]</a> is <code>"new"</code>,
+                set <var>stream</var>'s  <a>[[\State]]</a> to <code>"closed"</code>,
                 and abort these steps.</li>
-                <li>If <var>stream</var>'s  <a>[[\State]]</a> slot is <code>closed</code>,
+                <li>If <var>stream</var>'s  <a>[[\State]]</a> slot is <code>"closed"</code>,
                 then abort these steps.</li>
                 <li>Set <var>stream</var>'s <a>[[\Writable]]</a> and <a>[[\Readable]]</a>
                 slots to <code>false</code>.</li>
                 <li>Set <var>stream</var>'s <a>[[\State]]</a> slot to
-                <code>closed</code>.</li>
+                <code>"closed"</code>.</li>
                 <li>If the closing procedure has not started yet, start it by sending a RST_STREAM
                 frame.</li>
               </ol>

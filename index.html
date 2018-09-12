@@ -391,13 +391,9 @@ interface RTCQuicTransport : RTCStatsProvider {
                 then abort these steps.</li>
                 <li>Set <var>transport</var>'s <a>[[\QuicTransportState]]</a> to
                 <code>closed</code>.</li>
-                <li>Run the following steps for each <code><a>RTCQuicStream</a></code> <var>stream</var>
-                in <var>transport</var>'s <a>[[\QuicTransportStreams]]</a> internal slot:</li>
-                <ol>
-                  <li> Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> internal slot to <code>closed</code></li>
-                  <li> Set <var>stream</var>'s <a>[[\Readable]]</a> internal slot to <code>false</code></li>
-                  <li> Set <var>stream</var>'s <a>[[\Writable]]</a> internal slot to <code>false</code></li>
-                </ol>
+                <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to <code>closed</code>
+                for each <code><a>RTCQuicStream</a></code> <var>stream</var> in <var>transport</var>'s
+                <a>[[\QuicTransportStreams]]</a> slot.</li>
                 <li>Start the "Immediate Close" procedure by sending a closing frame.</li>
               </ol>
               <div>
@@ -721,15 +717,11 @@ interface RTCQuicStreamEvent : Event {
                 <p>The QUIC connection has been closed intentionally via a call to
                 <code>stop()</code> or receipt of a closing frame as described in
                 [[QUIC-TRANSPORT]] section 6.13.3. When receiving a closing frame
-                the user agent <em class="rfc2119" title="MUST">MUST</em> run the
-                following steps following steps for each <code><a>RTCQuicStream</a></code>
+                the user agent <em class="rfc2119" title="MUST">MUST</em> set
+                the <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
+                <code>closed</code> for each <code><a>RTCQuicStream</a></code>
                 <var>stream</var> in <var>transport</var>'s <a>[[\QuicTransportStreams]]</a>
-                internal slot:</p>
-                <ol>
-                  <li> Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> internal slot to <code>closed</code></li>
-                  <li> Set <var>stream</var>'s <a>[[\Readable]]</a> internal slot to <code>false</code></li>
-                  <li> Set <var>stream</var>'s <a>[[\Writable]]</a> internal slot to <code>false</code></li>
-                </ol>
+                internal slot.</p>
               </td>
             </tr>
             <tr>
@@ -1022,8 +1014,6 @@ interface RTCQuicStream {
                 and abort these steps.</li>
                 <li>If <var>stream</var>'s  <a>[[\QuicStreamState]]</a> slot is <code>closed</code>,
                 then abort these steps.</li>
-                <li>Set <var>stream</var>'s <a>[[\Writable]]</a> and <a>[[\Readable]]</a>
-                slots to <code>false</code>.</li>
                 <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
                 <code>closed</code>.</li>
                 <li>If the closing procedure has not started yet, start it by sending a RST_STREAM
@@ -1298,9 +1288,17 @@ interface RTCQuicStream {
                      and <var>stream</var> has <a>finished reading</a>.
                      </li>
                   </ol>
-                <p>On transitioning to the <code>closed</code> state, <var>stream</var>'s
-                <a>[[\Readable]]</a> and <a>[[\Writable]]</a> slots are set to
-                <code>false</code>.</p>
+                <p>On transitioning to the <code>closed</code> state, the user agent
+                <em class="rfc2119" title="MUST">MUST</em> run the following steps:</p>
+                  <ol>
+                    <li><a>[[\Readable]]</a> and <a>[[\Writable]]</a> slots are set to
+                    <code>false</code>.</li>
+                    <li>The <var>stream</var>'s read and write buffers are cleared.</li>
+                    <li>Let <var>transport</var> be the <code><a>RTCQuicTransport</a></code>,
+                    which the <var>stream</var> was created from.
+                    <li>Remove the <var>stream</var> from the <var>transport</var>'s
+                    <a>[[\QuicTransportStreams]]</a> internal slot.</li>
+                  </ol>
               </td>
             </tr>
           </tbody>

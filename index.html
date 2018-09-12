@@ -31,7 +31,7 @@
     support for message-based communications (such as <code>RTCDataChannel</code>)
     on top.  While the QUIC transport defined in [[!QUIC-TRANSPORT]] is reliable,
     support for unreliable communications is achievable via use of timers or
-    through extensions to the QUIC protocol.</p>
+    through future extensions to the QUIC protocol.</p>
   </section>
   <section id="conformance">
     <p>This specification defines conformance criteria that apply to a single
@@ -91,23 +91,22 @@
       one or more <code><a>RTCQuicStream</a></code> instances.</p>
       <p class="note">The QUIC API presented in this and the subsequent
       section represents a preliminary proposal based on work-in-progress
-      within the IETF QUIC WG. Since the QUIC protocol specification is still
-      in its early stages, both the protocol and API are likely to
-      change significantly going forward (such as changes to support
-      uni-directional streams).</p>
+      within the IETF QUIC WG. Since the QUIC transport specification is
+      a work-in-progress, both the protocol and API are likely to
+      change significantly going forward.</p>
     </section>
     <section id="rtcquictransport-operation*">
       <h3>Operation</h3>
       <p>The QUIC transport protocol is described in [[!QUIC-TRANSPORT]].
       A <code><a>RTCQuicTransport</a></code> instance is constructed
-      using an <code><a>RTCIceTransport</a></code> and a sequence of
+      using an <code><a>RTCIceTransport</a></code> and an optional sequence of
       <code><a>RTCCertificate</a></code> objects.
-      An <code><a>RTCQuicTransport</a></code> object in the <code>closed</code> or
-      <code>failed</code> states can be garbage-collected when it is no longer
+      An <code><a>RTCQuicTransport</a></code> object in the <code>"closed"</code> or
+      <code>"failed"</code> states can be garbage-collected when it is no longer
       referenced.</p>
       <p>The QUIC negotiation occurs between transport endpoints determined via ICE.
-      Approaches to multiplexing of QUIC with STUN, TURN, DTLS, RTP and RTCP
-      are described in [[QUIC-MULT]].</p>
+      Multiplexing of QUIC with STUN, TURN, DTLS, RTP and RTCP
+      is supported within [[QUIC-TRANSPORT]].</p>
       <p>A newly constructed <code><a>RTCQuicTransport</a></code> <em class="rfc2119"
       title="MUST">MUST</em> listen and respond to incoming QUIC packets before
       <code>start()</code> is called. However, to complete the negotiation it is

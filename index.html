@@ -549,7 +549,6 @@ interface RTCQuicTransport : RTCStatsProvider {
         [ Constructor (DOMString type, RTCQuicStreamEventInit eventInitDict), Exposed=Window]
 interface RTCQuicStreamEvent : Event {
     readonly        attribute RTCQuicStream stream;
-    readonly        attribute RTCQuicStreamParameters parameters;
 };</pre>
         <section>
           <h2>Constructors</h2>
@@ -600,13 +599,6 @@ interface RTCQuicStreamEvent : Event {
               attribute represents the <code><a>RTCQuicStream</a></code> object
               associated with the event.</p>
             </dd>
-            <dt><code>parameters</code> of type <span class=
-            "idlAttrType"><a>RTCQuicStreamParameters</a></span>, readonly</dt>
-            <dd>
-              <p>The <dfn id="dom-quicstreamevent-stream"><code>parameters</code></dfn>
-              attribute represents the <code><a>RTCQuicStreamParameters</a></code> dictionary
-              associated with the event.</p>
-            </dd>
           </dl>
         </section>
       </div>
@@ -615,7 +607,6 @@ interface RTCQuicStreamEvent : Event {
           information on the configuration of the QUIC stream.</p>
         <pre class="idl">dictionary RTCQuicStreamEventInit : EventInit {
              RTCQuicStream stream;
-             RTCQuicStreamParameters parameters;
 };</pre>
         <section>
           <h2>Dictionary RTCQuicStreamEventInit Members</h2>
@@ -625,12 +616,6 @@ interface RTCQuicStreamEvent : Event {
             "idlMemberType"><a>RTCQuicStream</a></span></dt>
             <dd>
               <p>The <code><a>RTCQuicStream</a></code> object associated with the
-              event.</p>
-            </dd>
-            <dt><dfn><code>parameters</code></dfn> of type <span class=
-            "idlMemberType"><a>RTCQuicStreamParameters</a></span></dt>
-            <dd>
-              <p>The <code><a>RTCQuicStreamParameters</a></code> dictionary associated with the
               event.</p>
             </dd>
           </dl>
@@ -660,13 +645,13 @@ interface RTCQuicStreamEvent : Event {
             <tr>
               <td><dfn><code id="idl-def-RTCQuicStreamDirection.recv">recv</code></dfn></td>
               <td>
-                <p>A receive-only QUIC stream.</p>
+                <p>A uni-directional stream created by the remote endpoint.</p>
               </td>
             </tr>
             <tr>
               <td><dfn><code id="idl-def-RTCQuicStreamDirection.send">send</code></dfn></td>
               <td>
-                <p>A send-only QUIC stream.</p>
+                <p>A uni-directional stream created by the local endpoint.</p>
               </td>
             </tr>
           </tbody>

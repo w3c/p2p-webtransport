@@ -697,13 +697,13 @@ interface RTCQuicStream {
     readonly        attribute RTCQuicTransport    transport;
     readonly        attribute RTCQuicStreamState  state;
     readonly        attribute unsigned long       readableAmount;
-    readonly        attribute unsigned long       queuedAmount;
+    readonly        attribute unsigned long       writeBufferedAmount;
     long                  readInto (Uint8Array data);
     void                  write (Uint8Array data);
     void                  finish ();
     void                  reset ();
     Promise&lt;void&gt;   waitForReadable(unsigned long amount);
-    Promise&lt;void&gt;   waitForQueuedBelow(unsigned long threshold);
+    Promise&lt;void&gt;   waitForWriteBufferedAmountBelow(unsigned long threshold);
                     attribute EventHandler        onstatechange;
 };</pre>
         <section>
@@ -748,10 +748,10 @@ interface RTCQuicStream {
               <code>readInto</code> method (the attribute does not reset to zero once the
               <code><a>RTCQuicStream</a></code> closes).</p>
             </dd>
-            <dt><code>queuedAmount</code> of type <span class="idlAttrType"><a>unsigned
+            <dt><code>writeBufferedAmount</code> of type <span class="idlAttrType"><a>unsigned
             long</a></span>, readonly</dt>
             <dd>
-              <p>The <dfn id="dom-quicstream-queuedamount"><code>queuedAmount</code></dfn>
+              <p>The <dfn id="dom-quicstream-queuedamount"><code>writeBufferedAmount</code></dfn>
               attribute represents the number of bytes of application data
               that have been queued using <code>write</code> but that, as of the last
               time the event loop started executing a task, had not yet been transmitted

@@ -391,7 +391,7 @@ interface RTCQuicTransport : RTCStatsProvider {
                   slot initialized to <code>false</code>.</p>
                 </li>
                 <li>
-                  <p>Let <var>stream</var> have a <dfn>[[\QueuedAmount]]</dfn> internal
+                  <p>Let <var>stream</var> have a <dfn>[[\WriteBufferedAmount]]</dfn> internal
                   slot initialized to zero.</p>
                 </li>
                 <li>
@@ -751,7 +751,7 @@ interface RTCQuicStream {
             <dt><code>writeBufferedAmount</code> of type <span class="idlAttrType"><a>unsigned
             long</a></span>, readonly</dt>
             <dd>
-              <p>The <dfn id="dom-quicstream-queuedamount"><code>writeBufferedAmount</code></dfn>
+              <p>The <dfn id="dom-quicstream-writebufferedamount"><code>writeBufferedAmount</code></dfn>
               attribute represents the number of bytes of application data
               that have been queued using <code>write</code> but that, as of the last
               time the event loop started executing a task, had not yet been transmitted
@@ -761,7 +761,7 @@ interface RTCQuicStream {
               include framing overhead incurred by the protocol, or buffering done
               by the operating system or network hardware. On getting, it
               <em class="rfc2119" title="MUST">MUST</em> return the value of the
-              <code><a>RTCQuicStream</a></code>'s <a>[[\QueuedAmount]]</a> internal slot.
+              <code><a>RTCQuicStream</a></code>'s <a>[[\WriteBufferedAmount]]</a> internal slot.
               If the <code><a>RTCQuicStream</a></code> is in the <code>closed</code>
               state, this attribute's value will only increase with each call to the
               <code>write</code> method (the attribute does not reset to zero once the
@@ -830,7 +830,7 @@ interface RTCQuicStream {
                <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is <code>false</code>,
                <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>
                <li>Increase the value of <var>stream</var>'s
-               <a>[[\QeueueAmount]]</a> slot by the length of
+               <a>[[\WriteBufferedAmount]]</a> slot by the length of
                <var>data</var> in bytes.</li>
                <li>Queue <var>data</var> for transmission on <var>stream</var>'s
                underlying data transport.
@@ -985,27 +985,27 @@ interface RTCQuicStream {
                 <em>Return type:</em> <code>Promise&lt;void&gt;</code>
               </div>
             </dd>
-            <dt><dfn><code>waitForQueuedBelow</code></dfn></dt>
+            <dt><dfn><code>waitForWriteBufferedAmountBelow</code></dfn></dt>
             <dd>
-              <p><code>waitForQueuedBelow</code> <a>resolves</a> the promise when
+              <p><code>waitForWriteBufferedAmountBelow</code> <a>resolves</a> the promise when
               the data queued in the write buffer falls below the given threshold.
-              If <code>waitForQueuedBelow</code>
+              If <code>waitForWriteBufferedAmountBelow</code>
               is called multiple times, multiple promises could be resolved when the
               write buffer falls below the threshold for each promise. The Promise will
               be <a>rejected</a> with a newly created <code>InvalidStateError</code> if the
               <var>stream</var>'s <a>[[\Writable]]</a> slot transitions from true to false
-              and the promise isn't <a>settled</a>. When the <code>waitForQueuedBelow</code> method
+              and the promise isn't <a>settled</a>. When the <code>waitForWriteBufferedAmountBelow</code> method
               is called, the <a>user agent</a> MUST run the following steps:</p>
               <ol>
                 <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code>
-                object on which <code>waitForQueuedBelow</code> was invoked.</li>
+                object on which <code>waitForWriteBufferedAmountBelow</code> was invoked.</li>
                 <li>Let <var>p</var> be a new promise.</li>
                 <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is
                 <code>false</code>, <a>reject</a> <var>p</var> with a
                 newly created <code>InvalidStateError</code> and abort
                 these steps.</li>
                 <li>Let <var>threshold</var> be the first argument.</li>
-                <li>When <var>stream</var>'s <a>[[\QueuedAmount]]</a> slot decreases
+                <li>When <var>stream</var>'s <a>[[\WriteBufferedAmount]]]</a> slot decreases
                 from above <var>threshold</var> to less than or equal to it,
                 <a>resolve</a> <var>p</var> with <code>undefined</code>.</li>
               </ol>

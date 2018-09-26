@@ -1320,10 +1320,10 @@ interface RTCQuicStream {
                 STREAM_BLOCKED frame, or has sent a STREAM frame and received an acknowledgement,
                 as described in [[QUIC-TRANSPORT]] Section 10.2. This is the initial state of an
                 <code><a>RTCQuicStream</a></code> object dispatched as a part of an
-                <code>RTCQuicStreamEvent</code>. On transitioning to the <code>open</code>
+                <code>RTCQuicStreamEvent</code>. On transitioning to the <code>"open"</code>
                 state, the <a>[[\Readable]]</a> slot is set to <code>true</code> if
                 the <a>[[\Direction]]</a> slot is set to <code>"read"</code>
-                or <code>"birectional"</code>. The <a>[[\Writable]]</a> slot is set to
+                or <code>"sendrecv"</code>. The <a>[[\Writable]]</a> slot is set to
                 <code>true</code> if the <a>[[\Direction]]</a> slot is set to <code>"send"</code>
                 or <code>"sendrecv"</code>.</p>
               </td>

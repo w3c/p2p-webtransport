@@ -386,11 +386,11 @@ interface RTCQuicTransport : RTCStatsProvider {
               <ol>
                 <li>Let <var>transport</var> be the <code><a>RTCQuicTransport</a></code>
                 on which <code>stop</code> is invoked.</li>
-                <li>If <var>transport</var>'s <a>[[\QuicTransportState]]</a> is <code>closed</code>
+                <li>If <var>transport</var>'s <a>[[\QuicTransportState]]</a> is <code>"closed"</code>
                 then abort these steps.</li>
                 <li>Set <var>transport</var>'s <a>[[\QuicTransportState]]</a> to
-                <code>closed</code>.</li>
-                <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to <code>closed</code>
+                <code>"closed"</code>.</li>
+                <li>Set <var>stream</var>'s <a>[[\State]]</a> slot to <code>"closed"</code>
                 for each <code><a>RTCQuicStream</a></code> <var>stream</var> in <var>transport</var>'s
                 <a>[[\QuicTransportStreams]]</a> slot.</li>
                 <li>Start the "Immediate Close" procedure by sending a closing frame.</li>
@@ -798,8 +798,8 @@ interface RTCQuicStreamEvent : Event {
                 <code>stop()</code> or receipt of a closing frame as described in
                 [[QUIC-TRANSPORT]] section 6.13.3. When receiving a closing frame
                 the user agent <em class="rfc2119" title="MUST">MUST</em> set
-                the <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
-                <code>closed</code> for each <code><a>RTCQuicStream</a></code>
+                the <var>stream</var>'s <a>[[\State]]</a> slot to
+                <code>"closed"</code> for each <code><a>RTCQuicStream</a></code>
                 <var>stream</var> in <var>transport</var>'s <a>[[\QuicTransportStreams]]</a>
                 internal slot.</p>
               </td>

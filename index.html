@@ -31,7 +31,7 @@
     support for message-based communications (such as <code>RTCDataChannel</code>)
     on top.  While the QUIC transport defined in [[!QUIC-TRANSPORT]] is reliable,
     support for unreliable communications is achievable via use of timers or
-    through extensions to the QUIC protocol.</p>
+    through future extensions to the QUIC protocol.</p>
   </section>
   <section id="conformance">
     <p>This specification defines conformance criteria that apply to a single
@@ -42,9 +42,10 @@
     particular, the algorithms defined in this specification are intended to be
     easy to follow, and not intended to be performant.)</p>
     <p>Implementations that use ECMAScript to implement the APIs defined in
-    this specification MUST implement them in a manner consistent with the
-    ECMAScript Bindings defined in the Web IDL specification [[!WEBIDL-1]], as
-    this specification uses that specification and terminology.</p>
+    this specification <em class="rfc2119" title="MUST">MUST</em> implement them
+    in a manner consistent with the ECMAScript Bindings defined in the Web IDL
+    specification [[!WEBIDL-1]], as this specification uses that specification
+    and terminology.</p>
   </section>
   <section>
     <h2>Terminology</h2>
@@ -91,23 +92,22 @@
       one or more <code><a>RTCQuicStream</a></code> instances.</p>
       <p class="note">The QUIC API presented in this and the subsequent
       section represents a preliminary proposal based on work-in-progress
-      within the IETF QUIC WG. Since the QUIC protocol specification is still
-      in its early stages, both the protocol and API are likely to
-      change significantly going forward (such as changes to support
-      uni-directional streams).</p>
+      within the IETF QUIC WG. Since the QUIC transport specification is
+      a work-in-progress, both the protocol and API are likely to
+      change significantly going forward.</p>
     </section>
     <section id="rtcquictransport-operation*">
       <h3>Operation</h3>
       <p>The QUIC transport protocol is described in [[!QUIC-TRANSPORT]].
       A <code><a>RTCQuicTransport</a></code> instance is constructed
-      using an <code><a>RTCIceTransport</a></code> and a sequence of
+      using an <code><a>RTCIceTransport</a></code> and an optional sequence of
       <code><a>RTCCertificate</a></code> objects.
-      An <code><a>RTCQuicTransport</a></code> object in the <code>closed</code> or
-      <code>failed</code> states can be garbage-collected when it is no longer
+      An <code><a>RTCQuicTransport</a></code> object in the <code>"closed"</code> or
+      <code>"failed"</code> states can be garbage-collected when it is no longer
       referenced.</p>
       <p>The QUIC negotiation occurs between transport endpoints determined via ICE.
-      Approaches to multiplexing of QUIC with STUN, TURN, DTLS, RTP and RTCP
-      are described in [[QUIC-MULT]].</p>
+      Multiplexing of QUIC with STUN, TURN, DTLS, RTP and RTCP
+      is supported within [[QUIC-TRANSPORT]].</p>
       <p>A newly constructed <code><a>RTCQuicTransport</a></code> <em class="rfc2119"
       title="MUST">MUST</em> listen and respond to incoming QUIC packets before
       <code>start()</code> is called. However, to complete the negotiation it is
@@ -144,30 +144,56 @@ interface RTCQuicTransport : RTCStatsProvider {
         <section>
           <h2>Constructors</h2>
           When the <code><a>RTCQuicTransport</a></code> constructor is invoked,
-          the user agent MUST run the following steps:
+          the user agent <em class="rfc2119" title="MUST">MUST</em> run the
+          following steps:
           <ol>
-            <li>If the <code><a>RTCIceTransport</a></code> <var>transport</var>
-            provided in the first argument is in the <code>closed</code>
+            <li>Let <var>transport</var> be the first argument.</li>
+            <li>If <var>transport</var> is in the <code>"closed"</code>
             state, <a>throw</a> an <code>InvalidStateError</code> and abort
             these steps.</li>
             <li>If <var>transport</var> has been used to construct another
             <code><a>RTCQuicTransport</a></code> whose <a>[[\QuicTransportState]]</a> slot
             is not <code>"closed"</code>, <a>throw</a> an <code>InvalidStateError</code>
             and abort these steps.</li>
-            <li>If the <code>certificates</code> argument is provided and is non-empty, check that the
-            <code>expires</code> attribute of each <code><a>RTCCertificate</a></code> object
-            is in the future. If a certificate has expired, <a>throw</a> an <code>InvalidAccessError</code>.</li>
-            <li>Let <var>quictransport</var> be a newly constructed <code><a>RTCQuicTransport</a></code> object.</li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportState]]</dfn> internal slot, initialized to
-            <code>"new"</code>.</li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\Certificates]]</dfn> internal slot.</li>
-            <li>If the <code>certificates</code> argument is provided and is non-empty,
-            initialize the <a>[[\Certificates]]</a> internal slot to the
-            the <var>certificates</var> argument passed in the constructor.</li>
-            <li>If the <code>certificates</code> argument is not provided or is empty,
-            generate a certificate using the default ciphersuite and store this in the
-            the <a>[[\Certificates]]</a> internal slot.</li>  
-            <li>Return <var>quictransport</var>.</li>
+            <li>
+              Let <var>certificates</var> be the second argument if provided,
+              <code>null</code> otherwise.
+            </li>
+            <li>
+              If <var>certificates</var> is non-null and is non-empty, check that the
+              <code>expires</code> attribute of each <code><a>RTCCertificate</a></code>
+              object is in the future. If a certificate has expired, <a>throw</a> an
+              <code>InvalidAccessError</code> and abort these steps.
+            </li>
+            <li>
+              Let <var>quictransport</var> be a newly constructed
+              <code><a>RTCQuicTransport</a></code> object.
+            </li>
+            <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportStreams]]</dfn>
+            internal slot representing a sequence of <code><a>RTCQuicStream</a></code>
+            objects, initialized to empty.
+            </li>
+            <li>
+              Let <var>quictransport</var> have a <dfn>[[\QuicTransportState]]</dfn>
+              internal slot, initialized to <code>"new"</code>.
+            </li>
+            <li>
+              Let <var>quictransport</var> have a <dfn>[[\Certificates]]</dfn>
+              internal slot.
+            </li>
+            <li>
+              If <var>certificates</var> is non-null and is non-empty,
+              initialize the <a>[[\Certificates]]</a> internal slot to
+              <var>certificates</var>.
+            </li>
+            <li>
+              If <var>certificates</var> is <code>null</code> or is empty,
+              generate a certificate using the default key generation algorithm
+              and store it in the <a>[[\Certificates]]</a> internal slot.
+            </li> 
+            <li>
+              Return <var>quictransport</var>.
+            </li>
           </ol>          
           <dl data-link-for="RTCQuicTransport" data-dfn-for="RTCQuicTransport" class=
           "constructors">
@@ -197,8 +223,8 @@ interface RTCQuicTransport : RTCStatsProvider {
                     <code>sequence</code>&lt;<code><a>RTCCertificate</a></code>&gt;</td>
                     <td class="prmNullFalse"><span role="img" aria-label=
                     "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
+                    <td class="prmOptTrue"><span role="img" aria-label=
+                    "True">&#10004;</span></td>
                     <td class="prmDesc"></td>
                   </tr>
                 </tbody>
@@ -218,8 +244,9 @@ interface RTCQuicTransport : RTCStatsProvider {
             <dt><dfn><code>state</code></dfn> of type <span class=
             "idlAttrType"><a>RTCQuicTransportState</a></span>, readonly</dt>
             <dd>
-              <p>The current state of the QUIC transport. On getting, it MUST return
-              the value of the <a>[[\QuicTransportState]]</a> internal slot.</p>
+              <p>The current state of the QUIC transport. On getting, it
+              <em class="rfc2119" title="MUST">MUST</em> return the value
+              of the <a>[[\QuicTransportState]]</a> internal slot.</p>
             </dd>
             <dt><dfn><code>onstatechange</code></dfn> of type <span class=
             "idlAttrType"><a>EventHandler</a></span></dt>
@@ -242,7 +269,8 @@ interface RTCQuicTransport : RTCStatsProvider {
             <dd>
               <p>This event handler, of event handler event type <code><a>quicstream</a></code>,
               <em class="rfc2119" title="MUST">MUST</em> be fired on when a remote
-              <code><a>RTCQuicStream</a></code> is created.</p>
+              <code><a>RTCQuicStream</a></code> is created.
+              </p>
             </dd>
           </dl>
         </section>
@@ -352,8 +380,21 @@ interface RTCQuicTransport : RTCStatsProvider {
             <dt><dfn><code>stop</code></dfn></dt>
             <dd>
               <p>Stops and closes the <code><a>RTCQuicTransport</a></code> object.
-              Calling <code>stop()</code> when <code>state</code> is <code>closed</code>
-              has no effect.</p>
+              This triggers an "Immediate Close," as described in [[QUIC-TRANSPORT]] section 6.13.3.
+              <p>When <code>stop</code> is called, the user agent <em class="rfc2119" title="MUST">MUST</em>
+              run the following steps:</p>
+              <ol>
+                <li>Let <var>transport</var> be the <code><a>RTCQuicTransport</a></code>
+                on which <code>stop</code> is invoked.</li>
+                <li>If <var>transport</var>'s <a>[[\QuicTransportState]]</a> is <code>closed</code>
+                then abort these steps.</li>
+                <li>Set <var>transport</var>'s <a>[[\QuicTransportState]]</a> to
+                <code>closed</code>.</li>
+                <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to <code>closed</code>
+                for each <code><a>RTCQuicStream</a></code> <var>stream</var> in <var>transport</var>'s
+                <a>[[\QuicTransportStreams]]</a> slot.</li>
+                <li>Start the "Immediate Close" procedure by sending a closing frame.</li>
+              </ol>
               <div>
                 <em>No parameters.</em>
               </div>
@@ -367,8 +408,9 @@ interface RTCQuicTransport : RTCStatsProvider {
               Since [[QUIC-TRANSPORT]] only defines reliable QUIC streams,
               <code>createStream</code> only supports creation of reliable
               streams.</p>
-              <p>When <code>createStream</code> is called, the user agent MUST run the
-              following steps:</p>
+              <p>When <code>createStream</code> is called, the user agent
+              <em class="rfc2119" title="MUST">MUST</em> run the following
+              steps:</p>
               <ol>
                 <li>Let <var>transport</var> be the <code><a>RTCQuicTransport</a></code>
                 on which <code>createStream</code> is invoked.</li>
@@ -397,6 +439,10 @@ interface RTCQuicTransport : RTCStatsProvider {
                 <li>
                   <p>Let <var>stream</var> have a <dfn>[[\ReadableAmount]]</dfn> internal
                   slot initialized to zero.</p>
+                </li>
+                <li>
+                  <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\QuicTransportStreams]]</a>
+                  internal slot. </p>
                 </li>
                 <li>
                   <p>Return <var>stream</var> and continue the following steps
@@ -457,7 +503,8 @@ interface RTCQuicTransport : RTCStatsProvider {
       name <var>e</var>, which does not bubble (except where otherwise stated) and is not
       cancelable (except where otherwise stated), and which uses the
       <code><a>RTCQuicStreamEvent</a></code> interface with the <code>stream</code>
-      attribute set to <var>stream</var>, MUST be created and dispatched at the given target.</p>
+      attribute set to <var>stream</var>, <em class="rfc2119" title="MUST">MUST</em>
+      be created and dispatched at the given target.</p>
       <div>
         <pre class="idl">
         [ Constructor (DOMString type, RTCQuicStreamEventInit eventInitDict), Exposed=Window]
@@ -655,9 +702,13 @@ interface RTCQuicStreamEvent : Event {
               "idl-def-RTCQuicTransportState.closed">closed</code></dfn></td>
               <td>
                 <p>The QUIC connection has been closed intentionally via a call to
-                <code>stop()</code> or receipt of a close_notify alert. Calling
-                <code>transport.stop()</code> will also result in a transition to the
-                <code>closed</code> state.</p>
+                <code>stop()</code> or receipt of a closing frame as described in
+                [[QUIC-TRANSPORT]] section 6.13.3. When receiving a closing frame
+                the user agent <em class="rfc2119" title="MUST">MUST</em> set
+                the <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
+                <code>closed</code> for each <code><a>RTCQuicStream</a></code>
+                <var>stream</var> in <var>transport</var>'s <a>[[\QuicTransportStreams]]</a>
+                internal slot.</p>
               </td>
             </tr>
             <tr>
@@ -822,7 +873,7 @@ interface RTCQuicStream {
             <dt><dfn><code>write</code></dfn></dt>
             <dd>
               <p>When the <code>write</code> method is called, the <a>user agent</a>
-              MUST run the following steps:</p>
+              <em class="rfc2119" title="MUST">MUST</em> run the following steps:</p>
               <ol>
                <li>Let <var>data</var> be the first argument.</li>
                <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code>
@@ -911,12 +962,8 @@ interface RTCQuicStream {
                 and abort these steps.</li>
                 <li>If <var>stream</var>'s  <a>[[\QuicStreamState]]</a> slot is <code>closed</code>,
                 then abort these steps.</li>
-                <li>Set <var>stream</var>'s <a>[[\Writable]]</a> and <a>[[\Readable]]</a>
-                slots to <code>false</code>.</li>
                 <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
-                <code>closing</code>.</li>
-                <li>If the <var>stream</var> has received a STREAM frame with the FIN bit set,
-                set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to <code>closed</code>.</li>
+                <code>closed</code>.</li>
                 <li>If the closing procedure has not started yet, start it by sending a RST_STREAM
                 frame.</li>
               </ol>
@@ -939,7 +986,8 @@ interface RTCQuicStream {
               <code>InvalidStateError</code> if the <var>stream</var>'s
               <a>[[\Readable]]</a> slot transitions from true to false and the promise
               isn't <a>settled</a>. When the <code>waitForReadable</code> method is
-              called, the <a>user agent</a> MUST run the following steps:</p>
+              called, the <a>user agent</a> <em class="rfc2119" title="MUST">MUST</em>
+              run the following steps:</p>
               <ol>
                 <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code>
                 on which <code>waitForReadable</code> is invoked.</li>
@@ -995,7 +1043,8 @@ interface RTCQuicStream {
               be <a>rejected</a> with a newly created <code>InvalidStateError</code> if the
               <var>stream</var>'s <a>[[\Writable]]</a> slot transitions from true to false
               and the promise isn't <a>settled</a>. When the <code>waitForWriteBufferedAmountBelow</code> method
-              is called, the <a>user agent</a> MUST run the following steps:</p>
+              is called, the <a>user agent</a> <em class="rfc2119" title="MUST">MUST</em> run
+              the following steps:</p>
               <ol>
                 <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code>
                 object on which <code>waitForWriteBufferedAmountBelow</code> was invoked.</li>
@@ -1096,12 +1145,6 @@ interface RTCQuicStream {
                 This can happen in multiple ways:</p>
                   <ol>
                      <li><var>stream</var> has not <a>finished reading</a> and the
-                     <code>reset</code> method has been called. This causes a
-                     RST_STREAM frame to be queued for transmission, the read
-                     and write buffers to be cleared and <var>stream</var>'s
-                     <a>[[\Readable]]</a> and <a>[[\Writable]]</a> slots to be set
-                     to <code>false</code>.</li>
-                     <li><var>stream</var> has not <a>finished reading</a> and the
                      <code>finish</code> method has been called. This causes a
                      STREAM frame with the FIN flag set to be queued for transmission,
                      the write buffer to be cleared and <var>stream</var>'s
@@ -1120,15 +1163,22 @@ interface RTCQuicStream {
                 closed or could not be established. This can happen in multiple ways:</p>
                   <ol>
                      <li>A RST_STREAM frame has been received.</li>
-                     <li>A RST_STREAM frame has been sent and a STREAM frame
-                     with the FIN flag set has been received.</li>
+                     <li>The <code>reset</code> method has been called.</li>
                      <li>A STREAM frame with the FIN flag set has been sent
                      and <var>stream</var> has <a>finished reading</a>.
                      </li>
                   </ol>
-                <p>On transitioning to the <code>closed</code> state, <var>stream</var>'s
-                <a>[[\Readable]]</a> and <a>[[\Writable]]</a> slots are set to
-                <code>false</code>.</p>
+                <p>On transitioning to the <code>closed</code> state, the user agent
+                <em class="rfc2119" title="MUST">MUST</em> run the following steps:</p>
+                  <ol>
+                    <li><a>[[\Readable]]</a> and <a>[[\Writable]]</a> slots are set to
+                    <code>false</code>.</li>
+                    <li>The <var>stream</var>'s read and write buffers are cleared.</li>
+                    <li>Let <var>transport</var> be the <code><a>RTCQuicTransport</a></code>,
+                    which the <var>stream</var> was created from.
+                    <li>Remove the <var>stream</var> from the <var>transport</var>'s
+                    <a>[[\QuicTransportStreams]]</a> internal slot.</li>
+                  </ol>
               </td>
             </tr>
           </tbody>
@@ -1228,7 +1278,10 @@ interface RTCQuicStream {
           <td><dfn><code>quicstream</code></dfn></td>
           <td><code><a>RTCQuicStreamEvent</a></code></td>
           <td>A new <code><a>RTCQuicStream</a></code> is dispatched to the script in
-          response to the remote peer creating a QUIC stream.</td>
+          response to the remote peer creating a QUIC stream. Prior to
+          <code><a>quicstream</a></code> firing, the <code><a>RTCQuicStream</a></code>
+          is added to <code><a>RTCQuicTransport</a></code>'s <a>[[\QuicTransportStreams]]</a>
+          internal slot.</td>
         </tr>
       </tbody>
     </table>

@@ -539,12 +539,6 @@ interface RTCQuicTransport : RTCStatsProvider {
       <h3><dfn>RTCQuicStreamEvent</dfn></h3>
       <p>The <code><a>quicstream</a></code> event uses the
       <code><a>RTCQuicStreamEvent</a></code> interface.</p>
-      <p>Firing a <code><a>quicstream</a></code> event named <var>e</var> with a
-      <code><a>RTCQuicStream</a></code> <var>stream</var> means that an event with the
-      name <var>e</var>, which does not bubble (except where otherwise stated) and is not
-      cancelable (except where otherwise stated), and which uses the
-      <code><a>RTCQuicStreamEvent</a></code> interface with the <code>stream</code>
-      attribute set to <var>stream</var>, MUST be created and dispatched at the given target.</p>
       <div>
         <pre class="idl">
         [ Constructor (DOMString type, RTCQuicStreamEventInit eventInitDict), Exposed=Window]
@@ -598,7 +592,10 @@ interface RTCQuicStreamEvent : Event {
             <dd>
               <p>The <dfn id="dom-quicstreamevent-stream"><code>stream</code></dfn>
               attribute represents the <code><a>RTCQuicStream</a></code> object
-              associated with the event.</p>
+              associated with the event. The <code><a>RTCQuicStream</a></code> object's
+              <a>[[\Direction]]</a> internal slot is set to the value <code>"recv"</code>
+              if the remote peer created a <code>"send"</code> stream, otherwise it
+              is set to <code>"sendrecv"</code>.</p>
             </dd>
           </dl>
         </section>
@@ -617,7 +614,10 @@ interface RTCQuicStreamEvent : Event {
             "idlMemberType"><a>RTCQuicStream</a></span></dt>
             <dd>
               <p>The <code><a>RTCQuicStream</a></code> object associated with the
-              event.</p>
+              event. The <code><a>RTCQuicStream</a></code> object's
+              <a>[[\Direction]]</a> internal slot is set to the value <code>"recv"</code>
+              if the remote peer created a <code>"send"</code> stream, otherwise it
+              is set to <code>"sendrecv"</code>.</p>
             </dd>
           </dl>
         </section>

@@ -400,8 +400,9 @@ interface RTCQuicTransport : RTCStatsProvider {
                   <code>null</code> otherwise.</p>
                </li>
                <li>
-                  <p>Let <var>direction</var> be <code><var>parameters</var>.direction</code>
-                  if <var>parameters</var> is non-null, <code>"sendrecv"</code> otherwise.</p>
+                  <p>if <var>parameters</var> is non-null, let <var>direction</var>
+                  be <var>parameters</var>'s <code>direction</code>
+                  member, <code>"sendrecv"</code> otherwise.</p>
                </li>
                <li>
                   <p>If <var>direction</var> is <code>"recv"</code> <a>throw</a> an

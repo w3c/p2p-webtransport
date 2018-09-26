@@ -433,10 +433,6 @@ interface RTCQuicTransport : RTCStatsProvider {
                   slot initialized to <code>false</code>.</p>
                 </li>
                 <li>
-                  <p>Let <var>stream</var> have a <dfn>[[\MaxWriteBufferedAmount]]</dfn> internal
-                  slot initialized to the maximum write buffer size.</p>
-                </li>
-                <li>
                   <p>Let <var>stream</var> have a <dfn>[[\WriteBufferedAmount]]</dfn> internal
                   slot initialized to zero.</p>
                 </li>
@@ -753,13 +749,12 @@ interface RTCQuicStream {
     readonly        attribute RTCQuicStreamState  state;
     readonly        attribute unsigned long       readableAmount;
     readonly        attribute unsigned long       writeBufferedAmount;
-    readonly        attribute unsigned long       maxWriteBufferedAmount;
     long                  readInto (Uint8Array data);
     void                  write (Uint8Array data);
     void                  finish ();
     void                  reset ();
     Promise&lt;void&gt;   waitForReadable(unsigned long amount);
-    Promise&lt;void&gt;   waitForWritable(unsigned long amount, optional unsigned long targetWriteBufferedAmount);
+    Promise&lt;void&gt;   waitForWriteBufferedAmountBelow(unsigned long threshold);
                     attribute EventHandler        onstatechange;
 };</pre>
         <section>
@@ -823,15 +818,6 @@ interface RTCQuicStream {
               <code>write</code> method (the attribute does not reset to zero once the
               <code><a>RTCQuicStream</a></code> closes).</p>
             </dd>
-            <dt><code>maxWriteBufferedAmount</code> of type <span class="idlAttrType"><a>unsigned
-            long</a></span>, readonly</dt>
-            <dd>
-              <p>The <dfn id="dom-quicstream-maxwritebufferedamount"><code>maxWriteBufferedAmount</code></dfn>
-              attribute represents the maximum number of bytes that the implementation allows
-              to be buffered by <code>write</code>. On getting, it <em class="rfc2119" title="MUST">MUST</em>
-              return the value of the <code><a>RTCQuicStream</a></code>'s
-              <a>[[\MaxWriteBufferedAmount]]</a> internal slot.</p>
-            </dd>
           </dl>
        </section>
        <section>
@@ -894,9 +880,6 @@ interface RTCQuicStream {
                object on which <var>data</var> is to be sent.</li>
                <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is <code>false</code>,
                <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>
-               <li>If the length of <var>data</var> added to <a>[[\WriteBufferedAmount]]</a>
-               exceeds <a>[[\MaxWriteBufferedAmount]]</a>, <a>throw</a> an
-               <code>OperationError</code> and abort these steps.</li>
                <li>Increase the value of <var>stream</var>'s
                <a>[[\WriteBufferedAmount]]</a> slot by the length of
                <var>data</var> in bytes.</li>
@@ -1050,36 +1033,28 @@ interface RTCQuicStream {
                 <em>Return type:</em> <code>Promise&lt;void&gt;</code>
               </div>
             </dd>
-            <dt><dfn><code>waitForWritable</code></dfn></dt>
+            <dt><dfn><code>waitForWriteBufferedAmountBelow</code></dfn></dt>
             <dd>
-              <p><code>waitForWritable</code> <a>resolves</a> the promise when
-              the data queued in the write buffer falls below a threshold
-              computed from the arguments to the method. If <code>waitForWritable</code>
+              <p><code>waitForWriteBufferedAmountBelow</code> <a>resolves</a> the promise when
+              the data queued in the write buffer falls below the given threshold.
+              If <code>waitForWriteBufferedAmountBelow</code>
               is called multiple times, multiple promises could be resolved when the
               write buffer falls below the threshold for each promise. The Promise will
               be <a>rejected</a> with a newly created <code>InvalidStateError</code> if the
               <var>stream</var>'s <a>[[\Writable]]</a> slot transitions from true to false
-              and the promise isn't <a>settled</a>. When the <code>waitForWritable</code> method
+              and the promise isn't <a>settled</a>. When the <code>waitForWriteBufferedAmountBelow</code> method
               is called, the <a>user agent</a> <em class="rfc2119" title="MUST">MUST</em> run
               the following steps:</p>
               <ol>
                 <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code>
-                object on which <code>waitForWritable</code> was invoked.</li>
+                object on which <code>waitForWriteBufferedAmountBelow</code> was invoked.</li>
                 <li>Let <var>p</var> be a new promise.</li>
                 <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is
                 <code>false</code>, <a>reject</a> <var>p</var> with a
                 newly created <code>InvalidStateError</code> and abort
                 these steps.</li>
-                <li>Let <var>amount</var> be the first argument.</li>
-                <li>Let <var>target</var> be the second argument, if provided.
-                If the second argument is not provided, let <var>target</var>
-                be the value of <var>stream</var>'s <a>[[\MaxWriteBufferedAmount]]</a>
-                slot.</li>
-                <li>If <var>amount</var> is larger than <var>target</var> then
-                <a>reject</a> <var>p</var> with a newly created
-                <code>OperationError</code>.</li>
-                <li>Let <var>threshold</var> be <var>target</var> minus <var>amount</var>.</li>
-                <li>When <var>stream</var>'s <a>[[\WriteBufferedAmount]]</a> slot decreases
+                <li>Let <var>threshold</var> be the first argument.</li>
+                <li>When <var>stream</var>'s <a>[[\WriteBufferedAmount]]]</a> slot decreases
                 from above <var>threshold</var> to less than or equal to it,
                 <a>resolve</a> <var>p</var> with <code>undefined</code>.</li>
               </ol>
@@ -1093,21 +1068,12 @@ interface RTCQuicStream {
                     <th>Description</th>
                   </tr>
                   <tr>
-                    <td class="prmName">amount</td>
+                    <td class="prmName">threshold</td>
                     <td class="prmType"><code>unsigned long</code></td>
                     <td class="prmNullFalse"><span role="img" aria-label=
                     "False">&#10008;</span></td>
                     <td class="prmOptFalse"><span role="img" aria-label=
                     "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                  <tr>
-                    <td class="prmName">targetWriteBufferedAmount</td>
-                    <td class="prmType"><code>unsigned long</code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptTrue"><span role="img" aria-label=
-                    "True">&#10004;</span></td>
                     <td class="prmDesc"></td>
                   </tr>
                 </tbody>

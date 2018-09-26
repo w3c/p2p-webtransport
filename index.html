@@ -136,7 +136,7 @@ interface RTCQuicTransport : RTCStatsProvider {
     sequence&lt;ArrayBuffer&gt; getRemoteCertificates ();
     void                  start (RTCQuicParameters remoteParameters);
     void                  stop ();
-    RTCQuicStream         createStream ();
+    RTCQuicStream         createStream (optional RTCQuicStreamParameters parameters);
                     attribute EventHandler             onstatechange;
                     attribute EventHandler             onerror;
                     attribute EventHandler             onquicstream;
@@ -412,17 +412,36 @@ interface RTCQuicTransport : RTCStatsProvider {
               <em class="rfc2119" title="MUST">MUST</em> run the following
               steps:</p>
               <ol>
-                <li>Let <var>transport</var> be the <code><a>RTCQuicTransport</a></code>
-                on which <code>createStream</code> is invoked.</li>
-                <li>If <code><var>transport</var>.state</code> is <code>closed</code>
-                <a>throw</a> an <code>InvalidStateError</code>.</li>
-               <li>
+                <li>
+                  <p>Let <var>transport</var> be the <code><a>RTCQuicTransport</a></code>
+                  on which <code>createStream</code> is invoked.</p>
+                </li>
+                <li>
+                  <p>If <code><var>transport</var>.state</code> is <code>closed</code>
+                  <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</p>
+                </li>
+                <li>
+                  <p>Let <var>parameters</var> be the first argument if provided,
+                  <code>null</code> otherwise.</p>
+                </li>
+                <li>
+                  <p>if <var>parameters</var> is non-null, let <var>direction</var>
+                  be <var>parameters</var>'s <code>direction</code>
+                  member, <code>"sendrecv"</code> otherwise.</p>
+                </li>
+                <li>
+                  <p>If <var>direction</var> is <code>"recv"</code> <a>throw</a> an
+                  <code>OperationError</code> and abort these steps.</p>
+                <li>
                   <p>Let <var>stream</var> be a newly created
                   <code><a>RTCQuicStream</a></code> object.</p>
                 </li>
                 <li>
-                  <p>Let <var>stream</var> have a <dfn>[[\QuicStreamState]]</dfn> internal
-                  slot initialized to <code>new</code>.</p>
+                  <p>Let <var>stream</var> have a <dfn>[[\State]]</dfn>
+                  internal slot initialized to <code>"new"</code>.</p>
+                </li>
+                <li><p>Let <var>stream</var> have a <dfn>[[\Direction]]</dfn>
+                  internal slot initialized to <var>direction</var>.</p>
                 </li>
                 <li>
                   <p>Let <var>stream</var> have a <dfn>[[\Readable]]</dfn> internal
@@ -453,12 +472,51 @@ interface RTCQuicTransport : RTCStatsProvider {
                   transport.</p>
                 </li>
               </ol>
-              <div>
-                <em>No parameters.</em>
-              </div>
+              <table class="parameters">
+                <tbody>
+                  <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Nullable</th>
+                    <th>Optional</th>
+                    <th>Description</th>
+                  </tr>
+                  <tr>
+                    <td class="prmName">parameters</td>
+                    <td class="prmType"><code><a>RTCQuicStreamParameters</a></code></td>
+                    <td class="prmNullFalse"><span role="img" aria-label=
+                    "False">&#10008;</span></td>
+                    <td class="prmOptTrue"><span role="img" aria-label=
+                    "True">&#10004;</span></td>
+                    <td class="prmDesc"></td>
+                  </tr>
+                </tbody>
+              </table>
               <div>
                 <em>Return type:</em> <code><a>RTCQuicStream</a></code>
               </div>
+            </dd>
+          </dl>
+        </section>
+      </div>
+    </section>
+    <section id="rtcquicstreamparameters*">
+      <h3><dfn>RTCQuicStreamParameters</dfn> Dictionary</h3>
+      <p>The <code>RTCQuicStreamParameters</code> dictionary includes information
+      relating to QUIC stream configuration.</p>
+      <div>
+        <pre class="idl">dictionary RTCQuicStreamParameters {
+             RTCQuicStreamDirection                  direction = "sendrecv";
+};</pre>
+        <section>
+          <h2>Dictionary <a class="idlType">RTCQuicStreamParameters</a> Members</h2>
+          <dl data-link-for="RTCQuicStreamParameters" data-dfn-for="RTCQuicStreamParameters" class=
+          "dictionary-members">
+            <dt><dfn><code>direction</code></dfn> of type <span class=
+            "idlMemberType"><a>RTCQuicStreamDirection</a></span>, defaulting to
+            <code>"sendrecv"</code></dt>
+            <dd>
+              <p>The QUIC stream direction, with a default of <code>"sendrecv"</code>.</p>
             </dd>
           </dl>
         </section>
@@ -498,13 +556,6 @@ interface RTCQuicTransport : RTCStatsProvider {
       <h3><dfn>RTCQuicStreamEvent</dfn></h3>
       <p>The <code><a>quicstream</a></code> event uses the
       <code><a>RTCQuicStreamEvent</a></code> interface.</p>
-      <p>Firing a <code><a>quicstream</a></code> event named <var>e</var> with a
-      <code><a>RTCQuicStream</a></code> <var>stream</var> means that an event with the
-      name <var>e</var>, which does not bubble (except where otherwise stated) and is not
-      cancelable (except where otherwise stated), and which uses the
-      <code><a>RTCQuicStreamEvent</a></code> interface with the <code>stream</code>
-      attribute set to <var>stream</var>, <em class="rfc2119" title="MUST">MUST</em>
-      be created and dispatched at the given target.</p>
       <div>
         <pre class="idl">
         [ Constructor (DOMString type, RTCQuicStreamEventInit eventInitDict), Exposed=Window]
@@ -558,7 +609,10 @@ interface RTCQuicStreamEvent : Event {
             <dd>
               <p>The <dfn id="dom-quicstreamevent-stream"><code>stream</code></dfn>
               attribute represents the <code><a>RTCQuicStream</a></code> object
-              associated with the event.</p>
+              associated with the event. The <code><a>RTCQuicStream</a></code> object's
+              <a>[[\Direction]]</a> internal slot is set to the value <code>"recv"</code>
+              if the remote peer created a <code>"send"</code> stream, otherwise it
+              is set to <code>"sendrecv"</code>.</p>
             </dd>
           </dl>
         </section>
@@ -577,12 +631,51 @@ interface RTCQuicStreamEvent : Event {
             "idlMemberType"><a>RTCQuicStream</a></span></dt>
             <dd>
               <p>The <code><a>RTCQuicStream</a></code> object associated with the
-              event.</p>
+              event. The <code><a>RTCQuicStream</a></code> object's
+              <a>[[\Direction]]</a> internal slot is set to the value <code>"recv"</code>
+              if the remote peer created a <code>"send"</code> stream, otherwise it
+              is set to <code>"sendrecv"</code>.</p>
             </dd>
           </dl>
         </section>
       </div>
     </section>
+    <section id="rtcquicstreamdirection*">
+      <h3><dfn>RTCQuicStreamDirection</dfn> Enum</h3>
+      <p><code>RTCQuicStreamDirection</code> indicates the direction of the QUIC stream.</p>
+      <div>
+        <pre class="idl">enum RTCQuicStreamDirection {
+    "sendrecv",
+    "recv",
+    "send"
+};</pre>
+        <table data-link-for="RTCQuicStreamDirection" data-dfn-for="RTCQuicStreamDirection" class="simple">
+          <tbody>
+            <tr>
+              <th colspan="2">Enumeration description</th>
+            </tr>
+            <tr>
+              <td><dfn><code id="idl-def-RTCQuicStreamDirection.sendrecv">sendrecv</code></dfn></td>
+              <td>
+                <p>A bi-directional QUIC stream.</p>
+              </td>
+            </tr>
+            <tr>
+              <td><dfn><code id="idl-def-RTCQuicStreamDirection.recv">recv</code></dfn></td>
+              <td>
+                <p>A uni-directional stream created by the remote endpoint.</p>
+              </td>
+            </tr>
+            <tr>
+              <td><dfn><code id="idl-def-RTCQuicStreamDirection.send">send</code></dfn></td>
+              <td>
+                  <p>A uni-directional stream created by the local endpoint.</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>              
     <section id="rtcquicrole*">
       <h3><dfn>RTCQuicRole</dfn> Enum</h3>
       <p><code>RTCQuicRole</code> indicates the role of the QUIC
@@ -749,6 +842,7 @@ interface RTCQuicStream {
     readonly        attribute RTCQuicStreamState  state;
     readonly        attribute unsigned long       readableAmount;
     readonly        attribute unsigned long       writeBufferedAmount;
+    RTCQuicStreamParameters getParameters();
     long                  readInto (Uint8Array data);
     void                  write (Uint8Array data);
     void                  finish ();
@@ -773,7 +867,7 @@ interface RTCQuicStream {
               attribute represents the state of the <a>RTCQuicStream</a> object.
               On getting it <em class="rfc2119" title="MUST">MUST</em> return
               the value of the <code><a>RTCQuicStream</a></code>'s
-              <a>[[\QuicStreamState]]</a> internal slot.</p>
+              <a>[[\State]]</a> internal slot.</p>
             </dd>
             <dt><dfn><code>onstatechange</code></dfn> of type <span class=
             "idlAttrType"><a>EventHandler</a></span></dt>
@@ -824,6 +918,30 @@ interface RTCQuicStream {
           <h2>Methods</h2>
           <dl data-link-for="RTCQuicStream" data-dfn-for="RTCQuicStream" class=
           "methods">
+            <dt><dfn><code>getParameters</code></dfn></dt>
+            <dd>
+              <p>Returns the <code><a>RTCQuicStreamParameters</a></code> applying to this
+              QUIC stream. When the <code>getParameters</code> method is called, the user
+              agent <em class="rfc2119" title="MUST">MUST</em> run the following
+              steps:</p>
+              <ol>
+                 <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code> object
+                 for which parameters are to be returned.</li>
+                 <li>Let <var>parameters</var> be a new
+                 <code><a>RTCQuicStreamParameters</a></code> dictionary.</li>
+                 <li>Set <var>parameters</var>'s <dfn id="dom-quicstream-direction"><code>direction</code></dfn>
+                 member to the value of <var>stream</var>'s <a>[[\Direction]]</a> internal slot,
+                 which <em class="rfc2119" title="MUST">MUST</em> have the value to which it was set when
+                 <var>stream</var> was created.</li>
+                 <li>Return <var>parameters</var>.</li>
+              </ol>
+              <div>
+                <em>No parameters.</em>
+              </div>
+              <div>
+                <em>Return type:</em> <code><a>RTCQuicStreamParameters</a></code>
+              </div>
+            </dd>
             <dt><dfn><code>readInto</code></dfn></dt>
             <dd>
               <p>Reads from <code><a>RTCQuicStream</a></code> into the buffer specified
@@ -926,17 +1044,17 @@ interface RTCQuicStream {
               <ol>
                 <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code> object
                 which is about to be closed.</li>
-                <li>If <var>stream</var>'s  <a>[[\QuicStreamState]]</a> is <code>new</code>,
-                set <var>stream</var>'s  <a>[[\QuicStreamState]]</a> to <code>closed</code>,
+                <li>If <var>stream</var>'s  <a>[[\State]]</a> is <code>"new"</code>,
+                set <var>stream</var>'s  <a>[[\State]]</a> to <code>"closed"</code>,
                 and abort these steps.</li>
-                <li>If <var>stream</var>'s  <a>[[\QuicStreamState]]</a> is <code>closed</code>,
+                <li>If <var>stream</var>'s  <a>[[\State]]</a> is <code>"closed"</code>,
                 then abort these steps.</li>
                 <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to <code>false</code>.</li>
-                <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
-                <code>closing</code>.</li>
+                <li>Set <var>stream</var>'s <a>[[\State]]</a> slot to
+                <code>"closing"</code>.</li>
                 <li>If <var>stream</var> has <a>finished reading</a>, set
-                <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
-                <code>closed</code>.</li>
+                <var>stream</var>'s <a>[[\State]]</a> slot to
+                <code>"closed"</code>.</li>
                 <li>If the closing procedure has not started yet, start it by sending a STREAM
                 frame with the FIN bit set.</li>
               </ol>
@@ -957,13 +1075,13 @@ interface RTCQuicStream {
               <ol>
                 <li>Let <var>stream</var> be the <code><a>RTCQuicStream</a></code> object
                 which is about to be reset.</li>
-                <li>If <var>stream</var>'s  <a>[[\QuicStreamState]]</a> is <code>new</code>,
-                set <var>stream</var>'s  <a>[[\QuicStreamState]]</a> to <code>closed</code>,
+                <li>If <var>stream</var>'s  <a>[[\State]]</a> is <code>"new"</code>,
+                set <var>stream</var>'s  <a>[[\State]]</a> to <code>"closed"</code>,
                 and abort these steps.</li>
-                <li>If <var>stream</var>'s  <a>[[\QuicStreamState]]</a> slot is <code>closed</code>,
+                <li>If <var>stream</var>'s  <a>[[\State]]</a> slot is <code>"closed"</code>,
                 then abort these steps.</li>
-                <li>Set <var>stream</var>'s <a>[[\QuicStreamState]]</a> slot to
-                <code>closed</code>.</li>
+                <li>Set <var>stream</var>'s <a>[[\State]]</a> slot to
+                <code>"closed"</code>.</li>
                 <li>If the closing procedure has not started yet, start it by sending a RST_STREAM
                 frame.</li>
               </ol>
@@ -1121,7 +1239,9 @@ interface RTCQuicStream {
                 <p>The underlying QUIC stream has queued a STREAM frame for
                 transmission, but has not yet received an acknowledgement.
                 On transitioning to the <code>opening</code> state, the
-                <a>[[\Writable]]</a> slot is set to <code>true</code>.</p>
+                <a>[[\Writable]]</a> slot is set to <code>true</code> if
+                the <a>[[\Direction]]</a> slot is set to <code>"send"</code>
+                or <code>"sendrecv"</code>.</p>
               </td>
             </tr>
             <tr>
@@ -1131,9 +1251,12 @@ interface RTCQuicStream {
                 STREAM_BLOCKED frame, or has sent a STREAM frame and received an acknowledgement,
                 as described in [[QUIC-TRANSPORT]] Section 10.2. This is the initial state of an
                 <code><a>RTCQuicStream</a></code> object dispatched as a part of an
-                <code>RTCQuicStreamEvent</code>. On transitioning to the <code>open</code>
-                state, the <a>[[\Readable]]</a> and <a>[[\Writable]]</a> slots are set to
-                <code>true</code>.</p>
+                <code>RTCQuicStreamEvent</code>. On transitioning to the <code>"open"</code>
+                state, the <a>[[\Readable]]</a> slot is set to <code>true</code> if
+                the <a>[[\Direction]]</a> slot is set to <code>"read"</code>
+                or <code>"sendrecv"</code>. The <a>[[\Writable]]</a> slot is set to
+                <code>true</code> if the <a>[[\Direction]]</a> slot is set to <code>"send"</code>
+                or <code>"sendrecv"</code>.</p>
               </td>
             </tr>
             <tr>

@@ -274,7 +274,8 @@ interface RTCQuicTransport : RTCStatsProvider {
               <p>This event handler, of event handler event type
               <code><a>newreceivestreamwithdata</a></code>,
               <em class="rfc2119" title="MUST">MUST</em> be fired on when data is received
-              from a newly created remote <code><a>RTCQuicSendStream</a></code>.
+              from a newly created remote <code><a>RTCQuicSendStream</a></code> for the
+              first time.
               </p>
             </dd>
             <dt><dfn><code>onnewbidirectionalstreamwithdata</code></dfn> of type <span class=
@@ -283,7 +284,8 @@ interface RTCQuicTransport : RTCStatsProvider {
               <p>This event handler, of event handler event type
               <code><a>newbidirectionalstreamwithdata</a></code>,
               <em class="rfc2119" title="MUST">MUST</em> be fired on when when data is received
-              from a newly created remote <code><a>RTCQuicBidirectionalStream</a></code>.
+              from a newly created remote <code><a>RTCQuicBidirectionalStream</a></code> for the
+              first time.
               </p>
             </dd>
           </dl>
@@ -540,7 +542,7 @@ interface RTCQuicTransport : RTCStatsProvider {
         <pre class="idl">
         [ Constructor (DOMString type, NewReceiveStreamWithDataEventInit eventInitDict), Exposed=Window]
 interface NewReceiveStreamWithDataEvent : Event {
-    readonly        attribute RTCQuicReceiveStream receiveStream;
+    readonly        attribute RTCQuicReceiveStream stream;
 };</pre>
         <section>
           <h2>Constructors</h2>
@@ -584,10 +586,10 @@ interface NewReceiveStreamWithDataEvent : Event {
           <h2>Attributes</h2>
           <dl data-link-for="NewReceiveStreamWithDataEvent" data-dfn-for="NewReceiveStreamWithDataEvent"
           class="attributes">
-            <dt><code>receiveStream</code> of type <span class=
+            <dt><code>stream</code> of type <span class=
             "idlAttrType"><a>RTCQuicReceiveStream</a></span>, readonly</dt>
             <dd>
-              <p>The <dfn id="dom-receivequicstreamevent-stream"><code>receiveStream</code></dfn>
+              <p>The <dfn id="dom-receivequicstreamevent-stream"><code>stream</code></dfn>
               attribute represents the <code><a>RTCQuicReceiveStream</a></code> object
               associated with the event.</p>
             </dd>
@@ -598,13 +600,13 @@ interface NewReceiveStreamWithDataEvent : Event {
           <p>The <dfn><code>NewReceiveStreamWithDataEventInit</code></dfn> dictionary includes
           information on the configuration of the QUIC stream.</p>
         <pre class="idl">dictionary NewReceiveStreamWithDataEventInit : EventInit {
-             RTCQuicReceiveStream receiveStream;
+             RTCQuicReceiveStream stream;
 };</pre>
         <section>
           <h2>Dictionary NewReceiveStreamWithDataEventInit Members</h2>
           <dl data-link-for="NewReceiveStreamWithDataEventInit" data-dfn-for=
           "NewReceiveStreamWithDataEventInit" class="dictionary-members">
-            <dt><dfn><code>receiveStream</code></dfn> of type <span class=
+            <dt><dfn><code>stream</code></dfn> of type <span class=
             "idlMemberType"><a>RTCQuicReceiveStream</a></span></dt>
             <dd>
               <p>The <code><a>RTCQuicReceiveStream</a></code> object associated with the
@@ -622,7 +624,7 @@ interface NewReceiveStreamWithDataEvent : Event {
         <pre class="idl">
         [ Constructor (DOMString type, NewBidirectionalStreamWithDataEventInit eventInitDict), Exposed=Window]
 interface NewBidirectionalStreamWithDataEvent : Event {
-    readonly        attribute RTCQuicBidirectionalStream bidirectionalStream;
+    readonly        attribute RTCQuicBidirectionalStream stream;
 };</pre>
         <section>
           <h2>Constructors</h2>
@@ -666,10 +668,10 @@ interface NewBidirectionalStreamWithDataEvent : Event {
           <h2>Attributes</h2>
           <dl data-link-for="NewBidirectionalStreamWithDataEvent" data-dfn-for="NewBidirectionalStreamWithDataEvent"
           class="attributes">
-            <dt><code>bidirectionalStream</code> of type <span class=
+            <dt><code>stream</code> of type <span class=
             "idlAttrType"><a>RTCQuicBidirectionalStream</a></span>, readonly</dt>
             <dd>
-              <p>The <dfn id="dom-bidirectionalquicstreamevent-stream"><code>bidirectionalStream</code></dfn>
+              <p>The <dfn id="dom-bidirectionalquicstreamevent-stream"><code>stream</code></dfn>
               attribute represents the <code><a>RTCQuicBidirectionalStream</a></code> object
               associated with the event.</p>
             </dd>
@@ -680,13 +682,13 @@ interface NewBidirectionalStreamWithDataEvent : Event {
           <p>The <dfn><code>NewBidirectionalStreamWithDataEventInit</code></dfn> dictionary includes
           information on the configuration of the QUIC stream.</p>
         <pre class="idl">dictionary NewBidirectionalStreamWithDataEventInit : EventInit {
-             RTCQuicBidirectionalStream bidirectionalStream;
+             RTCQuicBidirectionalStream stream;
 };</pre>
         <section>
           <h2>Dictionary NewBidirectionalStreamWithDataEventInit Members</h2>
           <dl data-link-for="NewBidirectionalStreamWithDataEventInit" data-dfn-for=
           "NewBidirectionalStreamWithDataEventInit" class="dictionary-members">
-            <dt><dfn><code>bidirectionalStream</code></dfn> of type <span class=
+            <dt><dfn><code>stream</code></dfn> of type <span class=
             "idlMemberType"><a>RTCQuicBidirectionalStream</a></span></dt>
             <dd>
               <p>The <code><a>RTCQuicBidirectionalStream</a></code> object associated with the
@@ -900,7 +902,7 @@ interface NewBidirectionalStreamWithDataEvent : Event {
             readonly attribute unsigned long writeBufferedAmount;
             readonly attribute Promise&lt;RTCQuicStreamAbortInfo&gt; writingAborted;
             void write (RTCQuicStreamWriteParameters data);
-            void abortWriting (RTCQuicStreamAbortInfo errorInfo);
+            void abortWriting (RTCQuicStreamAbortInfo abortInfo);
             Promise&lt;void&gt; waitForWriteBufferedAmountBelow(unsigned long threshold);
         };
         </pre>
@@ -1043,9 +1045,9 @@ interface NewBidirectionalStreamWithDataEvent : Event {
                 which the <var>stream</var> was created from.
                 <li>Remove the <var>stream</var> from the <var>transport</var>'s
                 <a>[[\QuicTransportStreams]]</a> internal slot.</li>
-                <li>Let <var>errorInfo</var> be the first argument.</li>
+                <li>Let <var>abortInfo</var> be the first argument.</li>
                 <li>Start the closing procedure by sending a RST_STREAM frame with its error
-                code set to the value of <var>errorInfo</var>.errorCode.</li>
+                code set to the value of <var>abortInfo</var>.errorCode.</li>
               </ol>
               <table class="parameters">
                 <tbody>
@@ -1057,7 +1059,7 @@ interface NewBidirectionalStreamWithDataEvent : Event {
                     <th>Description</th>
                   </tr>
                   <tr>
-                    <td class="prmName">errorInfo</td>
+                    <td class="prmName">abortInfo</td>
                     <td class="prmType"><code>RTCQuicStreamAbortInfo</code></td>
                     <td class="prmNullFalse"><span role="img" aria-label=
                     "False">&#10008;</span></td>
@@ -1134,7 +1136,7 @@ interface NewBidirectionalStreamWithDataEvent : Event {
             readonly attribute unsigned long readableAmount;
             readonly attribute Promise&lt;RTCQuicStreamAbortInfo&gt; readingAborted;
             RTCQuicStreamReadResult readInto (Uint8Array data);
-            void abortReading (RTCQuicStreamAbortInfo errorInfo);
+            void abortReading (RTCQuicStreamAbortInfo abortInfo);
         };
         </pre>
         <section>
@@ -1217,12 +1219,12 @@ interface NewBidirectionalStreamWithDataEvent : Event {
                <li>Let <var>result</var> be the <code><a>RTCQuicStreamReadResult</a></code>
                to be returned.</li>
                <li>If <var>stream</var> has <a>finished reading</a>, return
-               <var>result</var> with <code>bytesRead</code> set to 0 and <code>finished</code> set to
+               <var>result</var> with <code>amount</code> set to 0 and <code>finished</code> set to
                <code>true</code> and abort these steps.</li>
                <li>Transfer data from the read buffer into <var>data</var>.</li>
                <li>Decrease the value of <var>stream</var>'s <a>[[\ReadableAmount]]</a>
                slot by the length of <var>data</var> in bytes.</li>
-               <li>Set <var>result</var>'s <code>bytesRead</code> to the size of
+               <li>Set <var>result</var>'s <code>amount</code> to the size of
                <var>data</var> in bytes.</li>
                <li>If the <var>data</var> includes up to the FIN bit being read, then
                run the following steps:</li>
@@ -1280,9 +1282,9 @@ interface NewBidirectionalStreamWithDataEvent : Event {
                 which the <var>stream</var> was created from.
                 <li>Remove the <var>stream</var> from the <var>transport</var>'s
                 <a>[[\QuicTransportStreams]]</a> internal slot.</li>
-                <li>Let <var>errorInfo</var> be the first argument.</li>
+                <li>Let <var>abortInfo</var> be the first argument.</li>
                 <li>Start the closing procedure by sending a STOP_SENDING frame with its error
-                code set to the value of <var>errorInfo</var>.errorCode.</li>
+                code set to the value of <var>abortInfo</var>.errorCode.</li>
               </ol>
               <table class="parameters">
                 <tbody>
@@ -1294,7 +1296,7 @@ interface NewBidirectionalStreamWithDataEvent : Event {
                     <th>Description</th>
                   </tr>
                   <tr>
-                    <td class="prmName">errorInfo</td>
+                    <td class="prmName">abortInfo</td>
                     <td class="prmType"><code>RTCQuicStreamAbortInfo</code></td>
                     <td class="prmNullFalse"><span role="img" aria-label=
                     "False">&#10008;</span></td>
@@ -1371,27 +1373,25 @@ interface NewBidirectionalStreamWithDataEvent : Event {
       </section>
       </div>
     </section>
-    <section id="rtcquicbidirectionalstream-interface-definition*">
-      <h3>Interface <dfn>RTCQuicBidirectionalStream</dfn></h3>
+    <section id="rtcquicstream-interface-definition*">
+      <h3>Interface <dfn>RTCQuicStream</dfn></h3>
       <div>
         <pre class="idl">
         [ Exposed=Window ]
-        interface RTCQuicBidirectionalStream {
+        interface RTCQuicStream {
             readonly attribute unsigned long long streamId;
             readonly attribute RTCQuicTransport transport;
         };
-        RTCQuicBidirectionalStream includes RTCQuicWritableStream;
-        RTCQuicBidirectionalStream includes RTCQuicReadableStream;
         </pre>
         <section>
           <h2>Attributes</h2>
-          <dl data-link-for="RTCQuicBidirectionalStream" data-dfn-for="RTCQuicBidirectionalStream" class=
+          <dl data-link-for="RTCQuicStream" data-dfn-for="RTCQuicStream" class=
           "attributes">
             <dt><dfn><code>streamId</code></dfn> of type <span class=
             "idlAttrType"><a>unsigned long long</a></span>, readonly</dt>
             <dd>
               <p>The readonly attribute referring to the ID of the
-              <code><a>RTCQuicBidirectionalStream</a></code> object.</p>
+              <code><a>RTCQuicStream</a></code> object.</p>
             </dd>
             <dt><dfn><code>transport</code></dfn> of type <span class=
             "idlAttrType"><a>RTCQuicTransport</a></span>, readonly</dt>
@@ -1400,6 +1400,18 @@ interface NewBidirectionalStreamWithDataEvent : Event {
             </dd>
           </dl>
        </section>
+      </div>
+    </section>
+    <section id="rtcquicbidirectionalstream-interface-definition*">
+      <h3>Interface <dfn>RTCQuicBidirectionalStream</dfn></h3>
+      <div>
+        <pre class="idl">
+        [ Exposed=Window ]
+        interface RTCQuicBidirectionalStream : RTCQuicStream {
+        };
+        RTCQuicBidirectionalStream includes RTCQuicWritableStream;
+        RTCQuicBidirectionalStream includes RTCQuicReadableStream;
+        </pre>
       </div>
     </section>
     <section id="rtcquicsendstream-interface-definition*">
@@ -1407,29 +1419,10 @@ interface NewBidirectionalStreamWithDataEvent : Event {
       <div>
         <pre class="idl">
         [ Exposed=Window ]
-        interface RTCQuicSendStream {
-            readonly attribute unsigned long long streamId;
-            readonly attribute RTCQuicTransport transport;
+        interface RTCQuicSendStream : RTCQuicStream {
         };
         RTCQuicSendStream includes RTCQuicWritableStream;
         </pre>
-        <section>
-          <h2>Attributes</h2>
-          <dl data-link-for="RTCQuicSendStream" data-dfn-for="RTCQuicSendStream" class=
-          "attributes">
-            <dt><dfn><code>streamId</code></dfn> of type <span class=
-            "idlAttrType"><a>unsigned long long</a></span>, readonly</dt>
-            <dd>
-              <p>The readonly attribute referring to the ID of the
-              <code><a>RTCQuicSendStream</a></code> object.</p>
-            </dd>
-            <dt><dfn><code>transport</code></dfn> of type <span class=
-            "idlAttrType"><a>RTCQuicTransport</a></span>, readonly</dt>
-            <dd>
-              <p>The readonly attribute referring to the related <code><a>RTCQuicTransport</a></code> object.</p>
-            </dd>
-          </dl>
-       </section>
       </div>
     </section>
     <section id="rtcquicreceivestream-interface-definition*">
@@ -1437,29 +1430,10 @@ interface NewBidirectionalStreamWithDataEvent : Event {
       <div>
         <pre class="idl">
         [ Exposed=Window ]
-        interface RTCQuicReceiveStream {
-            readonly attribute unsigned long long streamId;
-            readonly attribute RTCQuicTransport transport;
+        interface RTCQuicReceiveStream : RTCQuicStream {
         };
         RTCQuicReceiveStream includes RTCQuicReadableStream;
         </pre>
-        <section>
-          <h2>Attributes</h2>
-          <dl data-link-for="RTCQuicReceiveStream" data-dfn-for="RTCQuicReceiveStream" class=
-          "attributes">
-            <dt><dfn><code>streamId</code></dfn> of type <span class=
-            "idlAttrType"><a>unsigned long long</a></span>, readonly</dt>
-            <dd>
-              <p>The readonly attribute referring to the ID of the
-              <code><a>RTCQuicReadableStream</a></code> object.</p>
-            </dd>
-            <dt><dfn><code>transport</code></dfn> of type <span class=
-            "idlAttrType"><a>RTCQuicTransport</a></span>, readonly</dt>
-            <dd>
-              <p>The readonly attribute referring to the related <code><a>RTCQuicTransport</a></code> object.</p>
-            </dd>
-          </dl>
-       </section>
       </div>
     </section>
     <section id="rtcquicstreamwriteparameters*">
@@ -1497,7 +1471,7 @@ interface NewBidirectionalStreamWithDataEvent : Event {
       relating to the result returned from <code>readInto</code>.</p>
       <div>
         <pre class="idl">dictionary RTCQuicStreamReadResult {
-             unsigned long bytesRead;
+             unsigned long amount;
              boolean finished = false;
         };
         </pre>
@@ -1505,7 +1479,7 @@ interface NewBidirectionalStreamWithDataEvent : Event {
           <h2>Dictionary <a class="idlType">RTCQuicStreamReadResult</a> Members</h2>
           <dl data-link-for="RTCQuicStreamReadResult" data-dfn-for="RTCQuicStreamReadResult" class=
           "dictionary-members">
-            <dt><dfn><code>bytesRead</code></dfn> of type <span class=
+            <dt><dfn><code>amount</code></dfn> of type <span class=
             "idlMemberType"><a>unsigned long</a></span>.</dt>
             <dd>
               <p>The amount of data read in bytes.</p>

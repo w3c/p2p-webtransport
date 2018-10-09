@@ -173,9 +173,13 @@ interface RTCQuicTransport : RTCStatsProvider {
               Let <var>quictransport</var> be a newly constructed
               <code><a>RTCQuicTransport</a></code> object.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportStreams]]</dfn>
-            internal slot representing a sequence of (<code><a>RTCQuicWritableStream</a></code>
-            or <code><a>RTCQuicReadableStream</a></code>) objects, initialized to empty.
+            <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportWritableStreams]]</dfn>
+            internal slot representing a sequence of <code><a>RTCQuicWritableStream</a></code>
+            objects, initialized to empty.
+            </li>
+            <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportReadableStreams]]</dfn>
+            internal slot representing a sequence of <code><a>RTCQuicReadableStream</a></code>
+            objects, initialized to empty.
             </li>
             <li>
               Let <var>quictransport</var> have a <dfn>[[\QuicTransportState]]</dfn>
@@ -438,8 +442,12 @@ interface RTCQuicTransport : RTCStatsProvider {
                   <code><a>RTCQuicBidirectionalStream</a></code> object.</p>
                 </li>
                 <li>
-                  <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\QuicTransportStreams]]</a>
-                  internal slot. </p>
+                  <p>Add <var>stream</var> to <var>transport</var>'s
+                  <a>[[\QuicTransportWritableStreams]]</a> internal slot. </p>
+                </li>
+                <li>
+                  <p>Add <var>stream</var> to <var>transport</var>'s
+                  <a>[[\QuicTransportReadableStreams]]</a> internal slot. </p>
                 </li>
                 <li>
                   <p>Return <var>stream</var> and continue the following steps
@@ -480,7 +488,7 @@ interface RTCQuicTransport : RTCStatsProvider {
                   <code><a>RTCQuicSendStream</a></code> object.</p>
                 </li>
                 <li>
-                  <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\QuicTransportStreams]]</a>
+                  <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\QuicTransportWritableStreams]]</a>
                   internal slot. </p>
                 </li>
                 <li>
@@ -825,24 +833,26 @@ interface NewBidirectionalStreamWithDataEvent : Event {
                 <ol>
                   <li>Let <var>transport</var> be the <code><a>RTCQuicTransport</a></code>.
                   <li>For each RTCQuicReadableStream in <var>transport</var>'s
-                  <a>[[\QuicTransportStreams]]</a> internal slot run the following:</li>
+                  <a>[[\QuicTransportReadableStreams]]</a> internal slot run the
+                  following:</li>
                   <ol>
                     <li>Let <var>stream</var> be the RTCQuicReadableStream.</li>
                     <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to
                     <code>false</code>.</li>
                     <li>Clear the <var>stream</var>'s read buffer.</li>
                     <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                    <a>[[\QuicTransportStreams]]</a> internal slot.
+                    <a>[[\QuicTransportReadableStreams]]</a> internal slot.
                   </ol>
                   <li>For each RTCQuicWritableStream in <var>transport</var>'s
-                  <a>[[\QuicTransportStreams]]</a> internal slot run the following:</li>
+                  <a>[[\QuicTransportWritableStreams]]</a> internal slot run the
+                  following:</li>
                   <ol>
                     <li>Let <var>stream</var> be the RTCQuicWritableStream.</li>
                     <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to
                     <code>false</code>.</li>
                     <li>Clear the <var>stream</var>'s write buffer.</li>
                     <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                    <a>[[\QuicTransportStreams]]</a> internal slot.
+                    <a>[[\QuicTransportWritableStreams]]</a> internal slot.
                   </ol>
                 </ol>
               </td>
@@ -962,7 +972,7 @@ interface NewBidirectionalStreamWithDataEvent : Event {
                 <li>Let <var>transport</var> be the <code><a>RTCQuicTransport</a></code>,
                 which the <var>stream</var> was created from.
                 <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                <a>[[\QuicTransportStreams]]</a> internal slot.</li>
+                <a>[[\QuicTransportWritableStreams]]</a> internal slot.</li>
                 <li><a>resolve</a> the promise with the resulting
                 <code><a>RTCQuicStreamAbortInfo</a></code> with the <code>errorCode</code>
                 set to the value from the STOP_SENDING frame.</li>
@@ -995,13 +1005,22 @@ interface NewBidirectionalStreamWithDataEvent : Event {
                <var>data</var>.data in bytes.</li>
                <li>Queue <var>data</var>.data for transmission on <var>stream</var>'s
                underlying data transport.</li>
-               <li>Queue a STREAM frame with the FIN bit set if <var>data</var>.finish
-               is set to <code>true</code>.
+               <li>if <var>data</var>.finish is set to <code>true</code>, run the
+               following:</li>
+               <ol>
+                 <li>Queue a STREAM frame with the FIN bit set.</li>
+                 <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to
+                 <code>false</code>.</li>
+                 <li>Let <var>transport</var> be the <code><a>RTCQuicTransport</a></code>,
+                 which the <var>stream</var> was created from.</li>
+                 <li>Remove the <var>stream</var> from the <var>transport</var>'s
+                 <a>[[\QuicTransportWritableStreams]]</a> internal slot.</li>
+               </ol>
                <div class="note">The actual transmission of data occurs in
                parallel. If sending data leads to a QUIC-level error, the
                application will be notified asynchronously through the
                <code><a>RTCQuicTransport</a></code>'s <code><a>onerror</a></code>
-               EventHandler.</div></li>
+               EventHandler.</div>
               </ol>
               <table class="parameters">
                 <tbody>
@@ -1042,9 +1061,9 @@ interface NewBidirectionalStreamWithDataEvent : Event {
                 <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to <code>false</code>.</li>
                 <li>Clear the <var>stream</var>'s write buffer.</li>
                 <li>Let <var>transport</var> be the <code><a>RTCQuicTransport</a></code>,
-                which the <var>stream</var> was created from.
+                which the <var>stream</var> was created from.</li>
                 <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                <a>[[\QuicTransportStreams]]</a> internal slot.</li>
+                <a>[[\QuicTransportWritableStreams]]</a> internal slot.</li>
                 <li>Let <var>abortInfo</var> be the first argument.</li>
                 <li>Start the closing procedure by sending a RST_STREAM frame with its error
                 code set to the value of <var>abortInfo</var>.errorCode.</li>
@@ -1192,7 +1211,7 @@ interface NewBidirectionalStreamWithDataEvent : Event {
                 <li>Let <var>transport</var> be the <code><a>RTCQuicTransport</a></code>,
                 which the <var>stream</var> was created from.
                 <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                <a>[[\QuicTransportStreams]]</a> internal slot.</li>
+                <a>[[\QuicTransportReadableStreams]]</a> internal slot.</li>
                 <li><a>resolve</a> the promise with the resulting
                 <code><a>RTCQuicStreamAbortInfo</a></code> with <code>errorCode</code>
                 set to the value of the errror code from the RST_STREAM frame.</li>
@@ -1235,7 +1254,7 @@ interface NewBidirectionalStreamWithDataEvent : Event {
                  <li>Let <var>transport</var> be the <code><a>RTCQuicTransport</a></code>,
                  which the <var>stream</var> was created from.
                  <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                 <a>[[\QuicTransportStreams]]</a> internal slot.</li>
+                 <a>[[\QuicTransportReadableStreams]]</a> internal slot.</li>
                </ol>
                <li>Else, set <var>result</var>'s <code>finished</code> to false.</li>
                <li>Return <var>result</var>.
@@ -1281,7 +1300,7 @@ interface NewBidirectionalStreamWithDataEvent : Event {
                 <li>Let <var>transport</var> be the <code><a>RTCQuicTransport</a></code>,
                 which the <var>stream</var> was created from.
                 <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                <a>[[\QuicTransportStreams]]</a> internal slot.</li>
+                <a>[[\QuicTransportReadableStreams]]</a> internal slot.</li>
                 <li>Let <var>abortInfo</var> be the first argument.</li>
                 <li>Start the closing procedure by sending a STOP_SENDING frame with its error
                 code set to the value of <var>abortInfo</var>.errorCode.</li>
@@ -1607,7 +1626,7 @@ interface NewBidirectionalStreamWithDataEvent : Event {
           script in response to the remote peer creating a send only QUIC stream and
           sending data on it. Prior to <code><a>newreceivestreamwithdata</a></code>
           firing, the <code><a>RTCQuicReceiveStream</a></code> is added to
-          <code><a>RTCQuicTransport</a></code>'s <a>[[\QuicTransportStreams]]</a>
+          <code><a>RTCQuicTransport</a></code>'s<a>[[\QuicTransportReadableStreams]]</a>
           internal slot.</td>
         </tr>
         <tr>
@@ -1616,9 +1635,9 @@ interface NewBidirectionalStreamWithDataEvent : Event {
           <td>A new <code><a>RTCQuicBidirectionalStream</a></code> is dispatched to the
           script in response to the remote peer creating a bidirectional QUIC stream and
           sending data on it. Prior to <code><a>newbidirectionalstreamwithdata</a></code>
-          firing, the <code><a>RTCQuicBidirectionalStream</a></code> is added to
-          <code><a>RTCQuicTransport</a></code>'s <a>[[\QuicTransportStreams]]</a>
-          internal slot.</td>
+          firing, the <code><a>RTCQuicBidirectionalStream</a></code> is added to both the
+          <code><a>RTCQuicTransport</a></code>'s <a>[[\QuicTransportReadableStreams]]</a>
+          and <a>[[\QuicTransportWritableStreams]]</a> internal slot.</td>
         </tr>
       </tbody>
     </table>

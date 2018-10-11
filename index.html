@@ -142,8 +142,8 @@ interface RTCQuicTransport : RTCStatsProvider {
     RTCQuicSendStream                  createSendStream ();
                     attribute EventHandler             onstatechange;
                     attribute EventHandler             onerror;
-                    attribute EventHandler             onnewreceivestreamwithdata;
-                    attribute EventHandler             onnewbidirectionalstreamwithdata;
+                    attribute EventHandler             onreceivestreamwithdata;
+                    attribute EventHandler             onbidirectionalstreamwithdata;
 };</pre>
         <section>
           <h2>Constructors</h2>
@@ -272,21 +272,21 @@ interface RTCQuicTransport : RTCStatsProvider {
               "SHOULD">SHOULD</em> include QUIC error information in
               <var>error.message</var> (defined in [[!HTML51]] Section 7.1.3.8.2).</p>
             </dd>
-            <dt><dfn><code>onnewreceivestreamwithdata</code></dfn> of type <span class=
+            <dt><dfn><code>onreceivestreamwithdata</code></dfn> of type <span class=
             "idlAttrType"><a>EventHandler</a></span></dt>
             <dd>
               <p>This event handler, of event handler event type
-              <code><a>newreceivestreamwithdata</a></code>,
+              <code><a>receivestreamwithdata</a></code>,
               <em class="rfc2119" title="MUST">MUST</em> be fired on when data is received
               from a newly created remote <code><a>RTCQuicSendStream</a></code> for the
               first time.
               </p>
             </dd>
-            <dt><dfn><code>onnewbidirectionalstreamwithdata</code></dfn> of type <span class=
+            <dt><dfn><code>onbidirectionalstreamwithdata</code></dfn> of type <span class=
             "idlAttrType"><a>EventHandler</a></span></dt>
             <dd>
               <p>This event handler, of event handler event type
-              <code><a>newbidirectionalstreamwithdata</a></code>,
+              <code><a>bidirectionalstreamwithdata</a></code>,
               <em class="rfc2119" title="MUST">MUST</em> be fired on when when data is received
               from a newly created remote <code><a>RTCQuicBidirectionalStream</a></code> for the
               first time.
@@ -543,20 +543,20 @@ interface RTCQuicTransport : RTCStatsProvider {
       </div>
     </section>
     <section>
-      <h3><dfn>NewReceiveStreamWithDataEvent</dfn></h3>
-      <p>The <code><a>newreceivestreamwithdata</a></code> event uses the
-      <code><a>NewReceiveStreamWithDataEvent</a></code> interface.</p>
+      <h3><dfn>ReceiveStreamWithDataEvent</dfn></h3>
+      <p>The <code><a>receivestreamwithdata</a></code> event uses the
+      <code><a>ReceiveStreamWithDataEvent</a></code> interface.</p>
       <div>
         <pre class="idl">
-        [ Constructor (DOMString type, NewReceiveStreamWithDataEventInit eventInitDict), Exposed=Window]
-interface NewReceiveStreamWithDataEvent : Event {
+        [ Constructor (DOMString type, ReceiveStreamWithDataEventInit eventInitDict), Exposed=Window]
+interface ReceiveStreamWithDataEvent : Event {
     readonly        attribute RTCQuicReceiveStream stream;
 };</pre>
         <section>
           <h2>Constructors</h2>
-          <dl data-link-for="NewReceiveStreamWithDataEvent" data-dfn-for="NewReceiveStreamWithDataEvent"
+          <dl data-link-for="ReceiveStreamWithDataEvent" data-dfn-for="ReceiveStreamWithDataEvent"
           class="constructors">
-            <dt><code>NewReceiveStreamWithDataEvent</code></dt>
+            <dt><code>ReceiveStreamWithDataEvent</code></dt>
             <dd>
               <table class="parameters">
                 <tbody>
@@ -578,7 +578,7 @@ interface NewReceiveStreamWithDataEvent : Event {
                   </tr>
                   <tr>
                     <td class="prmName">eventInitDict</td>
-                    <td class="prmType"><code><a>NewReceiveStreamWithDataEventInit</a></code></td>
+                    <td class="prmType"><code><a>ReceiveStreamWithDataEventInit</a></code></td>
                     <td class="prmNullFalse"><span role="img" aria-label=
                     "False">&#10008;</span></td>
                     <td class="prmOptFalse"><span role="img" aria-label=
@@ -592,7 +592,7 @@ interface NewReceiveStreamWithDataEvent : Event {
         </section>
         <section>
           <h2>Attributes</h2>
-          <dl data-link-for="NewReceiveStreamWithDataEvent" data-dfn-for="NewReceiveStreamWithDataEvent"
+          <dl data-link-for="ReceiveStreamWithDataEvent" data-dfn-for="ReceiveStreamWithDataEvent"
           class="attributes">
             <dt><code>stream</code> of type <span class=
             "idlAttrType"><a>RTCQuicReceiveStream</a></span>, readonly</dt>
@@ -605,15 +605,15 @@ interface NewReceiveStreamWithDataEvent : Event {
         </section>
       </div>
       <div>
-          <p>The <dfn><code>NewReceiveStreamWithDataEventInit</code></dfn> dictionary includes
+          <p>The <dfn><code>ReceiveStreamWithDataEventInit</code></dfn> dictionary includes
           information on the configuration of the QUIC stream.</p>
-        <pre class="idl">dictionary NewReceiveStreamWithDataEventInit : EventInit {
+        <pre class="idl">dictionary ReceiveStreamWithDataEventInit : EventInit {
              RTCQuicReceiveStream stream;
 };</pre>
         <section>
-          <h2>Dictionary NewReceiveStreamWithDataEventInit Members</h2>
-          <dl data-link-for="NewReceiveStreamWithDataEventInit" data-dfn-for=
-          "NewReceiveStreamWithDataEventInit" class="dictionary-members">
+          <h2>Dictionary ReceiveStreamWithDataEventInit Members</h2>
+          <dl data-link-for="ReceiveStreamWithDataEventInit" data-dfn-for=
+          "ReceiveStreamWithDataEventInit" class="dictionary-members">
             <dt><dfn><code>stream</code></dfn> of type <span class=
             "idlMemberType"><a>RTCQuicReceiveStream</a></span></dt>
             <dd>
@@ -625,20 +625,20 @@ interface NewReceiveStreamWithDataEvent : Event {
       </div>
     </section>
     <section>
-      <h3><dfn>NewBidirectionalStreamWithDataEvent</dfn></h3>
-      <p>The <code><a>newbidirectionalstreamwithdata</a></code> event uses the
-      <code><a>NewBidirectionalStreamWithDataEvent</a></code> interface.</p>
+      <h3><dfn>BidirectionalStreamWithDataEvent</dfn></h3>
+      <p>The <code><a>bidirectionalstreamwithdata</a></code> event uses the
+      <code><a>BidirectionalStreamWithDataEvent</a></code> interface.</p>
       <div>
         <pre class="idl">
-        [ Constructor (DOMString type, NewBidirectionalStreamWithDataEventInit eventInitDict), Exposed=Window]
-interface NewBidirectionalStreamWithDataEvent : Event {
+        [ Constructor (DOMString type, BidirectionalStreamWithDataEventInit eventInitDict), Exposed=Window]
+interface BidirectionalStreamWithDataEvent : Event {
     readonly        attribute RTCQuicBidirectionalStream stream;
 };</pre>
         <section>
           <h2>Constructors</h2>
-          <dl data-link-for="NewBidirectionalStreamWithDataEvent" data-dfn-for="NewBidirectionalStreamWithDataEvent"
+          <dl data-link-for="BidirectionalStreamWithDataEvent" data-dfn-for="BidirectionalStreamWithDataEvent"
           class="constructors">
-            <dt><code>NewBidirectionalStreamWithDataEvent</code></dt>
+            <dt><code>BidirectionalStreamWithDataEvent</code></dt>
             <dd>
               <table class="parameters">
                 <tbody>
@@ -660,7 +660,7 @@ interface NewBidirectionalStreamWithDataEvent : Event {
                   </tr>
                   <tr>
                     <td class="prmName">eventInitDict</td>
-                    <td class="prmType"><code><a>NewBidirectionalStreamWithDataEventInit</a></code></td>
+                    <td class="prmType"><code><a>BidirectionalStreamWithDataEventInit</a></code></td>
                     <td class="prmNullFalse"><span role="img" aria-label=
                     "False">&#10008;</span></td>
                     <td class="prmOptFalse"><span role="img" aria-label=
@@ -674,7 +674,7 @@ interface NewBidirectionalStreamWithDataEvent : Event {
         </section>
         <section>
           <h2>Attributes</h2>
-          <dl data-link-for="NewBidirectionalStreamWithDataEvent" data-dfn-for="NewBidirectionalStreamWithDataEvent"
+          <dl data-link-for="BidirectionalStreamWithDataEvent" data-dfn-for="BidirectionalStreamWithDataEvent"
           class="attributes">
             <dt><code>stream</code> of type <span class=
             "idlAttrType"><a>RTCQuicBidirectionalStream</a></span>, readonly</dt>
@@ -687,15 +687,15 @@ interface NewBidirectionalStreamWithDataEvent : Event {
         </section>
       </div>
       <div>
-          <p>The <dfn><code>NewBidirectionalStreamWithDataEventInit</code></dfn> dictionary includes
+          <p>The <dfn><code>BidirectionalStreamWithDataEventInit</code></dfn> dictionary includes
           information on the configuration of the QUIC stream.</p>
-        <pre class="idl">dictionary NewBidirectionalStreamWithDataEventInit : EventInit {
+        <pre class="idl">dictionary BidirectionalStreamWithDataEventInit : EventInit {
              RTCQuicBidirectionalStream stream;
 };</pre>
         <section>
-          <h2>Dictionary NewBidirectionalStreamWithDataEventInit Members</h2>
-          <dl data-link-for="NewBidirectionalStreamWithDataEventInit" data-dfn-for=
-          "NewBidirectionalStreamWithDataEventInit" class="dictionary-members">
+          <h2>Dictionary BidirectionalStreamWithDataEventInit Members</h2>
+          <dl data-link-for="BidirectionalStreamWithDataEventInit" data-dfn-for=
+          "BidirectionalStreamWithDataEventInit" class="dictionary-members">
             <dt><dfn><code>stream</code></dfn> of type <span class=
             "idlMemberType"><a>RTCQuicBidirectionalStream</a></span></dt>
             <dd>
@@ -863,7 +863,35 @@ interface NewBidirectionalStreamWithDataEvent : Event {
               <td>
                 <p>The QUIC connection has been closed as the result of an error (such as
                 receipt of an error alert or a failure to validate the remote
-                fingerprint).</p>
+                fingerprint). When the <code><a>RTCQuicTransport</a></code>'s
+                internal <a>[[\QuicTransportState]]</a> slot transitions to
+                <code>failed</code> the user agent <em class="rfc2119" title="MUST">MUST</em>
+                run the following steps:</p>
+                <ol>
+                  <li>Let <var>transport</var> be the <code><a>RTCQuicTransport</a></code>.
+                  <li>For each RTCQuicReadableStream in <var>transport</var>'s
+                  <a>[[\QuicTransportReadableStreams]]</a> internal slot run the
+                  following:</li>
+                  <ol>
+                    <li>Let <var>stream</var> be the RTCQuicReadableStream.</li>
+                    <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to
+                    <code>false</code>.</li>
+                    <li>Clear the <var>stream</var>'s read buffer.</li>
+                    <li>Remove the <var>stream</var> from the <var>transport</var>'s
+                    <a>[[\QuicTransportReadableStreams]]</a> internal slot.
+                  </ol>
+                  <li>For each RTCQuicWritableStream in <var>transport</var>'s
+                  <a>[[\QuicTransportWritableStreams]]</a> internal slot run the
+                  following:</li>
+                  <ol>
+                    <li>Let <var>stream</var> be the RTCQuicWritableStream.</li>
+                    <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to
+                    <code>false</code>.</li>
+                    <li>Clear the <var>stream</var>'s write buffer.</li>
+                    <li>Remove the <var>stream</var> from the <var>transport</var>'s
+                    <a>[[\QuicTransportWritableStreams]]</a> internal slot.
+                  </ol>
+                </ol>
               </td>
             </tr>
           </tbody>
@@ -887,7 +915,7 @@ interface NewBidirectionalStreamWithDataEvent : Event {
       following ways:</p>
       <ol>
         <li>Using the <code><a>RTCQuicTransport</a>.createBidirectionalStream</code></li>
-        <li>Getting a <code><a>newbidirectionalstreamwithdata</a></code> event on the
+        <li>Getting a <code><a>bidirectionalstreamwithdata</a></code> event on the
         <code><a>RTCQuicTransport</a></code></li>
       </ol>
       <p>A <code><a>RTCQuicSendStream</a></code> can be created in the following
@@ -898,7 +926,7 @@ interface NewBidirectionalStreamWithDataEvent : Event {
       <p>A <code><a>RTCQuicReceiveStream</a></code> can be created in the following
       ways:</p>
       <ol>
-        <li>Getting a <code><a>newreceivestreamwithdata</a></code> event on the
+        <li>Getting a <code><a>receivestreamwithdata</a></code> event on the
         <code><a>RTCQuicTransport</a></code></li>
       </ol>
     </section>
@@ -1156,6 +1184,7 @@ interface NewBidirectionalStreamWithDataEvent : Event {
             readonly attribute Promise&lt;RTCQuicStreamAbortInfo&gt; readingAborted;
             RTCQuicStreamReadResult readInto (Uint8Array data);
             void abortReading (RTCQuicStreamAbortInfo abortInfo);
+            Promise&lt;void&gt;   waitForReadable(unsigned long amount);
         };
         </pre>
         <section>
@@ -1620,21 +1649,21 @@ interface NewBidirectionalStreamWithDataEvent : Event {
           <td>The <code><a>RTCQuicTransportState</a></code> changed.</td>
         </tr>
         <tr>
-          <td><dfn><code>newreceivestreamwithdata</code></dfn></td>
-          <td><code><a>NewReceiveStreamWithDataEvent</a></code></td>
+          <td><dfn><code>receivestreamwithdata</code></dfn></td>
+          <td><code><a>ReceiveStreamWithDataEvent</a></code></td>
           <td>A new <code><a>RTCQuicReceiveStream</a></code> is dispatched to the
           script in response to the remote peer creating a send only QUIC stream and
-          sending data on it. Prior to <code><a>newreceivestreamwithdata</a></code>
+          sending data on it. Prior to <code><a>receivestreamwithdata</a></code>
           firing, the <code><a>RTCQuicReceiveStream</a></code> is added to
           <code><a>RTCQuicTransport</a></code>'s<a>[[\QuicTransportReadableStreams]]</a>
           internal slot.</td>
         </tr>
         <tr>
-          <td><dfn><code>newbidirectionalstreamwithdata</code></dfn></td>
-          <td><code><a>NewBidirectionalStreamWithDataEvent</a></code></td>
+          <td><dfn><code>bidirectionalstreamwithdata</code></dfn></td>
+          <td><code><a>BidirectionalStreamWithDataEvent</a></code></td>
           <td>A new <code><a>RTCQuicBidirectionalStream</a></code> is dispatched to the
           script in response to the remote peer creating a bidirectional QUIC stream and
-          sending data on it. Prior to <code><a>newbidirectionalstreamwithdata</a></code>
+          sending data on it. Prior to <code><a>bidirectionalstreamwithdata</a></code>
           firing, the <code><a>RTCQuicBidirectionalStream</a></code> is added to both the
           <code><a>RTCQuicTransport</a></code>'s <a>[[\QuicTransportReadableStreams]]</a>
           and <a>[[\QuicTransportWritableStreams]]</a> internal slot.</td>

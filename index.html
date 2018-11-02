@@ -937,6 +937,7 @@ interface BidirectionalStreamWithDataEvent : Event {
         [ Exposed=Window ]
         interface mixin RTCQuicWritableStream {
             readonly attribute boolean writable;
+            attribute boolean reliable;
             readonly attribute unsigned long writeBufferedAmount;
             readonly attribute Promise&lt;RTCQuicStreamAbortInfo&gt; writingAborted;
             void write (RTCQuicStreamWriteParameters data);
@@ -952,6 +953,8 @@ interface BidirectionalStreamWithDataEvent : Event {
             <li>Let <var>stream</var> be the <code><a>RTCQuicWritableStream</a></code>.</li>
             <li>Let <var>stream</var> have a <dfn>[[\Writable]]</dfn> internal
             slot initialized to <code>true</code>.</li>
+            <li>Let <var>stream</var> have a <dfn>[[\Reliable]]</dfn> internal
+            slot initialized to <code>true</code>.</li>
             <li>Let <var>stream</var> have a <dfn>[[\WriteBufferedAmount]]</dfn> internal
             slot initialized to zero.</li>
           </ol>
@@ -960,7 +963,7 @@ interface BidirectionalStreamWithDataEvent : Event {
           <h2>Attributes</h2>
           <dl data-link-for="RTCQuicWritableStream" data-dfn-for="RTCQuicWritableStream" class=
           "attributes">
-            <dt><code>writable</code> of type <span class=idlAttriType"><a>boolean</a>
+            <dt><code>writable</code> of type <span class="idlAttriType"><a>boolean</a>
             readonly</dt>
             <dd>
               <p>The <dfn id="dom-rtcquicwritablestream-writable"><code>writable</code></dfn>
@@ -968,6 +971,17 @@ interface BidirectionalStreamWithDataEvent : Event {
               <code><a>RTCQuicWritableStream</a></code>. On getting it
               <em class="rfc2119" title="MUST">MUST</em> return the value of the
               <a>[[\Writable]]</a> slot.</p>
+            </dd>
+            <dt><code>reliable</code> of type <span class="idlAttriType"><a>boolean</a></dt>
+            <dd>
+              <p>The <dfn id="dom-rtcquicwritablestream-reliable"><code>reliable</code></dfn>
+              attribute represents whether data written to the
+              <code><a>RTCQuicWritableStream</a></code> will be sent reliably. On getting it
+              <em class="rfc2119" title="MUST">MUST</em> return the value of the
+              <a>[[\Reliable]]</a> slot.  On setting it,
+              stream <em class="rfc2119" title="MUST">MUST</em> sent
+              according to the setting (unreliably if set to false,
+              reliably if set to true).</p>
             </dd>
             <dt><code>writeBufferedAmount</code> of type <span class="idlAttrType"><a>unsigned
             long</a></span>, readonly</dt>

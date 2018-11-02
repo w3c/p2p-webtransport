@@ -139,7 +139,7 @@ interface RTCQuicTransport : RTCStatsProvider {
     void                  start (RTCQuicParameters remoteParameters);
     void                  stop ();
     RTCQuicBidirectionalStream         createBidirectionalStream ();
-    RTCQuicSendStream                  createSendStream ();
+    RTCQuicSendStream                  createSendStream (optional RTCQuicStreamParameters parameters);
                     attribute EventHandler             onstatechange;
                     attribute EventHandler             onerror;
                     attribute EventHandler             onreceivestreamwithdata;
@@ -538,6 +538,30 @@ interface RTCQuicTransport : RTCStatsProvider {
               (with one computed with the digest algorithm used in the certificate
               signature).</p>
             </dd> 
+          </dl>
+        </section>
+      </div>
+    </section>
+    <section id="rtcstreamparameters*">
+      <h3><dfn>RTCQuicStreamParameters</dfn> Dictionary</h3>
+      <p>The <code>RTCQuicParameters</code> dictionary includes information
+      relating to QUIC stream configuration.</p>
+      <div>
+        <pre class="idl">dictionary RTCQuicStreamParameters {
+             bool reliable = true;
+};</pre>
+        <section>
+          <h2>Dictionary <a class="idlType">RTCQuicStreamParameters</a> Members</h2>
+          <dl data-link-for="RTCQuicStreamParameters" data-dfn-for="RTCQuicStreamParameters" class=
+          "dictionary-members">
+            <dt><dfn><code>reliable</code></dfn> of type <span class=
+            "idlMemberType"><a>bool</a></span>, defaulting to
+            <code>true</code></dt>
+            <dd>
+              <p>Reliable, with a default of <code>true</code>.  If
+              true, the stream will be sent reliably.  If not, the
+              stream will be sent unreliably.</p>
+            </dd>
           </dl>
         </section>
       </div>

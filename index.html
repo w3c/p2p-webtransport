@@ -576,14 +576,8 @@ interface BidirectionalStreamWithDataEvent : Event {
   </section>
   <section id="quic-transport*">
     <h2><dfn>QuicTransport</dfn> Interface</h2>
-    <p>The <code>QuicTransport</code> is a subclass
-    of <code>QuicTransportBase</code> focused on client/server use
-    cases.</p>
-    <section id="quictransport-operation*">
-      <h3>Operation</h3>
-      <p>A <code><a>QuicTransport</a></code> instance is constructed
-      using an URL which is constrained by CORS, just like a WebSocket.</p>
-    </section>
+    <p>The <code>QuicTransport</code> is a subclass of
+    <code>QuicTransportBase</code> focused on client/server use cases.</p>
     <section id="quictransport-interface-definition*">
       <h3>Interface Definition</h3>
       <div>
@@ -623,9 +617,13 @@ interface QuicTransport : QuicTransportBase {
             </li>
             <li>Run these steps in parallel:
               <ol>
-                <li>Establish a QUIC connection to the address
-                identified by the <var>parsedUrl</var>'s host and
-                port.</li>
+                <li>Establish a QUIC connection to the address identified by the
+                <var>parsedUrl</var>'s host and port.  The user agent MUST
+                include a QUIC transport parameter with ID web_origin(0x330) 
+                <!-- TODO: Register the transport parameter with IANA -->
+                and value equal to the value of an  <a
+                href="https://fetch.spec.whatwg.org/#origin-header">origin
+                header used for HTTP fetching</a></li>
                 <li>If the connection succeeds, set
                 the <var>quictransport</var>'s <dfn>[[\QuicTransportState]]</dfn>
                 internal slot to <code>"connected"</code>.</li>

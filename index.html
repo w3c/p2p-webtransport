@@ -137,7 +137,7 @@ interface RTCQuicTransport : RTCStatsProvider {
     sequence&lt;RTCCertificate&gt; getCertificates ();
     sequence&lt;ArrayBuffer&gt; getRemoteCertificates ();
     void                  start (RTCQuicParameters remoteParameters);
-    void                  stop ();
+    void                  stop (RTCQuicTransportStopInfo stopInfo);
     RTCQuicBidirectionalStream         createBidirectionalStream ();
     RTCQuicSendStream                  createSendStream ();
                     attribute EventHandler             onstatechange;
@@ -410,7 +410,10 @@ interface RTCQuicTransport : RTCStatsProvider {
                 then abort these steps.</li>
                 <li>Set <var>transport</var>'s <a>[[\QuicTransportState]]</a> to
                 <code>"closed"</code>.</li>
-                <li>Start the "Immediate Close" procedure by sending an APPLICATION_CLOSE frame.</li>
+                <li>Let <code>stopInfo></code> be the first argument.</li>
+                <li>Start the "Immediate Close" procedure by sending an CONNECTION_CLOSE frame
+                with its error code value set to the value of <var>stopInfo</var>.errorCode
+                and its reason value set to the value of <var>stopInfo</var>.reason.</li>
               </ol>
               <div>
                 <em>No parameters.</em>
@@ -418,6 +421,26 @@ interface RTCQuicTransport : RTCStatsProvider {
               <div>
                 <em>Return type:</em> <code>void</code>
               </div>
+              <table class="parameters">
+                <tbody>
+                  <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Nullable</th>
+                    <th>Optional</th>
+                    <th>Description</th>
+                  </tr>
+                  <tr>
+                    <td class="prmName">stopInfo</td>
+                    <td class="prmType"><code>RTCQuicTransportStopInfo</code></td>
+                    <td class="prmNullFalse"><span role="img" aria-label=
+                    "False">&#10008;</span></td>
+                    <td class="prmOptFalse"><span role="img" aria-label=
+                    "False">&#10008;</span></td>
+                    <td class="prmDesc"></td>
+                  </tr>
+                </tbody>
+              </table>
             </dd>
            <dt><dfn><code>createBidirectionalStream</code></dfn></dt>
             <dd>
@@ -896,6 +919,37 @@ interface BidirectionalStreamWithDataEvent : Event {
             </tr>
           </tbody>
         </table>
+      </div>
+    </section>
+    <section id="rtcquictransportstopinfo*">
+      <h3><dfn>RTCQuicTransportStopInfo</dfn> Dictionary</h3>
+      <p>The <code>RTCQuicTransportStopInfo</code> dictionary includes information
+      relating to the error code for stopping a <code><a>RTCQuicTransport</a></code>.
+      This information is used to set the error code and reason for an CONNECTION_CLOSE
+      frame.</p>
+      <div>
+        <pre class="idl">dictionary RTCQuicTransportStopInfo {
+             unsigned short errorCode = 0;
+             DOMString reason = "";
+        };
+        </pre>
+        <section>
+          <h2>Dictionary <a class="idlType">RTCQuicTransportStopInfo</a> Members</h2>
+          <dl data-link-for="RTCQuicTransportStopInfo" data-dfn-for="RTCQuicTransportStopInfo" class=
+          "dictionary-members">
+            <dt><dfn><code>errorCode</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned short</a></span>, defaulting to
+            <code>0</code>.</dt>
+            <dd>
+              <p>The error code used in CONNECTION_CLOSE frame.</p>
+            </dd>
+            <dt><dfn><code>reason</code></dfn> of type <span class=
+            "idlMemberType"><a>DOMString</a></span>, defaulting to <code>""</code></dt>
+            <dd>
+              <p>The reason for stopping the <code><a>RTCQuicTransport</a></code></p>
+            </dd>
+          </dl>
+        </section>
       </div>
     </section>
   </section>

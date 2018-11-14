@@ -1688,7 +1688,15 @@ interface BidirectionalStreamWithDataEvent : Event {
   </section>
  <section class="informative" id="examples*">
     <h2>Examples</h2>
+    <h3>Unreliable delivery</h3>
+    <p>Unreliable delivery can be achieved by creating many small streams
+    (treated each as a single small message) with restranmissions disabled.</p>
       <pre class="example highlight">
+let quic = getQuicTransport();
+let messages = getMessages();
+for (msg in messages) {
+  quic.createSendStream({disableRetransmissions: true}).write({data: msg, finished: true});
+}
       </pre>
  </section>
  <section id="change-log*">

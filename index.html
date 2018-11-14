@@ -138,8 +138,8 @@ interface RTCQuicTransport : RTCStatsProvider {
     sequence&lt;ArrayBuffer&gt; getRemoteCertificates ();
     void                  start (RTCQuicParameters remoteParameters);
     void                  stop ();
-    RTCQuicBidirectionalStream         createBidirectionalStream ();
-    RTCQuicSendStream                  createSendStream ();
+    Promise&lt;RTCQuicBidirectionalStream&gt;         createBidirectionalStream ();
+    Promise&lt;RTCQuicSendStream&gt;                  createSendStream ();
                     attribute EventHandler             onstatechange;
                     attribute EventHandler             onerror;
                     attribute EventHandler             onreceivestreamwithdata;
@@ -434,35 +434,38 @@ interface RTCQuicTransport : RTCStatsProvider {
                   on which <code>createBidectionalStream</code> is invoked.</p>
                 </li>
                 <li>
-                  <p>If <code><var>transport</var>'s state</code> is not <code>connected</code>
-                  <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</p>
+                  <p>Let <var>p</var> be a new promise.</p>
+                <li>
+                  <p>If <code><var>transport</var>'s state</code> is <code>closed</code> or
+                  <code>failed</code>, immediately <a>reject</a> <var>p</var> with a newly created
+                  <code>InvalidStateError</code> and abort these steps.</p>
                 </li>
                 <li>
-                  <p>Let <var>stream</var> be a newly created
-                  <code><a>RTCQuicBidirectionalStream</a></code> object.</p>
+                  <p>If <code><var>transport</var>'s state</code> is <code>connected</code>,
+                  immediately <a>resolve</a> <var>p</var> with a newly created
+                  <code><a>RTCQuicBidirectionalStream</a></code> object,
+                  <a>add the RTCQuicBidirectionalStream</a> to the <code><a>RTCQuicTransport</a></code>
+                  and abort these steps.</p>
                 </li>
                 <li>
-                  <p>Add <var>stream</var> to <var>transport</var>'s
-                  <a>[[\QuicTransportWritableStreams]]</a> internal slot. </p>
+                  <p>When <code><var>transport</var>'s state</code> transitions to
+                  <code>connected</code> and <var>p</var> has not been <a>settled</a>,
+                  <a>resolve</a> <var>p</var> with a newly created
+                  <code><a>RTCQuicBidirectionalStream</a></code> object, and
+                  <a>add the RTCQuicBidirectionalStream</a> to the <code><a>RTCQuicTransport</a></code>.</p>
                 </li>
                 <li>
-                  <p>Add <var>stream</var> to <var>transport</var>'s
-                  <a>[[\QuicTransportReadableStreams]]</a> internal slot. </p>
-                </li>
-                <li>
-                  <p>Return <var>stream</var> and continue the following steps
-                  in the background.</p>
-                </li>
-                <li>
-                  <p>Create <var>stream</var>'s associated underlying data
-                  transport.</p>
+                  <p>When <code><var>transport</var>'s state</code> transitions to
+                  <code>closed</code> or <code>failed</code> and <var>p</var> has not been
+                  <a>settled</a>, <a>reject</a> <var>p</var> with a newly created
+                  <code>InvalidStateError</code>.</p>
                 </li>
               </ol>
               <div>
                 <em>No parameters.</em>
               </div>
               <div>
-                <em>Return type:</em> <code><a>RTCQuicBidirectionalStream</a></code>
+                <em>Return type:</em> <code><a>Promise&lt;RTCQuicBidirectionalStream&gt;</a></code>
               </div>
             </dd>
            <dt><dfn><code>createSendStream</code></dfn></dt>
@@ -480,37 +483,94 @@ interface RTCQuicTransport : RTCStatsProvider {
                   on which <code>createSendStream</code> is invoked.</p>
                 </li>
                 <li>
-                  <p>If <code><var>transport</var>'s state</code> is not <code>connected</code>
-                  <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</p>
+                  <p>Let <var>p</var> be a new promise.</p>
+                <li>
+                  <p>If <code><var>transport</var>'s state</code> is <code>closed</code> or
+                  <code>failed</code>, immediately <a>reject</a> <var>p</var> with a newly created
+                  <code>InvalidStateError</code> and abort these steps.</p>
                 </li>
                 <li>
-                  <p>Let <var>stream</var> be a newly created
-                  <code><a>RTCQuicSendStream</a></code> object.</p>
+                  <p>If <code><var>transport</var>'s state</code> is <code>connected</code>,
+                  immediately <a>resolve</a> <var>p</var> with a newly created
+                  <code><a>RTCQuicSendStream</a></code> object, <a>add the RTCQuicSendStream</a>
+                  to the <code><a>RTCQuicTransport</a></code> and abort these steps.</p>
                 </li>
                 <li>
-                  <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\QuicTransportWritableStreams]]</a>
-                  internal slot. </p>
+                  <p>When <code><var>transport</var>'s state</code> transitions to
+                  <code>connected</code> and <var>p</var> has not been <a>settled</a>,
+                  <a>resolve</a> <var>p</var> with a newly created
+                  <code><a>RTCQuicSendStream</a></code> object, and
+                  <a>add the RTCQuicSendStream</a> to the <code><a>RTCQuicTransport</a></code>.</p>
                 </li>
                 <li>
-                  <p>Return <var>stream</var> and continue the following steps
-                  in the background.</p>
-                </li>
-                <li>
-                  <p>Create <var>stream</var>'s associated underlying data
-                  transport.</p>
+                  <p>When <code><var>transport</var>'s state</code> transitions to
+                  <code>closed</code> or <code>failed</code> and <var>p</var> has not been
+                  <a>settled</a>, <a>reject</a> <var>p</var> with a newly created
+                  <code>InvalidStateError</code>.</p>
                 </li>
               </ol>
               <div>
                 <em>No parameters.</em>
               </div>
               <div>
-                <em>Return type:</em> <code><a>RTCQuicSendStream</a></code>
+                <em>Return type:</em> <code><a>Promise&lt;RTCQuicSendStream&gt;</a></code>
               </div>
             </dd>
-
           </dl>
         </section>
       </div>
+    </section>
+    <section id="rtcquictransport-procedures*">
+    <h3>Procedures</h3>
+      <section>
+        <h4 id="add-bidirectional-stream-to-transport">Add RTCQuicBidirectionalStream
+        to the RTCQuicTransport</h4>
+        <p>To <dfn>add the RTCQuicBidirectionalStream</dfn> to the <code><a>RTCQuicTransport</a></code>
+        run the following steps:</p>
+        <ol>
+          <li>
+            <p>Let <var>stream</var> be the newly created
+            <code><a>RTCQuicBidirectionalStream</a></code> object.</p>
+          </li>
+          <li>
+            <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\QuicTransportReadableStreams]]</a>
+            internal slot. </p>
+          </li>
+          <li>
+            <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\QuicTransportWritableStreams]]</a>
+            internal slot. </p>
+          </li>
+          <li>
+            <p>Continue the following steps in the background.</p>
+          </li>
+          <li>
+            <p>Create <var>stream</var>'s associated underlying data
+            transport.</p>
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h4 id="add-send-stream-to-transport">Add RTCQuicSendStream to the RTCQuicTransport</h4>
+        <p>To <dfn>add the RTCQuicSendStream</dfn> to the <code><a>RTCQuicTransport</a></code>
+        run the following steps:</p>
+        <ol>
+          <li>
+            <p>Let <var>stream</var> be the newly created
+            <code><a>RTCQuicSendStream</a></code> object.</p>
+          </li>
+          <li>
+            <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\QuicTransportWritableStreams]]</a>
+            internal slot. </p>
+          </li>
+          <li>
+            <p>Continue the following steps in the background.</p>
+          </li>
+          <li>
+            <p>Create <var>stream</var>'s associated underlying data
+            transport.</p>
+          </li>
+        </ol>
+      </section>
     </section>
     <section id="rtcquicparameters*">
       <h3><dfn>RTCQuicParameters</dfn> Dictionary</h3>

@@ -29,10 +29,7 @@
     <p>While this specification defines an interface to QUIC streams,
     by utilizing a QUIC stream per message, it is possible to implement
     support for message-based communications (such as <code>RTCDataChannel</code>)
-    on top.  While the QUIC transport defined in [[!QUIC-TRANSPORT]] is reliable,
-    support for unreliable communications is achievable via use of timers or
-    through future extensions to the QUIC protocol.</p>
-  </section>
+    on top.</p>  </section>
   <section id="conformance">
     <p>This specification defines conformance criteria that apply to a single
     product: the <dfn>user agent</dfn> that implements the interfaces that it
@@ -137,7 +134,7 @@ interface RTCQuicTransport : RTCStatsProvider {
     sequence&lt;RTCCertificate&gt; getCertificates ();
     sequence&lt;ArrayBuffer&gt; getRemoteCertificates ();
     void                  start (RTCQuicParameters remoteParameters);
-    void                  stop ();
+    void                  stop (RTCQuicTransportStopInfo stopInfo);
     Promise&lt;RTCQuicBidirectionalStream&gt;         createBidirectionalStream ();
     Promise&lt;RTCQuicSendStream&gt;                  createSendStream ();
                     attribute EventHandler             onstatechange;
@@ -410,7 +407,10 @@ interface RTCQuicTransport : RTCStatsProvider {
                 then abort these steps.</li>
                 <li>Set <var>transport</var>'s <a>[[\QuicTransportState]]</a> to
                 <code>"closed"</code>.</li>
-                <li>Start the "Immediate Close" procedure by sending an APPLICATION_CLOSE frame.</li>
+                <li>Let <code>stopInfo></code> be the first argument.</li>
+                <li>Start the "Immediate Close" procedure by sending an CONNECTION_CLOSE frame
+                with its error code value set to the value of <var>stopInfo</var>.errorCode
+                and its reason value set to the value of <var>stopInfo</var>.reason.</li>
               </ol>
               <div>
                 <em>No parameters.</em>
@@ -418,13 +418,30 @@ interface RTCQuicTransport : RTCStatsProvider {
               <div>
                 <em>Return type:</em> <code>void</code>
               </div>
+              <table class="parameters">
+                <tbody>
+                  <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Nullable</th>
+                    <th>Optional</th>
+                    <th>Description</th>
+                  </tr>
+                  <tr>
+                    <td class="prmName">stopInfo</td>
+                    <td class="prmType"><code>RTCQuicTransportStopInfo</code></td>
+                    <td class="prmNullFalse"><span role="img" aria-label=
+                    "False">&#10008;</span></td>
+                    <td class="prmOptFalse"><span role="img" aria-label=
+                    "False">&#10008;</span></td>
+                    <td class="prmDesc"></td>
+                  </tr>
+                </tbody>
+              </table>
             </dd>
            <dt><dfn><code>createBidirectionalStream</code></dfn></dt>
             <dd>
-              <p>Creates an <code><a>RTCQuicBidirectionalStream</a></code> object.
-              Since [[QUIC-TRANSPORT]] only defines reliable QUIC streams,
-              <code>createBidectionalStream</code> only supports creation of reliable
-              streams.</p>
+              <p>Creates an <code><a>RTCQuicBidirectionalStream</a></code> object.</p>
               <p>When <code>createBidectionalStream</code> is called, the user agent
               <em class="rfc2119" title="MUST">MUST</em> run the following
               steps:</p>
@@ -470,10 +487,7 @@ interface RTCQuicTransport : RTCStatsProvider {
             </dd>
            <dt><dfn><code>createSendStream</code></dfn></dt>
             <dd>
-              <p>Creates an <code><a>RTCQuicSendStream</a></code> object.
-              Since [[QUIC-TRANSPORT]] only defines reliable QUIC streams,
-              <code>createSendStream</code> only supports creation of reliable
-              streams.</p>
+              <p>Creates an <code><a>RTCQuicSendStream</a></code> object.</p>
               <p>When <code>createSendStream</code> is called, the user agent
               <em class="rfc2119" title="MUST">MUST</em> run the following
               steps:</p>
@@ -598,6 +612,30 @@ interface RTCQuicTransport : RTCStatsProvider {
               (with one computed with the digest algorithm used in the certificate
               signature).</p>
             </dd> 
+          </dl>
+        </section>
+      </div>
+    </section>
+    <section id="rtcstreamparameters*">
+      <h3><dfn>RTCQuicStreamParameters</dfn> Dictionary</h3>
+      <p>The <code>RTCQuicParameters</code> dictionary includes information
+      relating to QUIC stream configuration.</p>
+      <div>
+        <pre class="idl">dictionary RTCQuicStreamParameters {
+             bool disableRetransmissions = false;
+};</pre>
+        <section>
+          <h2>Dictionary <a class="idlType">RTCQuicStreamParameters</a> Members</h2>
+          <dl data-link-for="RTCQuicStreamParameters" data-dfn-for="RTCQuicStreamParameters" class=
+          "dictionary-members">
+            <dt><dfn><code>disableRetransmissions</code></dfn> of type <span class=
+            "idlMemberType"><a>bool</a></span>, defaulting to
+            <code>false</code></dt>
+            <dd>
+              <p>disableRetransmissions, with a default of <code>false</code>.  If
+              true, the stream will be sent without retransmissions.  If false, the
+              stream will be sent with retransmissions.</p>
+            </dd>
           </dl>
         </section>
       </div>
@@ -956,6 +994,37 @@ interface BidirectionalStreamWithDataEvent : Event {
             </tr>
           </tbody>
         </table>
+      </div>
+    </section>
+    <section id="rtcquictransportstopinfo*">
+      <h3><dfn>RTCQuicTransportStopInfo</dfn> Dictionary</h3>
+      <p>The <code>RTCQuicTransportStopInfo</code> dictionary includes information
+      relating to the error code for stopping a <code><a>RTCQuicTransport</a></code>.
+      This information is used to set the error code and reason for an CONNECTION_CLOSE
+      frame.</p>
+      <div>
+        <pre class="idl">dictionary RTCQuicTransportStopInfo {
+             unsigned short errorCode = 0;
+             DOMString reason = "";
+        };
+        </pre>
+        <section>
+          <h2>Dictionary <a class="idlType">RTCQuicTransportStopInfo</a> Members</h2>
+          <dl data-link-for="RTCQuicTransportStopInfo" data-dfn-for="RTCQuicTransportStopInfo" class=
+          "dictionary-members">
+            <dt><dfn><code>errorCode</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned short</a></span>, defaulting to
+            <code>0</code>.</dt>
+            <dd>
+              <p>The error code used in CONNECTION_CLOSE frame.</p>
+            </dd>
+            <dt><dfn><code>reason</code></dfn> of type <span class=
+            "idlMemberType"><a>DOMString</a></span>, defaulting to <code>""</code></dt>
+            <dd>
+              <p>The reason for stopping the <code><a>RTCQuicTransport</a></code></p>
+            </dd>
+          </dl>
+        </section>
       </div>
     </section>
   </section>
@@ -1733,7 +1802,15 @@ interface BidirectionalStreamWithDataEvent : Event {
   </section>
  <section class="informative" id="examples*">
     <h2>Examples</h2>
+    <h3>Unreliable delivery</h3>
+    <p>Unreliable delivery can be achieved by creating many small streams
+    (treated each as a single small message) with restranmissions disabled.</p>
       <pre class="example highlight">
+let quic = getQuicTransport();
+let messages = getMessages();
+for (msg in messages) {
+  quic.createSendStream({disableRetransmissions: true}).write({data: msg, finished: true});
+}
       </pre>
  </section>
  <section id="change-log*">

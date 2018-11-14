@@ -29,10 +29,7 @@
     <p>While this specification defines an interface to QUIC streams,
     by utilizing a QUIC stream per message, it is possible to implement
     support for message-based communications (such as <code>RTCDataChannel</code>)
-    on top.  While the QUIC transport defined in [[!QUIC-TRANSPORT]] is reliable,
-    support for unreliable communications is achievable via use of timers or
-    through future extensions to the QUIC protocol.</p>
-  </section>
+    on top.</p>  </section>
   <section id="conformance">
     <p>This specification defines conformance criteria that apply to a single
     product: the <dfn>user agent</dfn> that implements the interfaces that it
@@ -421,10 +418,7 @@ interface RTCQuicTransport : RTCStatsProvider {
             </dd>
            <dt><dfn><code>createBidirectionalStream</code></dfn></dt>
             <dd>
-              <p>Creates an <code><a>RTCQuicBidirectionalStream</a></code> object.
-              Since [[QUIC-TRANSPORT]] only defines reliable QUIC streams,
-              <code>createBidectionalStream</code> only supports creation of reliable
-              streams.</p>
+              <p>Creates an <code><a>RTCQuicBidirectionalStream</a></code> object.</p>
               <p>When <code>createBidectionalStream</code> is called, the user agent
               <em class="rfc2119" title="MUST">MUST</em> run the following
               steps:</p>
@@ -467,10 +461,7 @@ interface RTCQuicTransport : RTCStatsProvider {
             </dd>
            <dt><dfn><code>createSendStream</code></dfn></dt>
             <dd>
-              <p>Creates an <code><a>RTCQuicSendStream</a></code> object.
-              Since [[QUIC-TRANSPORT]] only defines reliable QUIC streams,
-              <code>createSendStream</code> only supports creation of reliable
-              streams.</p>
+              <p>Creates an <code><a>RTCQuicSendStream</a></code> object.</p>
               <p>When <code>createSendStream</code> is called, the user agent
               <em class="rfc2119" title="MUST">MUST</em> run the following
               steps:</p>
@@ -548,19 +539,19 @@ interface RTCQuicTransport : RTCStatsProvider {
       relating to QUIC stream configuration.</p>
       <div>
         <pre class="idl">dictionary RTCQuicStreamParameters {
-             bool reliable = true;
+             bool disableRetransmissions = false;
 };</pre>
         <section>
           <h2>Dictionary <a class="idlType">RTCQuicStreamParameters</a> Members</h2>
           <dl data-link-for="RTCQuicStreamParameters" data-dfn-for="RTCQuicStreamParameters" class=
           "dictionary-members">
-            <dt><dfn><code>reliable</code></dfn> of type <span class=
+            <dt><dfn><code>disableRetransmissions</code></dfn> of type <span class=
             "idlMemberType"><a>bool</a></span>, defaulting to
-            <code>true</code></dt>
+            <code>false</code></dt>
             <dd>
-              <p>Reliable, with a default of <code>true</code>.  If
-              true, the stream will be sent reliably.  If not, the
-              stream will be sent unreliably.</p>
+              <p>disableRetransmissions, with a default of <code>false</code>.  If
+              true, the stream will be sent without retransmissions.  If false, the
+              stream will be sent with retransmissions.</p>
             </dd>
           </dl>
         </section>

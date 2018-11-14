@@ -621,9 +621,9 @@ interface QuicTransport : QuicTransportBase {
                 <var>parsedUrl</var>'s host and port.  The user agent MUST
                 include a QUIC transport parameter with ID web_origin(0x330) 
                 <!-- TODO: Register the transport parameter with IANA -->
-                and value equal to the value of an  <a
-                href="https://fetch.spec.whatwg.org/#origin-header">origin
-                header used for HTTP fetching</a></li>
+                and value equal to the value of <a
+                href="https://html.spec.whatwg.org/multipage/webappapis.html#dom-origin">the
+                serialized origin</a> of the relevant global object (i.e. self.origin).</li>
                 <li>If the connection succeeds, set
                 the <var>quictransport</var>'s <dfn>[[\QuicTransportState]]</dfn>
                 internal slot to <code>"connected"</code>.</li>

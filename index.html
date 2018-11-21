@@ -1090,7 +1090,7 @@ interface BidirectionalStreamWithDataEvent : Event {
               run the following steps:</p>
               <ol>
                <li>Let <var>data</var> be the first argument.</li>
-               <li>Let <var>stream</var> be the RTCQuicWritableStream
+               <li>Let <var>stream</var> be the <code><a>RTCQuicWritableStream</a></code>
                object on which <var>data</var> is to be sent.</li>
                <li>if length of <var>data</var>.data is 0 and <var>data</var>.finished is
                <code>false</code>, <a>throw</a> a <code>NotSupportedError</code> and abort
@@ -1604,7 +1604,7 @@ interface BidirectionalStreamWithDataEvent : Event {
             <dt><dfn><code>finished</code></dfn> of type <span class=
             "idlMemberType">boolean</span>.</dt>
             <dd>
-              <p>Set to <code>true</code> if the RTCQuicReadableStream has
+              <p>Set to <code>true</code> if the <code><a>RTCQuicReadableStream</a></code> has
               <a>finished reading</a>.</p>
             </dd>
           </dl>

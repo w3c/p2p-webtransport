@@ -397,7 +397,7 @@ interface RTCQuicTransport : RTCStatsProvider {
             <dt><dfn><code>stop</code></dfn></dt>
             <dd>
               <p>Stops and closes the <code><a>RTCQuicTransport</a></code> object.
-              This triggers an "Immediate Close," as described in [[QUIC-TRANSPORT]] section 6.13.3.
+              This triggers an <dfn>Immediate Close</dfn> as described in [[QUIC-TRANSPORT]] section 10.3.
               <p>When <code>stop</code> is called, the user agent <em class="rfc2119" title="MUST">MUST</em>
               run the following steps:</p>
               <ol>
@@ -408,7 +408,7 @@ interface RTCQuicTransport : RTCStatsProvider {
                 <li>Set <var>transport</var>'s <a>[[\QuicTransportState]]</a> to
                 <code>"closed"</code>.</li>
                 <li>Let <code>stopInfo</code> be the first argument.</li>
-                <li>Start the "Immediate Close" procedure by sending an CONNECTION_CLOSE frame
+                <li>Start the <a>Immediate Close</a> procedure by sending an CONNECTION_CLOSE frame
                 with its error code value set to the value of <var>stopInfo</var>.errorCode
                 and its reason value set to the value of <var>stopInfo</var>.reason.</li>
               </ol>

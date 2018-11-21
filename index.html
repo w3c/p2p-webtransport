@@ -870,22 +870,22 @@ interface BidirectionalStreamWithDataEvent : Event {
                 run the following steps:</p>
                 <ol>
                   <li>Let <var>transport</var> be the <code><a>RTCQuicTransport</a></code>.
-                  <li>For each RTCQuicReadableStream in <var>transport</var>'s
+                  <li>For each <code><a>RTCQuicReadableStream</a></code> in <var>transport</var>'s
                   <a>[[\QuicTransportReadableStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
-                    <li>Let <var>stream</var> be the RTCQuicReadableStream.</li>
+                    <li>Let <var>stream</var> be the <code><a>RTCQuicReadableStream</a></code>.</li>
                     <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to
                     <code>false</code>.</li>
                     <li>Clear the <var>stream</var>'s read buffer.</li>
                     <li>Remove the <var>stream</var> from the <var>transport</var>'s
                     <a>[[\QuicTransportReadableStreams]]</a> internal slot.
                   </ol>
-                  <li>For each RTCQuicWritableStream in <var>transport</var>'s
+                  <li>For each <code><a>RTCQuicWritableStream</a></code> in <var>transport</var>'s
                   <a>[[\QuicTransportWritableStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
-                    <li>Let <var>stream</var> be the RTCQuicWritableStream.</li>
+                    <li>Let <var>stream</var> be the <code><a>RTCQuicWritableStream</a></code>.</li>
                     <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to
                     <code>false</code>.</li>
                     <li>Clear the <var>stream</var>'s write buffer.</li>
@@ -907,22 +907,22 @@ interface BidirectionalStreamWithDataEvent : Event {
                 run the following steps:</p>
                 <ol>
                   <li>Let <var>transport</var> be the <code><a>RTCQuicTransport</a></code>.
-                  <li>For each RTCQuicReadableStream in <var>transport</var>'s
+                  <li>For each <code><a>RTCQuicReadableStream</a></code> in <var>transport</var>'s
                   <a>[[\QuicTransportReadableStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
-                    <li>Let <var>stream</var> be the RTCQuicReadableStream.</li>
+                    <li>Let <var>stream</var> be the <code><a>RTCQuicReadableStream</a></code>.</li>
                     <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to
                     <code>false</code>.</li>
                     <li>Clear the <var>stream</var>'s read buffer.</li>
                     <li>Remove the <var>stream</var> from the <var>transport</var>'s
                     <a>[[\QuicTransportReadableStreams]]</a> internal slot.
                   </ol>
-                  <li>For each RTCQuicWritableStream in <var>transport</var>'s
+                  <li>For each <code><a>RTCQuicWritableStream</a></code> in <var>transport</var>'s
                   <a>[[\QuicTransportWritableStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
-                    <li>Let <var>stream</var> be the RTCQuicWritableStream.</li>
+                    <li>Let <var>stream</var> be the <code><a>RTCQuicWritableStream</a></code>.</li>
                     <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to
                     <code>false</code>.</li>
                     <li>Clear the <var>stream</var>'s write buffer.</li>

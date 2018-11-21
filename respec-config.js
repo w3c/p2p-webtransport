@@ -39,6 +39,17 @@ var respecConfig = {
       "href": "https://www.iana.org/assignments/stun-parameters/stun-parameters.xhtml#stun-parameters-6",
       "publisher": "IANA"
     },
+      "QUIC-DATAGRAM": {
+      "title": "An Unreliable Datagram Extension to QUIC",
+      "href": "https://tools.ietf.org/html/draft-pauly-quic-datagram",
+      "authors": [
+        "T. Pauly",
+        "E. Kinnear",
+        "D. Schinazi"
+      ],
+      "status": "10 September 2018. Internet draft (work in progress)",
+      "publisher": "IETF"
+    },
     "QUIC-TRANSPORT": {
       "title": "QUIC: A UDP-Based Multiplexed and Secure Transport",
       "href": "https://tools.ietf.org/html/draft-ietf-quic-transport",
@@ -46,7 +57,7 @@ var respecConfig = {
         "J. Iyengar",
         "M. Thomson"
       ],
-      "status": "13 October 2017. Internet draft (work in progress)",
+      "status": "23 October 2018. Internet draft (work in progress)",
       "publisher": "IETF"
     },
     "QUIC-MULT": {
@@ -57,7 +68,7 @@ var respecConfig = {
         "P. Thatcher",
         "C. Perkins"
       ],
-      "status": "29 October 2017. Internet draft (work in progress)",
+      "status": "23 October 2018. Internet draft (work in progress)",
       "publisher": "IETF"
     },
     "RFC7675": {
@@ -92,7 +103,7 @@ var respecConfig = {
         "C. Jennings",
         "E. Rescorla"
       ],
-      "status": "10 October 2017. Internet Draft (work in progress)",
+      "status": "22 October 2018. Internet Draft (work in progress)",
       "publisher": "IETF"
     },
     "RTCWEB-SECURITY": {
@@ -101,7 +112,7 @@ var respecConfig = {
       "authors": [
         "E. Rescorla"
       ],
-      "status": "29 October 2017. Internet Draft (work in progress)",
+      "status": "22 January 2018. Internet Draft (work in progress)",
       "publisher": "IETF"
     },
     "RTCWEB-SECURITY-ARCH": {
@@ -110,7 +121,7 @@ var respecConfig = {
       "authors": [
         "E. Rescorla"
       ],
-      "status": "30 October 2017. Internet Draft (work in progress)",
+      "status": "17 November 2018. Internet Draft (work in progress)",
       "publisher": "IETF"
     },
     "TLS13": {
@@ -119,7 +130,7 @@ var respecConfig = {
       "authors": [
         "E. Rescorla"
       ],
-      "status": "03 July 2017. Internet Draft (work in progress)",
+      "status": "20 March 2018. Internet Draft (work in progress)",
       "publisher": "IETF"
     },
     "WEBRTC-STATS": {
@@ -129,7 +140,7 @@ var respecConfig = {
         "Harald Alvestrand",
         "Varun Singh"
       ],
-      "status": "29 October 2017 (work in progress)",
+      "status": "07 November 2018 (work in progress)",
       "publisher": "W3C"
     }
   }

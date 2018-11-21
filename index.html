@@ -407,7 +407,7 @@ interface RTCQuicTransport : RTCStatsProvider {
                 then abort these steps.</li>
                 <li>Set <var>transport</var>'s <a>[[\QuicTransportState]]</a> to
                 <code>"closed"</code>.</li>
-                <li>Let <code>stopInfo></code> be the first argument.</li>
+                <li>Let <code>stopInfo</code> be the first argument.</li>
                 <li>Start the "Immediate Close" procedure by sending an CONNECTION_CLOSE frame
                 with its error code value set to the value of <var>stopInfo</var>.errorCode
                 and its reason value set to the value of <var>stopInfo</var>.reason.</li>

@@ -499,26 +499,26 @@ interface RTCQuicTransport : RTCStatsProvider {
                 <li>
                   <p>Let <var>p</var> be a new promise.</p>
                 <li>
-                  <p>If <code><var>transport</var>'s state</code> is <code>closed</code> or
-                  <code>failed</code>, immediately <a>reject</a> <var>p</var> with a newly created
+                  <p>If <code><var>transport</var>'s state</code> is <code>"closed"</code> or
+                  <code>"failed"</code>, immediately <a>reject</a> <var>p</var> with a newly created
                   <code>InvalidStateError</code> and abort these steps.</p>
                 </li>
                 <li>
-                  <p>If <code><var>transport</var>'s state</code> is <code>connected</code>,
+                  <p>If <code><var>transport</var>'s state</code> is <code>"connected"</code>,
                   immediately <a>resolve</a> <var>p</var> with a newly created
                   <code><a>RTCQuicSendStream</a></code> object, <a>add the RTCQuicSendStream</a>
                   to the <code><a>RTCQuicTransport</a></code> and abort these steps.</p>
                 </li>
                 <li>
                   <p>When <code><var>transport</var>'s state</code> transitions to
-                  <code>connected</code> and <var>p</var> has not been <a>settled</a>,
+                  <code>"connected"</code> and <var>p</var> has not been <a>settled</a>,
                   <a>resolve</a> <var>p</var> with a newly created
                   <code><a>RTCQuicSendStream</a></code> object, and
                   <a>add the RTCQuicSendStream</a> to the <code><a>RTCQuicTransport</a></code>.</p>
                 </li>
                 <li>
                   <p>When <code><var>transport</var>'s state</code> transitions to
-                  <code>closed</code> or <code>failed</code> and <var>p</var> has not been
+                  <code>"closed"</code> or <code>"failed"</code> and <var>p</var> has not been
                   <a>settled</a>, <a>reject</a> <var>p</var> with a newly created
                   <code>InvalidStateError</code>.</p>
                 </li>

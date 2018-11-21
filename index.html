@@ -29,7 +29,13 @@
     <p>While this specification defines an interface to QUIC streams,
     by utilizing a QUIC stream per message, it is possible to implement
     support for message-based communications (such as <code>RTCDataChannel</code>)
-    on top.</p>  </section>
+    on top.</p>
+    <p class="note">The QUIC API presented in this and the subsequent
+    section represents a preliminary proposal based on work-in-progress
+    within the IETF QUIC WG. Since the QUIC transport specification is
+    a work-in-progress, both the protocol and API are likely to
+    change significantly going forward.</p>
+  </section>
   <section id="conformance">
     <p>This specification defines conformance criteria that apply to a single
     product: the <dfn>user agent</dfn> that implements the interfaces that it
@@ -89,11 +95,6 @@
       one or more <code><a>RTCQuicBidirectionalStream</a></code>,
       <code><a>RTCQuicSendStream</a></code>, or <code><a>RTCQuicReceiveStream</a></code>
       instances.</p>
-      <p class="note">The QUIC API presented in this and the subsequent
-      section represents a preliminary proposal based on work-in-progress
-      within the IETF QUIC WG. Since the QUIC transport specification is
-      a work-in-progress, both the protocol and API are likely to
-      change significantly going forward.</p>
     </section>
     <section id="rtcquictransport-operation*">
       <h3>Operation</h3>

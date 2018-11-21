@@ -1,5 +1,5 @@
 var respecConfig = {
-  specStatus: "ED",
+  specStatus: "unofficial",
   // if there a publicly available Editor's Draft, this is the link
   edDraftURI: "https://w3c.github.io/webrtc-quic/",
   shortName: "webrtc-quic",

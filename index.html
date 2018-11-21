@@ -1051,7 +1051,7 @@ interface BidirectionalStreamWithDataEvent : Event {
               include framing overhead incurred by the protocol, or buffering done
               by the operating system or network hardware. On getting, it
               <em class="rfc2119" title="MUST">MUST</em> return the value of the
-              RTCQuicWritableStream's <a>[[\WriteBufferedAmount]]</a> internal slot.
+              <code><a>RTCQuicWritableStream</a></code>'s <a>[[\WriteBufferedAmount]]</a> internal slot.
             </dd>
             <dt><code>writingAborted</code> of type <span class=idlAttriType"><a>RTCQuicStreamAbortInfo</a>
             readonly</dt>
@@ -1145,13 +1145,13 @@ interface BidirectionalStreamWithDataEvent : Event {
             </dd>
             <dt><dfn><code>abortWriting</code></dfn></dt>
             <dd>
-              <p>A hard shutdown of the RTCQuicWritable stream. It may be called
-              regardless of whether the RTCQuicWritableStream object
+              <p>A hard shutdown of the <code><a>RTCQuicWritableStream</a></code>. It may be called
+              regardless of whether the <code><a>RTCQuicWritableStream</a></code>
               was created by the local or remote peer. When the <code>abortWriting()</code>
               method is called, the user agent <em class="rfc2119" title="MUST">MUST</em>
               run the following steps:</p>
               <ol>
-                <li>Let <var>stream</var> be the RTCQuicWritableStream object
+                <li>Let <var>stream</var> be the <code><a>RTCQuicWritableStream</a></code> object
                 which is about to abort writing.</li>
                 <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is <code>false</code>,
                 <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>
@@ -1202,7 +1202,7 @@ interface BidirectionalStreamWithDataEvent : Event {
               is called, the <a>user agent</a> <em class="rfc2119" title="MUST">MUST</em> run
               the following steps:</p>
               <ol>
-                <li>Let <var>stream</var> be the RTCQuicWritableStream
+                <li>Let <var>stream</var> be the <code><a>RTCQuicWritableStream</a></code>
                 object on which <code>waitForWriteBufferedAmountBelow</code> was invoked.</li>
                 <li>Let <var>p</var> be a new promise.</li>
                 <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is
@@ -1278,7 +1278,7 @@ interface BidirectionalStreamWithDataEvent : Event {
               <p>The <dfn id="dom-rtcquicreadablestream-readableamount"><code>readable</code></dfn>
               attribute represents whether data can be read from the <code><a>RTCQuicReadableStream</a></code>.
               On getting, it <em class="rfc2119" title="MUST">MUST</em> return the value of the
-              RTCQuicReadableStream's <a>[[\Readable]]</a> slot.
+              <code><a>RTCQuicReadableStream</a></code>'s <a>[[\Readable]]</a> slot.
             </dd>
             <dt><code>readableAmount</code> of type <span class="idlAttrType"><a>unsigned
             long</a></span>, readonly</dt>
@@ -1289,7 +1289,7 @@ interface BidirectionalStreamWithDataEvent : Event {
               started executing a task, had not yet been read. This does not include
               framing overhead incurred by the protocol, or buffers associated with
               the network hardware. On getting, it <em class="rfc2119" title="MUST">MUST</em>
-              return the value of the RTCQuicReadableStream's
+              return the value of the <code><a>RTCQuicReadableStream</a></code>'s
               <a>[[\ReadableAmount]]</a> internal slot.</p>
             </dd>
             <dt><code>readingAborted</code> of type <span class=idlAttriType"><a>RTCQuicStreamAbortInfo</a>
@@ -1323,12 +1323,12 @@ interface BidirectionalStreamWithDataEvent : Event {
           "methods">
             <dt><dfn><code>readInto</code></dfn></dt>
             <dd>
-              <p>Reads from RTCQuicReadableStream into the buffer specified
+              <p>Reads from the <code><a>RTCQuicReadableStream</a></code> into the buffer specified
               by the first argument and returns <code><a>RTCQuicStreamReadResult</a></code>.
               When the <code>readInto</code> method is called, the user agent
               <em class="rfc2119" title="MUST">MUST</em> run the following steps:</p>
               <ol>
-               <li>Let <var>stream</var> be the RTCQuicReadableStream object
+               <li>Let <var>stream</var> be the <code><a>RTCQuicReadableStream</a></code> object
                on which <code>readInto</code> is invoked.</li>
                <li>If <var>stream</var>'s <a>[[\Readable]]</a> slot is <code>false</code>,
                <a>throw</a> an <code>InvalidStateError</code>, then abort these steps.</li>
@@ -1383,13 +1383,13 @@ interface BidirectionalStreamWithDataEvent : Event {
             </dd>
             <dt><dfn><code>abortReading</code></dfn></dt>
             <dd>
-              <p>A hard shutdown of the RTCQuicReadableStream. It may be called
-              regardless of whether the RTCQuicReadableStream object
+              <p>A hard shutdown of the <code><a>RTCQuicReadableStream</a></code>. It may be called
+              regardless of whether the <code><a>RTCQuicReadableStream</a></code> object
               was created by the local or remote peer. When the <code>abortReading()</code>
               method is called, the user agent <em class="rfc2119" title="MUST">MUST</em>
               run the following steps:</p>
               <ol>
-                <li>Let <var>stream</var> be the RTCQuicReadableStream object
+                <li>Let <var>stream</var> be the <code><a>RTCQuicReadableStream</a></code> object
                 which is about to abort reading.</li>
                 <li>If <var>stream</var>'s <a>[[\Readable]]</a> slot is <code>false</code>,
                 <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>

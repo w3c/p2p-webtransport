@@ -864,14 +864,16 @@ interface BidirectionalStreamEvent : Event {
               "idl-def-RTCQuicTransportState.closed">closed</code></dfn></td>
               <td>
                 <p>The QUIC connection has been closed intentionally via a call to
-                <code>stop()</code> or receipt of a closing frame as described in
-                [[QUIC-TRANSPORT]]. When the <code><a>RTCQuicTransport</a></code>'s
-                internal <a>[[\QuicTransportState]]</a> slot transitions to
-                <code>closed</code> the user agent <em class="rfc2119" title="MUST">MUST</em>
+                <code>stop()</code>, receipt of a closing frame as described in
+                [[QUIC-TRANSPORT]], or transition of the <code><a>RTCIceTransport</a></code>
+                <var>transport</var>'s <code>state</code> attribute to <code>"closed"</code>.
+                When the <code><a>RTCQuicTransport</a></code>'s
+                <a>[[\QuicTransportState]]</a> internal slot transitions to
+                <code>"closed"</code> the user agent <em class="rfc2119" title="MUST">MUST</em>
                 run the following steps:</p>
                 <ol>
-                  <li>Let <var>transport</var> be the <code><a>RTCQuicTransport</a></code>.
-                  <li>For each <code><a>RTCQuicReadableStream</a></code> in <var>transport</var>'s
+                  <li>Let <var>quicTransport</var> be the <code><a>RTCQuicTransport</a></code>.
+                  <li>For each <code><a>RTCQuicReadableStream</a></code> in <var>quicTransport</var>'s
                   <a>[[\QuicTransportReadableStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
@@ -882,7 +884,7 @@ interface BidirectionalStreamEvent : Event {
                     <li>Remove the <var>stream</var> from the <var>transport</var>'s
                     <a>[[\QuicTransportReadableStreams]]</a> internal slot.
                   </ol>
-                  <li>For each <code><a>RTCQuicWritableStream</a></code> in <var>transport</var>'s
+                  <li>For each <code><a>RTCQuicWritableStream</a></code> in <var>quicTransport</var>'s
                   <a>[[\QuicTransportWritableStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
@@ -890,7 +892,7 @@ interface BidirectionalStreamEvent : Event {
                     <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to
                     <code>false</code>.</li>
                     <li>Clear the <var>stream</var>'s write buffer.</li>
-                    <li>Remove the <var>stream</var> from the <var>transport</var>'s
+                    <li>Remove the <var>stream</var> from the <var>quicTransport</var>'s
                     <a>[[\QuicTransportWritableStreams]]</a> internal slot.
                   </ol>
                 </ol>

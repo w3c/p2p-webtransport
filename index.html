@@ -138,10 +138,12 @@ interface RTCQuicTransport : RTCStatsProvider {
     void                  stop (RTCQuicTransportStopInfo stopInfo);
     RTCQuicBidirectionalStream         createBidirectionalStream ();
     RTCQuicSendStream                  createSendStream (optional RTCQuicStreamParameters parameters);
+    QuicSendDatagramResult             sendDatagram (Uint8Array data);
                     attribute EventHandler             onstatechange;
                     attribute EventHandler             onerror;
                     attribute EventHandler             onreceivestream;
                     attribute EventHandler             onbidirectionalstream;
+                    attribute EventHandler             ondatagramreceived;
 };</pre>
         <section>
           <h2>Constructors</h2>
@@ -513,6 +515,66 @@ interface RTCQuicTransport : RTCStatsProvider {
                 <li>
                   <p>Create <var>stream</var>'s associated underlying data
                   transport.</p>
+                </li>
+              </ol>
+              <div>
+                <em>No parameters.</em>
+              </div>
+              <div>
+                <em>Return type:</em> <code><a>RTCQuicSendStream</a></code>
+              </div>
+            </dd>
+
+           <dt><dfn><code>sendDatagram</code></dfn></dt>
+            <dd>
+              <p>Sends a datagram as defined by [[QUIC-DATAGRAM]].</p>
+              <p>When <code>sendDatagram</code> is called, the user agent
+              <em class="rfc2119" title="MUST">MUST</em> run the following
+              steps:</p>
+              <ol>
+		<li>Let <var>data</var> be the first argument.</li>
+                <li>
+                  <p>Let <var>transport</var> be
+                  the <code><a>RTCQuicTransport</a></code> on
+                  which <code>sendDatagram</code> is invoked.</p>
+                </li>
+                <li>
+                  <p>If <code><var>transport</var>'s state</code> is
+                  not <code>connected</code> <a>throw</a>
+                  an <code>InvalidStateError</code> and abort these steps.</p>
+                </li>
+                <li>
+                  <p>If <code><var>data</var> is too large to fit into a
+                  datagram, <a>throw</a> an <code>InvalidArgumentError</code>
+                  and abort these steps.</p>
+                </li>
+                <li>
+                  <p>Let <var>result</var> be a newly created
+                  <code><a>QuicSendDatagramResult</a></code> object
+                  with <code>result.blocked<code> set to false
+                  and <code>result.acked</code> set to a new promise.</p>
+                </li>
+                <li>
+                  <p>If <var>transport</var> is unable to send the datagram due
+                  to backpressure, set <code>result.blocked</code> to true,
+                  resolve <code>result.acked</code> to false and
+                  return <var>result</var> and abort these steps.</p>
+                </li>
+                <li>
+                  <p>Set <code>result.blocked</code> to false,
+                  return <var>result</var> and continue the following steps in
+                  the background.</p>
+                </li>
+                <li>
+                  <p>Send <var>data</var> in a QUIC datagram.</p>
+                </li>
+                <li>
+                  <p>When the datagram is acked,
+                  resolve <code>result.acked</code> with <code>true</code>.</p>
+                </li>
+                <li>
+                  <p>When the datagram is detemined to be lost, resolve 
+                  resolve <code>result.acked</code> with <code>false</code>.</p>
                 </li>
               </ol>
               <div>

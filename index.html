@@ -292,6 +292,15 @@ interface RTCQuicTransport : RTCStatsProvider {
               first time.
               </p>
             </dd>
+            <dt><dfn><code>ondatagramreceived</code></dfn> of type <span class=
+            "idlAttrType"><a>EventHandler</a></span></dt>
+            <dd>
+              <p>This event handler, of event handler event type
+              <code><a>datagramreceived</a></code>,
+              <em class="rfc2119" title="MUST">MUST</em> be fired when data is received
+              from a received datagram.
+              </p>
+            </dd>
           </dl>
         </section>
         <section>
@@ -802,6 +811,86 @@ interface BidirectionalStreamEvent : Event {
             <dd>
               <p>The <code><a>RTCQuicBidirectionalStream</a></code> object associated with the
               event.</p>
+            </dd>
+          </dl>
+        </section>
+      </div>
+    </section>
+    <section>
+      <h3><dfn>DatagramReceivedEvent</dfn></h3>
+      <p>The <code><a>datagramreceived</a></code> event uses the
+      <code><a>DatagramReceivedEvent</a></code> interface.</p>
+      <div>
+        <pre class="idl">
+        [ Constructor (DOMString type, DatagramReceivedEventInit eventInitDict), Exposed=Window]
+interface DatagramReceivedEvent : Event {
+    readonly        attribute Uint8Array data;
+};</pre>
+        <section>
+          <h2>Constructors</h2>
+          <dl data-link-for="DatagramReceivedEvent" data-dfn-for="DatagramReceivedEvent"
+          class="constructors">
+            <dt><code>DatagramReceivedEvent</code></dt>
+            <dd>
+              <table class="parameters">
+                <tbody>
+                  <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Nullable</th>
+                    <th>Optional</th>
+                    <th>Description</th>
+                  </tr>
+                  <tr>
+                    <td class="prmName">type</td>
+                    <td class="prmType"><code>DOMString</code></td>
+                    <td class="prmNullFalse"><span role="img" aria-label=
+                    "False">&#10008;</span></td>
+                    <td class="prmOptFalse"><span role="img" aria-label=
+                    "False">&#10008;</span></td>
+                    <td class="prmDesc"></td>
+                  </tr>
+                  <tr>
+                    <td class="prmName">eventInitDict</td>
+                    <td class="prmType"><code><a>DatagramReceivedEventInit</a></code></td>
+                    <td class="prmNullFalse"><span role="img" aria-label=
+                    "False">&#10008;</span></td>
+                    <td class="prmOptFalse"><span role="img" aria-label=
+                    "False">&#10008;</span></td>
+                    <td class="prmDesc"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </dd>
+          </dl>
+        </section>
+        <section>
+          <h2>Attributes</h2>
+          <dl data-link-for="DatagramReceivedEvent" data-dfn-for="DatagramReceivedEvent"
+          class="attributes">
+            <dt><code>data</code> of type <span class=
+            "idlAttrType"><a>Uint8Array</a></span>, readonly</dt>
+            <dd>
+              <p>The <dfn id="dom-datagramreceivedevent-data"><code>data</code></dfn>
+              attribute represents the <code><a>data</a></code> received. </p>
+            </dd>
+          </dl>
+        </section>
+      </div>
+      <div>
+          <p>The <dfn><code>DatagramReceivedEventInit</code></dfn> dictionary includes
+          information to construct a DatagramReceivedEvent .</p>
+        <pre class="idl">dictionary DatagramReceivedEventInit : EventInit {
+             Uint8Array data;
+};</pre>
+        <section>
+          <h2>Dictionary DatagramReceivedEventInit Members</h2>
+          <dl data-link-for="DatagramReceivedEventInit" data-dfn-for=
+          "DatagramReceivedEventInit" class="dictionary-members">
+            <dt><dfn><code>data</code></dfn> of type <span class=
+            "idlMemberType"><a>Uint8Array</a></span></dt>
+            <dd>
+              <p>The data received.</p>
             </dd>
           </dl>
         </section>
@@ -1353,7 +1442,7 @@ interface BidirectionalStreamEvent : Event {
               return the value of the <code><a>RTCQuicReadableStream</a></code>'s
               <a>[[\ReadableAmount]]</a> internal slot.</p>
             </dd>
-            <dt><code>readingAborted</code> of type <span class=idlAttriType"><a>RTCQuicStreamAbortInfo</a>
+            <dt><code>readingAborted</code> of type <span class="idlAttriType"><a>RTCQuicStreamAbortInfo</a>
             readonly</dt>
             <dd>
               <p>The <dfn id="dom-rtcquicreadablestream-readingAborted"><code>readingAborted</code></dfn>
@@ -1696,6 +1785,42 @@ interface BidirectionalStreamEvent : Event {
         </section>
       </div>
     </section>
+    <section id="quicsenddatagramresult*">
+      <h3><dfn>QuicSendDatagramdResult</dfn> Dictionary</h3>
+      <p>The <code>QuicStreamReadResult</code> includes information
+      relating to the result returned from <code>sendDatagram</code>.</p>
+      <div>
+        <pre class="idl">interface QuicSendDatagramResult {
+	     readonly attribute bool blocked;
+             readonly attribute Promise&lt;bool&gt; acked;
+        };
+        </pre>
+        <section>
+          <h2><a class="idlType">QuicSendDatagramResult</a> attributes</h2>
+          <dl data-link-for="QuicSendDatagramResult" data-dfn-for="QuicSendDatagramResult" class=
+          "attributes">
+            <dt><dfn><code>blocked</code></dfn> of type <span class=
+            "idlAttrType"><a>bool</a></span>.</dt>
+            <dd>
+              <p>Whether or not the datagram was dropped due to backpressure.  A
+              false values guarantees that the datagram will not be delivered.
+              But a true value does not guarantee that a datagram will be
+              delivered.  The intended use is for the app to detect backpressure
+              and not send so many datagrams.</p>
+            </dd>
+            <dt><dfn><code>acked</code></dfn> of type <span class=
+            "idlAttrType">Promise&lt;bool&gt;</span>.</dt>
+            <dd>
+              <p>Resolves to <code>true</code> when an ack is received for the
+              send datagram and resolved to <code>false</code> when the user
+              agent decides the datagram is lost and will never be acked.  The
+              inteded use is for the app to detect loss and retransmit datagrams
+              if it sees fit.</p>
+            </dd>
+          </dl>
+        </section>
+      </div>
+    </section>
   </section>
     <section id="privacy-security">
     <h2>Privacy and Security Considerations</h2>
@@ -1812,6 +1937,31 @@ let quic = getQuicTransport();
 let messages = getMessages();
 for (msg in messages) {
   quic.createSendStream({disableRetransmissions: true}).write({data: msg, finished: true});
+}
+</pre>
+ </section>
+ <section class="informative" id="datagramexamples*">
+    <h3>Datagrams</h3>
+    <p>Datagrams can be sent and received like so.</p>
+<pre class="example highlight">
+let quic = getQuicTransport();
+let datagrams = getDatagrams();
+quic.ondatagramreceived = (***) => {
+  
+};
+for (datagram in datagrams) {
+  let result = quic.sendDatagram(datagram);
+  if (result.blocked) {
+    // We're sending too many datagrams at once. Back off and try later.
+    break;
+  }
+  result.acked.then((acked) => {
+    let lost = !acked;
+    if (lost) {
+      // Resend each datagram once.
+      quic.sendDatagram(datagram);      
+    }
+  });
 }
 </pre>
  </section>

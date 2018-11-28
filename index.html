@@ -29,9 +29,12 @@
     <p>While this specification defines an interface to QUIC streams,
     by utilizing a QUIC stream per message, it is possible to implement
     support for message-based communications (such as <code>RTCDataChannel</code>)
-    on top.  While the QUIC transport defined in [[!QUIC-TRANSPORT]] is reliable,
-    support for unreliable communications is achievable via use of timers or
-    through future extensions to the QUIC protocol.</p>
+    on top.</p>
+    <p class="note">The QUIC API presented in this specification
+    represents a preliminary proposal based on work-in-progress
+    within the IETF QUIC WG. Since the QUIC transport specification is
+    a work-in-progress, both the protocol and API are likely to
+    change significantly going forward.</p>
   </section>
   <section id="conformance">
     <p>This specification defines conformance criteria that apply to a single
@@ -97,12 +100,6 @@
       one or more <code><a>QuicBidirectionalStream</a></code>,
       <code><a>QuicSendStream</a></code>, or <code><a>QuicReceiveStream</a></code>
       instances.</p>
-      <p>The QUIC transport protocol is described in [[!QUIC-TRANSPORT]].</p>
-      <p class="note">The QUIC API presented in this and the subsequent
-      section represents a preliminary proposal based on work-in-progress
-      within the IETF QUIC WG. Since the QUIC transport specification is
-      a work-in-progress, both the protocol and API are likely to
-      change significantly going forward.</p>
     </section>
     <section id="quictransportbase-interface-definition*">
       <h3>Interface Definition</h3>
@@ -110,13 +107,13 @@
         <pre class="idl">
 interface QuicTransportBase : RTCStatsProvider {
     readonly        attribute QuicTransportState    state;
-    void                  stop ();
+    void                  stop (QuicTransportStopInfo stopInfo);
     QuicBidirectionalStream         createBidirectionalStream ();
-    QuicSendStream                  createSendStream ();
+    QuicSendStream                  createSendStream (optional QuicStreamParameters parameters);
                     attribute EventHandler             onstatechange;
                     attribute EventHandler             onerror;
-                    attribute EventHandler             onreceivestreamwithdata;
-                    attribute EventHandler             onbidirectionalstreamwithdata;
+                    attribute EventHandler             onreceivestream;
+                    attribute EventHandler             onbidirectionalstream;
 };</pre>
         <section>
           <h2>Attributes</h2>
@@ -145,22 +142,22 @@ interface QuicTransportBase : RTCStatsProvider {
               "SHOULD">SHOULD</em> include QUIC error information in
               <var>error.message</var> (defined in [[!HTML51]] Section 7.1.3.8.2).</p>
             </dd>
-            <dt><dfn><code>onreceivestreamwithdata</code></dfn> of type <span class=
+            <dt><dfn><code>onreceivestream</code></dfn> of type <span class=
             "idlAttrType"><a>EventHandler</a></span></dt>
             <dd>
               <p>This event handler, of event handler event type
-              <code><a>receivestreamwithdata</a></code>,
+              <code><a>receivestream</a></code>,
               <em class="rfc2119" title="MUST">MUST</em> be fired on when data is received
               from a newly created remote <code><a>QuicReceiveStream</a></code> for the
               first time.
               </p>
             </dd>
-            <dt><dfn><code>onbidirectionalstreamwithdata</code></dfn> of type <span class=
+            <dt><dfn><code>onbidirectionalstream</code></dfn> of type <span class=
             "idlAttrType"><a>EventHandler</a></span></dt>
             <dd>
               <p>This event handler, of event handler event type
-              <code><a>bidirectionalstreamwithdata</a></code>,
-              <em class="rfc2119" title="MUST">MUST</em> be fired on when when data is received
+              <code><a>bidirectionalstream</a></code>,
+              <em class="rfc2119" title="MUST">MUST</em> be fired when data is received
               from a newly created remote <code><a>QuicBidirectionalStream</a></code> for the
               first time.
               </p>
@@ -174,7 +171,7 @@ interface QuicTransportBase : RTCStatsProvider {
             <dt><dfn><code>stop</code></dfn></dt>
             <dd>
               <p>Stops and closes the <code><a>QuicTransportBase</a></code> object.
-              This triggers an "Immediate Close," as described in [[QUIC-TRANSPORT]] section 6.13.3.
+              This triggers an <dfn>Immediate Close</dfn> as described in [[QUIC-TRANSPORT]] section 10.3.
               <p>When <code>stop</code> is called, the user agent <em class="rfc2119" title="MUST">MUST</em>
               run the following steps:</p>
               <ol>
@@ -184,7 +181,10 @@ interface QuicTransportBase : RTCStatsProvider {
                 then abort these steps.</li>
                 <li>Set <var>transport</var>'s <a>[[\QuicTransportState]]</a> to
                 <code>"closed"</code>.</li>
-                <li>Start the "Immediate Close" procedure by sending an APPLICATION_CLOSE frame.</li>
+                <li>Let <code>stopInfo</code> be the first argument.</li>
+                <li>Start the <a>Immediate Close</a> procedure by sending an CONNECTION_CLOSE frame
+                with its error code value set to the value of <var>stopInfo</var>.errorCode
+                and its reason value set to the value of <var>stopInfo</var>.reason.</li>
               </ol>
               <div>
                 <em>No parameters.</em>
@@ -192,13 +192,30 @@ interface QuicTransportBase : RTCStatsProvider {
               <div>
                 <em>Return type:</em> <code>void</code>
               </div>
+              <table class="parameters">
+                <tbody>
+                  <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Nullable</th>
+                    <th>Optional</th>
+                    <th>Description</th>
+                  </tr>
+                  <tr>
+                    <td class="prmName">stopInfo</td>
+                    <td class="prmType"><code>QuicTransportStopInfo</code></td>
+                    <td class="prmNullFalse"><span role="img" aria-label=
+                    "False">&#10008;</span></td>
+                    <td class="prmOptFalse"><span role="img" aria-label=
+                    "False">&#10008;</span></td>
+                    <td class="prmDesc"></td>
+                  </tr>
+                </tbody>
+              </table>
             </dd>
            <dt><dfn><code>createBidirectionalStream</code></dfn></dt>
             <dd>
-              <p>Creates a <code><a>QuicBidirectionalStream</a></code> object.
-              Since [[QUIC-TRANSPORT]] only defines reliable QUIC streams,
-              <code>createBidectionalStream</code> only supports creation of reliable
-              streams.</p>
+              <p>Creates an <code><a>QuicBidirectionalStream</a></code> object.</p>
               <p>When <code>createBidectionalStream</code> is called, the user agent
               <em class="rfc2119" title="MUST">MUST</em> run the following
               steps:</p>
@@ -241,10 +258,7 @@ interface QuicTransportBase : RTCStatsProvider {
             </dd>
            <dt><dfn><code>createSendStream</code></dfn></dt>
             <dd>
-              <p>Creates an <code><a>QuicSendStream</a></code> object.
-              Since [[QUIC-TRANSPORT]] only defines reliable QUIC streams,
-              <code>createSendStream</code> only supports creation of reliable
-              streams.</p>
+              <p>Creates an <code><a>QuicSendStream</a></code> object.</p>
               <p>When <code>createSendStream</code> is called, the user agent
               <em class="rfc2119" title="MUST">MUST</em> run the following
               steps:</p>
@@ -291,16 +305,71 @@ interface QuicTransportBase : RTCStatsProvider {
       <p>The <code><a>receivestreamwithdata</a></code> event uses the
       <code><a>ReceiveStreamWithDataEvent</a></code> interface.</p>
       <div>
+        <pre class="idl">dictionary RTCQuicParameters {
+             RTCQuicRole                  role = "auto";
+             sequence&lt;RTCDtlsFingerprint&gt; fingerprints;
+};</pre>
+        <section>
+          <h2>Dictionary <a class="idlType">RTCQuicParameters</a> Members</h2>
+          <dl data-link-for="RTCQuicParameters" data-dfn-for="RTCQuicParameters" class=
+          "dictionary-members">
+            <dt><dfn><code>role</code></dfn> of type <span class=
+            "idlMemberType"><a>RTCQuicRole</a></span>, defaulting to
+            <code>"auto"</code></dt>
+            <dd>
+              <p>The QUIC role, with a default of <code>auto</code>.</p>
+            </dd>
+            <dt><dfn><code>fingerprints</code></dfn> of type <span class=
+            "idlMemberType">sequence&lt;<a>RTCDtlsFingerprint</a>&gt;</span></dt>
+            <dd>
+              <p>Sequence of fingerprints, at least one fingerprint for each certificate
+              (with one computed with the digest algorithm used in the certificate
+              signature).</p>
+            </dd> 
+          </dl>
+        </section>
+      </div>
+    </section>
+    <section id="streamparameters*">
+      <h3><dfn>QuicStreamParameters</dfn> Dictionary</h3>
+      <p>The <code>QuicStreamParameters</code> dictionary includes information
+      relating to QUIC stream configuration.</p>
+      <div>
+        <pre class="idl">dictionary QuicStreamParameters {
+             bool disableRetransmissions = false;
+};</pre>
+        <section>
+          <h2>Dictionary <a class="idlType">QuicStreamParameters</a> Members</h2>
+          <dl data-link-for="QuicStreamParameters" data-dfn-for="QuicStreamParameters" class=
+          "dictionary-members">
+            <dt><dfn><code>disableRetransmissions</code></dfn> of type <span class=
+            "idlMemberType"><a>bool</a></span>, defaulting to
+            <code>false</code></dt>
+            <dd>
+              <p>disableRetransmissions, with a default of <code>false</code>.  If
+              true, the stream will be sent without retransmissions.  If false, the
+              stream will be sent with retransmissions.</p>
+            </dd>
+          </dl>
+        </section>
+      </div>
+    </section>
+    <section>
+      <h3><dfn>ReceiveStreamEvent</dfn></h3>
+      <p>The <code><a>receivestream</a></code> event uses the
+      <code><a>ReceiveStreamEvent</a></code> interface.</p>
+      <div>
         <pre class="idl">
-        [ Constructor (DOMString type, ReceiveStreamWithDataEventInit eventInitDict), Exposed=Window]
-interface ReceiveStreamWithDataEvent : Event {
+        [ Constructor (DOMString type, ReceiveStreamEventInit eventInitDict), Exposed=Window]
+interface ReceiveStreamEvent : Event {
     readonly        attribute QuicReceiveStream stream;
+>>>>>>> master
 };</pre>
         <section>
           <h2>Constructors</h2>
-          <dl data-link-for="ReceiveStreamWithDataEvent" data-dfn-for="ReceiveStreamWithDataEvent"
+          <dl data-link-for="ReceiveStreamEvent" data-dfn-for="ReceiveStreamEvent"
           class="constructors">
-            <dt><code>ReceiveStreamWithDataEvent</code></dt>
+            <dt><code>ReceiveStreamEvent</code></dt>
             <dd>
               <table class="parameters">
                 <tbody>
@@ -322,7 +391,7 @@ interface ReceiveStreamWithDataEvent : Event {
                   </tr>
                   <tr>
                     <td class="prmName">eventInitDict</td>
-                    <td class="prmType"><code><a>ReceiveStreamWithDataEventInit</a></code></td>
+                    <td class="prmType"><code><a>ReceiveStreamEventInit</a></code></td>
                     <td class="prmNullFalse"><span role="img" aria-label=
                     "False">&#10008;</span></td>
                     <td class="prmOptFalse"><span role="img" aria-label=
@@ -336,7 +405,7 @@ interface ReceiveStreamWithDataEvent : Event {
         </section>
         <section>
           <h2>Attributes</h2>
-          <dl data-link-for="ReceiveStreamWithDataEvent" data-dfn-for="ReceiveStreamWithDataEvent"
+          <dl data-link-for="ReceiveStreamEvent" data-dfn-for="ReceiveStreamEvent"
           class="attributes">
             <dt><code>stream</code> of type <span class=
             "idlAttrType"><a>QuicReceiveStream</a></span>, readonly</dt>
@@ -349,15 +418,15 @@ interface ReceiveStreamWithDataEvent : Event {
         </section>
       </div>
       <div>
-          <p>The <dfn><code>ReceiveStreamWithDataEventInit</code></dfn> dictionary includes
+          <p>The <dfn><code>ReceiveStreamEventInit</code></dfn> dictionary includes
           information on the configuration of the QUIC stream.</p>
-        <pre class="idl">dictionary ReceiveStreamWithDataEventInit : EventInit {
+        <pre class="idl">dictionary ReceiveStreamEventInit : EventInit {
              QuicReceiveStream stream;
 };</pre>
         <section>
-          <h2>Dictionary ReceiveStreamWithDataEventInit Members</h2>
-          <dl data-link-for="ReceiveStreamWithDataEventInit" data-dfn-for=
-          "ReceiveStreamWithDataEventInit" class="dictionary-members">
+          <h2>Dictionary ReceiveStreamEventInit Members</h2>
+          <dl data-link-for="ReceiveStreamEventInit" data-dfn-for=
+          "ReceiveStreamEventInit" class="dictionary-members">
             <dt><dfn><code>stream</code></dfn> of type <span class=
             "idlMemberType"><a>QuicReceiveStream</a></span></dt>
             <dd>
@@ -369,20 +438,20 @@ interface ReceiveStreamWithDataEvent : Event {
       </div>
     </section>
     <section>
-      <h3><dfn>BidirectionalStreamWithDataEvent</dfn></h3>
-      <p>The <code><a>bidirectionalstreamwithdata</a></code> event uses the
-      <code><a>BidirectionalStreamWithDataEvent</a></code> interface.</p>
+      <h3><dfn>BidirectionalStreamEvent</dfn></h3>
+      <p>The <code><a>bidirectionalstream</a></code> event uses the
+      <code><a>BidirectionalStreamEvent</a></code> interface.</p>
       <div>
         <pre class="idl">
-        [ Constructor (DOMString type, BidirectionalStreamWithDataEventInit eventInitDict), Exposed=Window]
-interface BidirectionalStreamWithDataEvent : Event {
+        [ Constructor (DOMString type, BidirectionalStreamEventInit eventInitDict), Exposed=Window]
+interface BidirectionalStreamEvent : Event {
     readonly        attribute QuicBidirectionalStream stream;
 };</pre>
         <section>
           <h2>Constructors</h2>
-          <dl data-link-for="BidirectionalStreamWithDataEvent" data-dfn-for="BidirectionalStreamWithDataEvent"
+          <dl data-link-for="BidirectionalStreamEvent" data-dfn-for="BidirectionalStreamEvent"
           class="constructors">
-            <dt><code>BidirectionalStreamWithDataEvent</code></dt>
+            <dt><code>BidirectionalStreamEvent</code></dt>
             <dd>
               <table class="parameters">
                 <tbody>
@@ -404,7 +473,7 @@ interface BidirectionalStreamWithDataEvent : Event {
                   </tr>
                   <tr>
                     <td class="prmName">eventInitDict</td>
-                    <td class="prmType"><code><a>BidirectionalStreamWithDataEventInit</a></code></td>
+                    <td class="prmType"><code><a>BidirectionalStreamEventInit</a></code></td>
                     <td class="prmNullFalse"><span role="img" aria-label=
                     "False">&#10008;</span></td>
                     <td class="prmOptFalse"><span role="img" aria-label=
@@ -418,7 +487,7 @@ interface BidirectionalStreamWithDataEvent : Event {
         </section>
         <section>
           <h2>Attributes</h2>
-          <dl data-link-for="BidirectionalStreamWithDataEvent" data-dfn-for="BidirectionalStreamWithDataEvent"
+          <dl data-link-for="BidirectionalStreamEvent" data-dfn-for="BidirectionalStreamEvent"
           class="attributes">
             <dt><code>stream</code> of type <span class=
             "idlAttrType"><a>QuicBidirectionalStream</a></span>, readonly</dt>
@@ -431,15 +500,15 @@ interface BidirectionalStreamWithDataEvent : Event {
         </section>
       </div>
       <div>
-          <p>The <dfn><code>BidirectionalStreamWithDataEventInit</code></dfn> dictionary includes
+          <p>The <dfn><code>BidirectionalStreamEventInit</code></dfn> dictionary includes
           information on the configuration of the QUIC stream.</p>
-        <pre class="idl">dictionary BidirectionalStreamWithDataEventInit : EventInit {
+        <pre class="idl">dictionary BidirectionalStreamEventInit : EventInit {
              QuicBidirectionalStream stream;
 };</pre>
         <section>
-          <h2>Dictionary BidirectionalStreamWithDataEventInit Members</h2>
-          <dl data-link-for="BidirectionalStreamWithDataEventInit" data-dfn-for=
-          "BidirectionalStreamWithDataEventInit" class="dictionary-members">
+          <h2>Dictionary BidirectionalStreamEventInit Members</h2>
+          <dl data-link-for="BidirectionalStreamEventInit" data-dfn-for=
+          "BidirectionalStreamEventInit" class="dictionary-members">
             <dt><dfn><code>stream</code></dfn> of type <span class=
             "idlMemberType"><a>QuicBidirectionalStream</a></span></dt>
             <dd>
@@ -507,22 +576,22 @@ interface BidirectionalStreamWithDataEvent : Event {
                 run the following steps:</p>
                 <ol>
                   <li>Let <var>transport</var> be the <code><a>QuicTransportBase</a></code>.
-                  <li>For each QuicReadableStream in <var>transport</var>'s
+                  <li>For each <code><a>QuicReadableStream</a></code> in <var>transport</var>'s
                   <a>[[\QuicTransportReadableStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
-                    <li>Let <var>stream</var> be the QuicReadableStream.</li>
+                    <li>Let <var>stream</var> be the <code><a>QuicReadableStream</a></code>.</li>
                     <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to
                     <code>false</code>.</li>
                     <li>Clear the <var>stream</var>'s read buffer.</li>
                     <li>Remove the <var>stream</var> from the <var>transport</var>'s
                     <a>[[\QuicTransportReadableStreams]]</a> internal slot.
                   </ol>
-                  <li>For each QuicWritableStream in <var>transport</var>'s
+                  <li>For each <code><a>QuicWritableStream</a></code> in <var>transport</var>'s
                   <a>[[\QuicTransportWritableStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
-                    <li>Let <var>stream</var> be the QuicWritableStream.</li>
+                    <li>Let <var>stream</var> be the <code><a>QuicWritableStream</a></code>.</li>
                     <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to
                     <code>false</code>.</li>
                     <li>Clear the <var>stream</var>'s write buffer.</li>
@@ -544,22 +613,21 @@ interface BidirectionalStreamWithDataEvent : Event {
                 run the following steps:</p>
                 <ol>
                   <li>Let <var>transport</var> be the <code><a>QuicTransportBase</a></code>.
-                  <li>For each QuicReadableStream in <var>transport</var>'s
+                  <li>For each <code><a>QuicReadableStream</a></code> in <var>transport</var>'s
                   <a>[[\QuicTransportReadableStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
-                    <li>Let <var>stream</var> be the QuicReadableStream.</li>
+                    <li>Let <var>stream</var> be the <code><a>QuicReadableStream</a></code>.</li>
                     <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to
                     <code>false</code>.</li>
                     <li>Clear the <var>stream</var>'s read buffer.</li>
                     <li>Remove the <var>stream</var> from the <var>transport</var>'s
                     <a>[[\QuicTransportReadableStreams]]</a> internal slot.
                   </ol>
-                  <li>For each QuicWritableStream in <var>transport</var>'s
+                  <li>For each <code><a>QuicWritableStream</a></code> in <var>transport</var>'s
                   <a>[[\QuicTransportWritableStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
-                    <li>Let <var>stream</var> be the QuicWritableStream.</li>
                     <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to
                     <code>false</code>.</li>
                     <li>Clear the <var>stream</var>'s write buffer.</li>
@@ -571,6 +639,37 @@ interface BidirectionalStreamWithDataEvent : Event {
             </tr>
           </tbody>
         </table>
+      </div>
+    </section>
+    <section id="rtcquictransportstopinfo*">
+      <h3><dfn>QuicTransportStopInfo</dfn> Dictionary</h3>
+      <p>The <code>QuicTransportStopInfo</code> dictionary includes information
+      relating to the error code for stopping a <code><a>QuicTransportBase</a></code>.
+      This information is used to set the error code and reason for an CONNECTION_CLOSE
+      frame.</p>
+      <div>
+        <pre class="idl">dictionary QuicTransportStopInfo {
+             unsigned short errorCode = 0;
+             DOMString reason = "";
+        };
+        </pre>
+        <section>
+          <h2>Dictionary <a class="idlType">QuicTransportStopInfo</a> Members</h2>
+          <dl data-link-for="QuicTransportStopInfo" data-dfn-for="QuicTransportStopInfo" class=
+          "dictionary-members">
+            <dt><dfn><code>errorCode</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned short</a></span>, defaulting to
+            <code>0</code>.</dt>
+            <dd>
+              <p>The error code used in CONNECTION_CLOSE frame.</p>
+            </dd>
+            <dt><dfn><code>reason</code></dfn> of type <span class=
+            "idlMemberType"><a>DOMString</a></span>, defaulting to <code>""</code></dt>
+            <dd>
+              <p>The reason for stopping the <code><a>QuicTransportBase</a></code></p>
+            </dd>
+          </dl>
+        </section>
       </div>
     </section>
   </section>
@@ -1044,23 +1143,21 @@ interface RTCQuicTransport : QuicTransportBase {
     </section>
     <section id="quicstream-operation*">
       <h3>Operation</h3>
-      <p>A <code><a>QuicBidirectionalStream</a></code> can be created in the
-      following ways:</p>
+      <p>An <code><a>QuicBidirectionalStream</a></code> can be created in the following ways:</p>
       <ol>
-        <li>Using the <code><a>QuicTransportBase</a>.createBidirectionalStream</code></li>
-        <li>Getting a <code><a>bidirectionalstreamwithdata</a></code> event on the
-        <code><a>QuicTransportBase</a></code></li>
+        <li>Using the <code><a>RTCQuicTransport</a></code>'s <code>createBidirectionalStream</code> method.</li>
+        <li>Getting a <code><a>bidirectionalstream</a></code> event on the
+        <code><a>QuicTransportBase</a></code>.</li>
       </ol>
-      <p>A <code><a>QuicSendStream</a></code> can be created in the following
+      <p>An <code><a>QuicSendStream</a></code> can be created in the following ways:</p>
+      <ol>
+        <li>Using the <code><a>QuicTransportBase</a></code>'s </code>createSendStream</code> method.</li>
+      </ol>
+      <p>An <code><a>QuicReceiveStream</a></code> can be created in the following
       ways:</p>
       <ol>
-        <li>Using the <code><a>QuicTransportBase</a>.createSendStream</code></li>
-      </ol>
-      <p>A <code><a>QuicReceiveStream</a></code> can be created in the following
-      ways:</p>
-      <ol>
-        <li>Getting a <code><a>receivestreamwithdata</a></code> event on the
-        <code><a>QuicTransportBase</a></code></li>
+        <li>Getting a <code><a>receivestream</a></code> event on the
+        <code><a>QuicTransportBase</a></code>.</li>
       </ol>
     </section>
     <section id="quicwritablestream-interface-mixin-definition*">
@@ -1115,7 +1212,7 @@ interface RTCQuicTransport : QuicTransportBase {
               include framing overhead incurred by the protocol, or buffering done
               by the operating system or network hardware. On getting, it
               <em class="rfc2119" title="MUST">MUST</em> return the value of the
-              QuicWritableStream's <a>[[\WriteBufferedAmount]]</a> internal slot.
+              <code><a>QuicWritableStream</a></code>'s <a>[[\WriteBufferedAmount]]</a> internal slot.
             </dd>
             <dt><code>writingAborted</code> of type <span class="idlAttriType"><a>QuicStreamAbortInfo</a>
             readonly</dt>
@@ -1154,7 +1251,7 @@ interface RTCQuicTransport : QuicTransportBase {
               run the following steps:</p>
               <ol>
                <li>Let <var>data</var> be the first argument.</li>
-               <li>Let <var>stream</var> be the QuicWritableStream
+               <li>Let <var>stream</var> be the <code><a>QuicWritableStream</a></code>
                object on which <var>data</var> is to be sent.</li>
                <li>if length of <var>data</var>.data is 0 and <var>data</var>.finished is
                <code>false</code>, <a>throw</a> a <code>NotSupportedError</code> and abort
@@ -1209,13 +1306,13 @@ interface RTCQuicTransport : QuicTransportBase {
             </dd>
             <dt><dfn><code>abortWriting</code></dfn></dt>
             <dd>
-              <p>A hard shutdown of the QuicWritable stream. It may be called
-              regardless of whether the QuicWritableStream object
+              <p>A hard shutdown of the <code><a>QuicWritableStream</a></code>. It may be called
+              regardless of whether the <code><a>QuicWritableStream</a></code>
               was created by the local or remote peer. When the <code>abortWriting()</code>
               method is called, the user agent <em class="rfc2119" title="MUST">MUST</em>
               run the following steps:</p>
               <ol>
-                <li>Let <var>stream</var> be the QuicWritableStream object
+                <li>Let <var>stream</var> be the <code><a>QuicWritableStream</a></code> object
                 which is about to abort writing.</li>
                 <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is <code>false</code>,
                 <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>
@@ -1266,7 +1363,7 @@ interface RTCQuicTransport : QuicTransportBase {
               is called, the <a>user agent</a> <em class="rfc2119" title="MUST">MUST</em> run
               the following steps:</p>
               <ol>
-                <li>Let <var>stream</var> be the QuicWritableStream
+                <li>Let <var>stream</var> be the <code><a>QuicWritableStream</a></code>
                 object on which <code>waitForWriteBufferedAmountBelow</code> was invoked.</li>
                 <li>Let <var>p</var> be a new promise.</li>
                 <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is
@@ -1342,7 +1439,7 @@ interface RTCQuicTransport : QuicTransportBase {
               <p>The <dfn id="dom-quicreadablestream-readableamount"><code>readable</code></dfn>
               attribute represents whether data can be read from the <code><a>QuicReadableStream</a></code>.
               On getting, it <em class="rfc2119" title="MUST">MUST</em> return the value of the
-              QuicReadableStream's <a>[[\Readable]]</a> slot.
+              <code><a>QuicReadableStream</a></code>'s <a>[[\Readable]]</a> slot.
             </dd>
             <dt><code>readableAmount</code> of type <span class="idlAttrType"><a>unsigned
             long</a></span>, readonly</dt>
@@ -1353,7 +1450,7 @@ interface RTCQuicTransport : QuicTransportBase {
               started executing a task, had not yet been read. This does not include
               framing overhead incurred by the protocol, or buffers associated with
               the network hardware. On getting, it <em class="rfc2119" title="MUST">MUST</em>
-              return the value of the QuicReadableStream's
+              return the value of the <code><a>QuicReadableStream</a></code>'s
               <a>[[\ReadableAmount]]</a> internal slot.</p>
             </dd>
             <dt><code>readingAborted</code> of type <span class="idlAttriType"><a>QuicStreamAbortInfo</a>
@@ -1387,12 +1484,12 @@ interface RTCQuicTransport : QuicTransportBase {
           "methods">
             <dt><dfn><code>readInto</code></dfn></dt>
             <dd>
-              <p>Reads from QuicReadableStream into the buffer specified
+              <p>Reads from the <code><a>QuicReadableStream</a></code> into the buffer specified
               by the first argument and returns <code><a>QuicStreamReadResult</a></code>.
               When the <code>readInto</code> method is called, the user agent
               <em class="rfc2119" title="MUST">MUST</em> run the following steps:</p>
               <ol>
-               <li>Let <var>stream</var> be the QuicReadableStream object
+               <li>Let <var>stream</var> be the <code><a>QuicReadableStream</a></code> object
                on which <code>readInto</code> is invoked.</li>
                <li>If <var>stream</var>'s <a>[[\Readable]]</a> slot is <code>false</code>,
                <a>throw</a> an <code>InvalidStateError</code>, then abort these steps.</li>
@@ -1447,13 +1544,13 @@ interface RTCQuicTransport : QuicTransportBase {
             </dd>
             <dt><dfn><code>abortReading</code></dfn></dt>
             <dd>
-              <p>A hard shutdown of the QuicReadableStream. It may be called
-              regardless of whether the QuicReadableStream object
+              <p>A hard shutdown of the <code><a>QuicReadableStream</a></code>. It may be called
+              regardless of whether the <code><a>QuicReadableStream</a></code> object
               was created by the local or remote peer. When the <code>abortReading()</code>
               method is called, the user agent <em class="rfc2119" title="MUST">MUST</em>
               run the following steps:</p>
               <ol>
-                <li>Let <var>stream</var> be the QuicReadableStream object
+                <li>Let <var>stream</var> be the <code><a>QuicReadableStream</a></code> object
                 which is about to abort reading.</li>
                 <li>If <var>stream</var>'s <a>[[\Readable]]</a> slot is <code>false</code>,
                 <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>
@@ -1668,7 +1765,7 @@ interface RTCQuicTransport : QuicTransportBase {
             <dt><dfn><code>finished</code></dfn> of type <span class=
             "idlMemberType">boolean</span>.</dt>
             <dd>
-              <p>Set to <code>true</code> if the QuicReadableStream has
+              <p>Set to <code>true</code> if the <code><a>QuicReadableStream</a></code> has
               <a>finished reading</a>.</p>
             </dd>
           </dl>
@@ -1782,33 +1879,43 @@ interface RTCQuicTransport : QuicTransportBase {
           <td>The <code><a>QuicTransportState</a></code> changed.</td>
         </tr>
         <tr>
-          <td><dfn><code>receivestreamwithdata</code></dfn></td>
-          <td><code><a>ReceiveStreamWithDataEvent</a></code></td>
+          <td><dfn><code>receivestream</code></dfn></td>
+          <td><code><a>ReceiveStreamEvent</a></code></td>
           <td>A new <code><a>QuicReceiveStream</a></code> is dispatched to the
           script in response to the remote peer creating a send only QUIC stream and
-          sending data on it. Prior to <code><a>receivestreamwithdata</a></code>
+          sending data on it. Prior to <code><a>receivestream</a></code>
           firing, the <code><a>QuicReceiveStream</a></code> is added to
-          <code><a>QuicTransportBase</a></code>'s<a>[[\QuicTransportReadableStreams]]</a>
+          <code><a>QuicTransportBase</a></code>'s <a>[[\QuicTransportReadableStreams]]</a>
           internal slot.</td>
         </tr>
         <tr>
-          <td><dfn><code>bidirectionalstreamwithdata</code></dfn></td>
-          <td><code><a>BidirectionalStreamWithDataEvent</a></code></td>
+          <td><dfn><code>bidirectionalstream</code></dfn></td>
+          <td><code><a>BidirectionalStreamEvent</a></code></td>
           <td>A new <code><a>QuicBidirectionalStream</a></code> is dispatched to the
           script in response to the remote peer creating a bidirectional QUIC stream and
-          sending data on it. Prior to <code><a>bidirectionalstreamwithdata</a></code>
-          firing, the <code><a>QuicBidirectionalStream</a></code> is added to both the
+          sending data on it. Prior to <code><a>bidirectionalstream</a></code>
+          firing, the <code><a>QuicBidirectionalStream</a></code> is added to the
           <code><a>QuicTransportBase</a></code>'s <a>[[\QuicTransportReadableStreams]]</a>
-          and <a>[[\QuicTransportWritableStreams]]</a> internal slot.</td>
+          and <a>[[\QuicTransportWritableStreams]]</a> internal slots.</td>
         </tr>
       </tbody>
     </table>
   </section>
- <section class="informative" id="examples*">
+ <section id="examples*">
     <h2>Examples</h2>
-      <pre class="example highlight">
-      </pre>
+ <section class="informative" id="unreliableexamples*">
+    <h3>Unreliable delivery</h3>
+    <p>Unreliable delivery can be achieved by creating many streams with retransmissions disabled,
+    each transporting a single small message.</p>
+<pre class="example highlight">
+let quic = getQuicTransport();
+let messages = getMessages();
+for (msg in messages) {
+  quic.createSendStream({disableRetransmissions: true}).write({data: msg, finished: true});
+}
+</pre>
  </section>
+</section>
  <section id="change-log*">
     <h2>Change Log</h2>
     <p>This section will be removed before publication.</p>
@@ -1819,7 +1926,7 @@ interface RTCQuicTransport : QuicTransportBase {
     Harald Alvestrand, Stefan H&aring;kansson, Bernard Aboba and Dominique
     Haza&euml;l-Massieux, for their support. Contributions to this
     specification were provided by Robin Raymond.</p>
-    <p>The <code><a>RTCQuicTransport</a></code> and <code>QuicStream</code> objects
+    <p>The <code><a>nQuicTransport</a></code> and <code><a>QuicStream</a></code> objects
     were initially described in the <a href="https://www.w3.org/community/ortc/">W3C ORTC CG</a>,
     and have been adapted for use in this specification.</p>
  </section>

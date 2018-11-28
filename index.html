@@ -144,7 +144,6 @@ interface RTCQuicTransport : RTCStatsProvider {
                     attribute EventHandler             onreceivestream;
                     attribute EventHandler             onbidirectionalstream;
                     attribute EventHandler             ondatagramreceived;
-                    attribute EventHandler             onsenddatagramunblocked;
 };</pre>
         <section>
           <h2>Constructors</h2>
@@ -300,23 +299,6 @@ interface RTCQuicTransport : RTCStatsProvider {
               <code><a>datagramreceived</a></code>,
               <em class="rfc2119" title="MUST">MUST</em> be fired when data is received
               from a received datagram.
-              </p>
-            </dd>
-            <dt><dfn><code>onsenddatagramunblocked</code></dfn> of type <span class=
-            "idlAttrType"><a>EventHandler</a></span></dt>
-            <dd>
-              <p>This event handler, of event handler event type
-              <code><a>senddatagramunblocked</a></code>,
-              <em class="rfc2119" title="MUST">MUST</em> be fired when
-              backpressure has been relieved after the previous call
-              to <code>sendDatagram</code> resulted in the datagram being
-              dropped due to backpressure (and <code>result.blocked</code> being
-              set to <code>true</code>), such that a subsequent call
-              to <code>sendDatagram</code> would not result in the datagram
-              being dropped due to backpressure (and <code>result.blocked</code>
-              being set to <code>false</code>).  The intented use of this is for
-              the app to know when backpressure is relieved and when it can
-              again call <code>sendDatagram</code>.
               </p>
             </dd>
           </dl>
@@ -578,13 +560,15 @@ interface RTCQuicTransport : RTCStatsProvider {
                 <li>
                   <p>Let <var>result</var> be a newly created
                   <code><a>QuicSendDatagramResult</a></code> object
-                  with <code>result.blocked<code> set to false
-                  and <code>result.acked</code> set to a new promise.</p>
+                  with <code>result.blocked<code> set to false,
+		  <code>result.acked</code> set to a new promise,
+		  and <code>result.unblocked</code> set to a null.</p>
                 </li>
                 <li>
                   <p>If <var>transport</var> is unable to send the datagram due
                   to backpressure, set <code>result.blocked</code> to true,
-                  resolve <code>result.acked</code> to false and
+                  resolve <code>result.acked</code> to false,
+		  set <code>result.unblocked</code> to a new promise,
                   return <var>result</var> and abort these steps.</p>
                 </li>
                 <li>
@@ -1810,6 +1794,7 @@ interface DatagramReceivedEvent : Event {
       <div>
         <pre class="idl">interface QuicSendDatagramResult {
 	     readonly attribute bool blocked;
+             readonly attribute Promise unblocked;
              readonly attribute Promise&lt;bool&gt; acked;
         };
         </pre>
@@ -1834,6 +1819,24 @@ interface DatagramReceivedEvent : Event {
               agent decides the datagram is lost and will never be acked.  The
               inteded use is for the app to detect loss and retransmit datagrams
               if it sees fit.</p>
+            </dd>
+            <dt><dfn><code>unblocked</code></dfn> of type <span class=
+            "idlAttrType">Promise</span>.</dt>
+            <dd>
+              <p>Resolves when the backpressure that caused the result to be
+              blocked is no longer applied, such that a subsequent call
+              to <code>sendDatagram</code> will likely not result in the
+              datagram being dropped due to backpressure.  The intented use of
+              this is for the app to know when backpressure is relieved and when
+              it can again call <code>sendDatagram</code>.  Note that this
+              promise being resolved does not guarantee that subsequent calls
+              to <code>sendDatagram</code> will not be blocked (because
+              backpressure could be hit again in between the time when it
+              resolves and the time <code>sendDatagram</code> is called).  But
+              it does signal to the app that it should resume sending datagrams
+              if it stopped due to this call to <code>sendDatagram</code>
+              being blocked.
+              </p>
             </dd>
           </dl>
         </section>
@@ -1967,12 +1970,12 @@ let datagrams = getDatagrams();
 quic.ondatagramreceived = (event) => {
   // do something with event.data
 };
-for (datagram in datagrams) {
+for await (datagram in datagrams) {
   let result = quic.sendDatagram(datagram);
   if (result.blocked) {
     // We're sending too many datagrams at once. 
-    // Back off and try again when quic.onsenddatagramunblocked is fired.
-    break;
+    // Wait until we can send more
+    await result.unblocked;
   }
   result.acked.then((acked) => {
     let lost = !acked;

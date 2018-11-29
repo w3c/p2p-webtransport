@@ -716,18 +716,19 @@ interface QuicTransport : QuicTransportBase {
             </li>
             <li>Run these steps in parallel:
               <ol>
-                Let <var>serializedOrigin<var>
-                be <var>quictransport<var>'s 
+                Let <var>serializedOrigin<var> be the string <code>"null"</code>.
+		<!-- TODO: Remove the transport parameter or replace it with something that is encrypted. -->
+                <!-- TODO: If QUIC gets encrypted transport parameters, fill in a non-null value like so:
+                Let <var>serializedOrigin<var> be <var>quictransport<var>'s 
                 <a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">relevant settings object</a>'s
                 <a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-origin">origin</a>,
                 <a href="https://html.spec.whatwg.org/multipage/origin.html#ascii-serialisation-of-an-origin">serialized</a>.
-
+                -->
                 <li>Establish a QUIC connection to the address identified by the
                 <var>parsedUrl</var>'s host and port.  The user agent MUST
-                include a QUIC transport parameter with ID web_origin(0x330) 
+                include a QUIC transport parameter with ID of web_origin(0x330) 
                 <!-- TODO: Register the transport parameter with IANA -->
-		<!-- TODO: Remove the transport parameter or replace it with something that is encrypted. -->
-                and value <var>serializedOrigin</var>.</li>
+                and value of <var>serializedOrigin</var>.</li>
                 <li>If the connection succeeds, set
                 the <var>quictransport</var>'s <dfn>[[\QuicTransportState]]</dfn>
                 internal slot to <code>"connected"</code>.</li>

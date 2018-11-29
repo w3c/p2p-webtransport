@@ -565,10 +565,11 @@ interface RTCQuicTransport : RTCStatsProvider {
 		  and <code>result.unblocked</code> set to a null.</p>
                 </li>
                 <li>
-                  <p>If <var>transport</var> is unable to send the datagram due
-                  to backpressure, set <code>result.blocked</code> to true,
+                  <p>If <var>transport</var> is unable to send the
+                  datagram due to flow control or congestion control,
+                  set <code>result.blocked</code> to true,
                   resolve <code>result.acked</code> to false,
-		  set <code>result.unblocked</code> to a new promise,
+                  set <code>result.unblocked</code> to a new promise,
                   return <var>result</var> and abort these steps.</p>
                 </li>
                 <li>
@@ -1805,11 +1806,13 @@ interface DatagramReceivedEvent : Event {
             <dt><dfn><code>blocked</code></dfn> of type <span class=
             "idlAttrType"><a>bool</a></span>.</dt>
             <dd>
-              <p>Whether or not the datagram was dropped due to backpressure.  A
-              false values guarantees that the datagram will not be delivered.
-              But a true value does not guarantee that a datagram will be
-              delivered.  The intended use is for the app to detect backpressure
-              and not send so many datagrams.</p>
+              <p>Whether or not the datagram was dropped due to flow
+              control or congestion control.  A false values
+              guarantees that the datagram will not be delivered.  But
+              a true value does not guarantee that a datagram will be
+              delivered.  The intended use is for the app to detect
+              flow control or congestion control and not send so many
+              datagrams.</p>
             </dd>
             <dt><dfn><code>acked</code></dfn> of type <span class=
             "idlAttrType">Promise&lt;bool&gt;</span>.</dt>
@@ -1823,20 +1826,24 @@ interface DatagramReceivedEvent : Event {
             <dt><dfn><code>unblocked</code></dfn> of type <span class=
             "idlAttrType">Promise</span>.</dt>
             <dd>
-              <p>Resolves when the backpressure that caused the result to be
-              blocked is no longer applied, such that a subsequent call
-              to <code>sendDatagram</code> will likely not result in the
-              datagram being dropped due to backpressure.  The intented use of
-              this is for the app to know when backpressure is relieved and when
-              it can again call <code>sendDatagram</code>.  Note that this
-              promise being resolved does not guarantee that subsequent calls
-              to <code>sendDatagram</code> will not be blocked (because
-              backpressure could be hit again in between the time when it
-              resolves and the time <code>sendDatagram</code> is called).  But
-              it does signal to the app that it should resume sending datagrams
-              if it stopped due to this call to <code>sendDatagram</code>
-              being blocked.
-              </p>
+              <p>Resolves when the flow control or congestion control
+              that caused the result to be blocked is no longer
+              applied, such that a subsequent call
+              to <code>sendDatagram</code> will likely not result in
+              the datagram being dropped due to flow control or
+              congestion control.  The intented use of this is for the
+              app to know when flow control or congestion control is
+              relieved and when it can again
+              call <code>sendDatagram</code>.  Note that this promise
+              being resolved does not guarantee that subsequent calls
+              to <code>sendDatagram</code> will not be blocked
+              (because flow control or congestion control could be hit
+              again in between the time when it resolves and the
+              time <code>sendDatagram</code> is called).  But it does
+              signal to the app that it should resume sending
+              datagrams if it stopped due to this call
+              to <code>sendDatagram</code> being blocked.  `
+	      </p>
             </dd>
           </dl>
         </section>

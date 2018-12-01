@@ -10,7 +10,8 @@ specification developed by the IETF QUIC Working Group.
 The editors' draft is the tip-of-tree of this document, it may contain work in
 progress changes and other inconsistencies, including an incomplete change log.
 
-* [Latest editor's draft at github](https://w3c.github.io/webrtc-quic/)
+* [Latest P2P API draft at github](https://w3c.github.io/webrtc-quic/)
+* [Latest Client-Server API draft at github](https://w3c.github.io/webrtc-quic/cs.html)
 
 ### Useful Links
 

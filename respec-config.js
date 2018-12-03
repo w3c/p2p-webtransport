@@ -11,7 +11,7 @@ var respecConfig = {
   ],
   wg: "Object-RTC API Community Group",
   wgURI: "https://www.w3.org/community/ortc/",
-  wgPublicList: "public-webrtc",
+  wgPublicList: "public-ortc",
   wgPatentURI:  "https://www.w3.org/2004/01/pp-impl/47318/status",
   issueBase: "https://github.com/w3c/webrtc-quic/issues",
   otherLinks: [
@@ -20,7 +20,7 @@ var respecConfig = {
       data: [
         {
           value: "Mailing list",
-          href: "https://lists.w3.org/Archives/Public/public-webrtc/"
+          href: "https://lists.w3.org/Archives/Public/public-ortc/"
         },
         {
           value: "Browse open issues",

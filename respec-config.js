@@ -1,7 +1,7 @@
 var respecConfig = {
   specStatus: "CG-DRAFT",
   // if there a publicly available Editor's Draft, this is the link
-  edDraftURI: "https://w3c.github.io/webrtc-quic/",
+  edDraftURI: "https://w3c.github.io/webrtc-quic/p2p.html",
   shortName: "webrtc-quic",
   editors: [
     { name: "Peter Thatcher", company: "Google", w3cid: "68236" },
@@ -48,6 +48,16 @@ var respecConfig = {
         "Justin Uberti"
       ],
       "status": "03 October 2018 (work in progress)",
+      "publisher": "W3C"
+    },
+    "CS-QUIC": {
+      "title": "QUIC API for Client-Server Connections",
+      "href": "https://w3c.github.io/webrtc-quic/cs.html",
+      "authors": [
+        "Peter Thatcher",
+        "Bernard Aboba"
+      ],
+      "status": "05 December 2018 (work in progress)",
       "publisher": "W3C"
     },
     "QUIC-DATAGRAM": {

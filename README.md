@@ -12,6 +12,7 @@ progress changes and other inconsistencies, including an incomplete change log.
 
 * [Latest P2P API draft at github](https://w3c.github.io/webrtc-quic/)
 * [Latest Client-Server API draft at github](https://w3c.github.io/webrtc-quic/cs.html)
+* [Work-in-progress revision of P2P API draft at github](https://w3c.github.io/webrtc-quic/p2p.html)
 
 ### Useful Links
 

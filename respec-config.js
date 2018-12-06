@@ -81,17 +81,6 @@ var respecConfig = {
       "status": "23 October 2018. Internet draft (work in progress)",
       "publisher": "IETF"
     },
-    "QUIC-DATAGRAM": {
-      "title": "An Unreliable Datagram Extension to QUIC",
-      "href": "https://tools.ietf.org/html/draft-pauly-quic-datagram-00",
-      "authors": [
-        "T. Pauly",
-        "E. Kinnear",
-        "D. Schinazi",
-      ],
-      "status": "September 10, 2018. Internet draft (work in progress)",
-      "publisher": "IETF"
-    },
     "QUIC-MULT": {
       "title": "QUIC Multiplexing",
       "href": "https://tools.ietf.org/html/draft-aboba-avtcore-quic-multiplexing",

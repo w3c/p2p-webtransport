@@ -138,12 +138,10 @@ interface RTCQuicTransport : RTCStatsProvider {
     void                  stop (RTCQuicTransportStopInfo stopInfo);
     RTCQuicBidirectionalStream         createBidirectionalStream ();
     RTCQuicSendStream                  createSendStream (optional RTCQuicStreamParameters parameters);
-    QuicSendDatagramResult             sendDatagram (Uint8Array data);
                     attribute EventHandler             onstatechange;
                     attribute EventHandler             onerror;
                     attribute EventHandler             onreceivestream;
                     attribute EventHandler             onbidirectionalstream;
-                    attribute EventHandler             ondatagramreceived;
 };</pre>
         <section>
           <h2>Constructors</h2>
@@ -290,15 +288,6 @@ interface RTCQuicTransport : RTCStatsProvider {
               <em class="rfc2119" title="MUST">MUST</em> be fired when data is received
               from a newly created remote <code><a>RTCQuicBidirectionalStream</a></code> for the
               first time.
-              </p>
-            </dd>
-            <dt><dfn><code>ondatagramreceived</code></dfn> of type <span class=
-            "idlAttrType"><a>EventHandler</a></span></dt>
-            <dd>
-              <p>This event handler, of event handler event type
-              <code><a>datagramreceived</a></code>,
-              <em class="rfc2119" title="MUST">MUST</em> be fired when data is received
-              from a received datagram.
               </p>
             </dd>
           </dl>
@@ -534,68 +523,6 @@ interface RTCQuicTransport : RTCStatsProvider {
               </div>
             </dd>
 
-           <dt><dfn><code>sendDatagram</code></dfn></dt>
-            <dd>
-              <p>Sends a datagram as defined by [[QUIC-DATAGRAM]].</p>
-              <p>When <code>sendDatagram</code> is called, the user agent
-              <em class="rfc2119" title="MUST">MUST</em> run the following
-              steps:</p>
-              <ol>
-		<li>Let <var>data</var> be the first argument.</li>
-                <li>
-                  <p>Let <var>transport</var> be
-                  the <code><a>RTCQuicTransport</a></code> on
-                  which <code>sendDatagram</code> is invoked.</p>
-                </li>
-                <li>
-                  <p>If <code><var>transport</var>'s state</code> is
-                  not <code>connected</code> <a>throw</a>
-                  an <code>InvalidStateError</code> and abort these steps.</p>
-                </li>
-                <li>
-                  <p>If <code><var>data</var> is too large to fit into a
-                  datagram, <a>throw</a> an <code>InvalidArgumentError</code>
-                  and abort these steps.</p>
-                </li>
-                <li>
-                  <p>Let <var>result</var> be a newly created
-                  <code><a>QuicSendDatagramResult</a></code> object
-                  with <code>result.blocked<code> set to false,
-		  <code>result.acked</code> set to a new promise,
-		  and <code>result.unblocked</code> set to a null.</p>
-                </li>
-                <li>
-                  <p>If <var>transport</var> is unable to send the datagram due
-                  to congestion control, set <code>result.blocked</code> to
-                  true, resolve <code>result.acked</code> to false,
-                  set <code>result.unblocked</code> to a new promise,
-                  return <var>result</var> and abort these steps.</p>
-                </li>
-                <li>
-                  <p>Set <code>result.blocked</code> to false,
-                  return <var>result</var> and continue the following steps in
-                  the background.</p>
-                </li>
-                <li>
-                  <p>Send <var>data</var> in a QUIC datagram.</p>
-                </li>
-                <li>
-                  <p>When the datagram is acked,
-                  resolve <code>result.acked</code> with <code>true</code>.</p>
-                </li>
-                <li>
-                  <p>When the datagram is detemined to be lost, resolve 
-                  resolve <code>result.acked</code> with <code>false</code>.</p>
-                </li>
-              </ol>
-              <div>
-                <em>No parameters.</em>
-              </div>
-              <div>
-                <em>Return type:</em> <code><a>RTCQuicSendStream</a></code>
-              </div>
-            </dd>
-
           </dl>
         </section>
       </div>
@@ -813,86 +740,6 @@ interface BidirectionalStreamEvent : Event {
             <dd>
               <p>The <code><a>RTCQuicBidirectionalStream</a></code> object associated with the
               event.</p>
-            </dd>
-          </dl>
-        </section>
-      </div>
-    </section>
-    <section>
-      <h3><dfn>DatagramReceivedEvent</dfn></h3>
-      <p>The <code><a>datagramreceived</a></code> event uses the
-      <code><a>DatagramReceivedEvent</a></code> interface.</p>
-      <div>
-        <pre class="idl">
-        [ Constructor (DOMString type, DatagramReceivedEventInit eventInitDict), Exposed=Window]
-interface DatagramReceivedEvent : Event {
-    readonly        attribute Uint8Array data;
-};</pre>
-        <section>
-          <h2>Constructors</h2>
-          <dl data-link-for="DatagramReceivedEvent" data-dfn-for="DatagramReceivedEvent"
-          class="constructors">
-            <dt><code>DatagramReceivedEvent</code></dt>
-            <dd>
-              <table class="parameters">
-                <tbody>
-                  <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Nullable</th>
-                    <th>Optional</th>
-                    <th>Description</th>
-                  </tr>
-                  <tr>
-                    <td class="prmName">type</td>
-                    <td class="prmType"><code>DOMString</code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                  <tr>
-                    <td class="prmName">eventInitDict</td>
-                    <td class="prmType"><code><a>DatagramReceivedEventInit</a></code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                </tbody>
-              </table>
-            </dd>
-          </dl>
-        </section>
-        <section>
-          <h2>Attributes</h2>
-          <dl data-link-for="DatagramReceivedEvent" data-dfn-for="DatagramReceivedEvent"
-          class="attributes">
-            <dt><code>data</code> of type <span class=
-            "idlAttrType"><a>Uint8Array</a></span>, readonly</dt>
-            <dd>
-              <p>The <dfn id="dom-datagramreceivedevent-data"><code>data</code></dfn>
-              attribute represents the <code><a>data</a></code> received. </p>
-            </dd>
-          </dl>
-        </section>
-      </div>
-      <div>
-          <p>The <dfn><code>DatagramReceivedEventInit</code></dfn> dictionary includes
-          information to construct a DatagramReceivedEvent .</p>
-        <pre class="idl">dictionary DatagramReceivedEventInit : EventInit {
-             Uint8Array data;
-};</pre>
-        <section>
-          <h2>Dictionary DatagramReceivedEventInit Members</h2>
-          <dl data-link-for="DatagramReceivedEventInit" data-dfn-for=
-          "DatagramReceivedEventInit" class="dictionary-members">
-            <dt><dfn><code>data</code></dfn> of type <span class=
-            "idlMemberType"><a>Uint8Array</a></span></dt>
-            <dd>
-              <p>The data received.</p>
             </dd>
           </dl>
         </section>
@@ -1444,7 +1291,7 @@ interface DatagramReceivedEvent : Event {
               return the value of the <code><a>RTCQuicReadableStream</a></code>'s
               <a>[[\ReadableAmount]]</a> internal slot.</p>
             </dd>
-            <dt><code>readingAborted</code> of type <span class="idlAttriType"><a>RTCQuicStreamAbortInfo</a>
+            <dt><code>readingAborted</code> of type <span class=idlAttriType"><a>RTCQuicStreamAbortInfo</a>
             readonly</dt>
             <dd>
               <p>The <dfn id="dom-rtcquicreadablestream-readingAborted"><code>readingAborted</code></dfn>
@@ -1787,61 +1634,6 @@ interface DatagramReceivedEvent : Event {
         </section>
       </div>
     </section>
-    <section id="quicsenddatagramresult*">
-      <h3><dfn>QuicSendDatagramdResult</dfn> Dictionary</h3>
-      <p>The <code>QuicStreamReadResult</code> includes information
-      relating to the result returned from <code>sendDatagram</code>.</p>
-      <div>
-        <pre class="idl">interface QuicSendDatagramResult {
-	     readonly attribute bool blocked;
-             readonly attribute Promise unblocked;
-             readonly attribute Promise&lt;bool&gt; acked;
-        };
-        </pre>
-        <section>
-          <h2><a class="idlType">QuicSendDatagramResult</a> attributes</h2>
-          <dl data-link-for="QuicSendDatagramResult" data-dfn-for="QuicSendDatagramResult" class=
-          "attributes">
-            <dt><dfn><code>blocked</code></dfn> of type <span class=
-            "idlAttrType"><a>bool</a></span>.</dt>
-            <dd>
-              <p>Whether or not the datagram was dropped due to congestion
-              control.  A false values guarantees that the datagram will not be
-              delivered.  But a true value does not guarantee that a datagram
-              will be delivered.  The intended use is for the app to detect
-              congestion control and not send so many datagrams.</p>
-            </dd>
-            <dt><dfn><code>acked</code></dfn> of type <span class=
-            "idlAttrType">Promise&lt;bool&gt;</span>.</dt>
-            <dd>
-              <p>Resolves to <code>true</code> when an ack is received for the
-              send datagram and resolved to <code>false</code> when the user
-              agent decides the datagram is lost and will never be acked.  The
-              inteded use is for the app to detect loss and retransmit datagrams
-              if it sees fit.</p>
-            </dd>
-            <dt><dfn><code>unblocked</code></dfn> of type <span class=
-            "idlAttrType">Promise</span>.</dt>
-            <dd>
-              <p>Resolves when the congestion control that caused the result to
-              be blocked is no longer applied, such that a subsequent call
-              to <code>sendDatagram</code> will likely not result in the
-              datagram being dropped due to congestion control.  The intented
-              use of this is for the app to know when congestion control is
-              relieved and when it can again call <code>sendDatagram</code>.
-              Note that this promise being resolved does not guarantee that
-              subsequent calls to <code>sendDatagram</code> will not be blocked
-              (because congestion control could be hit again in between the time
-              when it resolves and the time <code>sendDatagram</code> is
-              called).  But it does signal to the app that it should resume
-              sending datagrams if it stopped due to this call
-              to <code>sendDatagram</code> being blocked.  `
-	      </p>
-            </dd>
-          </dl>
-        </section>
-      </div>
-    </section>
   </section>
     <section id="privacy-security">
     <h2>Privacy and Security Considerations</h2>
@@ -1958,32 +1750,6 @@ let quic = getQuicTransport();
 let messages = getMessages();
 for (msg in messages) {
   quic.createSendStream({disableRetransmissions: true}).write({data: msg, finished: true});
-}
-</pre>
- </section>
- <section class="informative" id="datagramexamples*">
-    <h3>Datagrams</h3>
-    <p>Datagrams can be sent and received like so.</p>
-<pre class="example highlight">
-let quic = getQuicTransport();
-let datagrams = getDatagrams();
-quic.ondatagramreceived = (event) => {
-  // do something with event.data
-};
-for await (datagram in datagrams) {
-  let result = quic.sendDatagram(datagram);
-  if (result.blocked) {
-    // We're sending too many datagrams at once. 
-    // Wait until we can send more
-    await result.unblocked;
-  }
-  result.acked.then((acked) => {
-    let lost = !acked;
-    if (lost) {
-      // Resend each datagram once.
-      quic.sendDatagram(datagram);      
-    }
-  });
 }
 </pre>
  </section>

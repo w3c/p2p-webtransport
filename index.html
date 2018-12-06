@@ -11,20 +11,20 @@
   <section id="abstract">
     <p>This document defines a set of ECMAScript APIs in WebIDL to allow data to be sent
     and received from another browser or device implementing the QUIC
-    protocol. This specification is being developed in conjunction with a protocol
-    specification developed by the IETF QUIC Working Group.</p>
+    protocol. This specification is being developed in conjunction with protocol
+    specifications developed by the IETF QUIC Working Group.</p>
   </section>
   <section id="sotd">
-    <p>The API is based on preliminary work done in the W3C ORTC Community Group.</p>
+    <p>The API is a product of the W3C ORTC Community Group.</p>
   </section>
   <section class="informative" id="intro">
     <h2>Introduction</h2>
-    <p>This specification extends the WebRTC specification [[!WEBRTC]] to
-    enable the use of QUIC [[!QUIC-TRANSPORT]] to exchange arbitrary data with
+    <p>This specification extends the WebRTC [[!WEBRTC]] and ORTC [[!ORTC]] specifications
+    to enable the use of QUIC [[!QUIC-TRANSPORT]] to exchange arbitrary data with
     remote peers using NAT-traversal technologies such as ICE, STUN, and
     TURN. Since QUIC can be multiplexed on the same port as RTP, RTCP,
     DTLS, STUN and TURN, this specification is compatible with all the
-    functionality defined in [[!WEBRTC]], including communication
+    functionality defined in [[!WEBRTC]] and [[!ORTC]] including communication
     using audio/video media and SCTP data channels.</p>
     <p>While this specification defines an interface to QUIC streams,
     by utilizing a QUIC stream per message, it is possible to implement
@@ -83,7 +83,7 @@
       <dfn data-lt="settled">settled</dfn> used in the context of Promises are defined in
       [[!ECMASCRIPT-6.0]].</p>
       <p>The <dfn><code>RTCIceTransport</code></dfn> and <dfn><code>RTCCertificate</code></dfn> interfaces
-      and the <dfn><code>RTCDtlsFingerprint</code></dfn> dictionary are defined in [[!WEBRTC]].</p>
+      and the <dfn><code>RTCDtlsFingerprint</code></dfn> dictionary are defined in [[!WEBRTC]] and [[!ORTC]].</p>
   </section>
   <section id="quic-transport*">
     <h2><dfn>RTCQuicTransport</dfn> Interface</h2>

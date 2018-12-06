@@ -672,9 +672,9 @@ interface QuicTransport : QuicTransportBase {
             </li>
             <li>Run these steps in parallel:
               <ol>
-                Let <var>serializedOrigin<var> be the string <code>"null"</code>.
-		<!-- TODO: Remove the transport parameter or replace it with something that is encrypted. -->
-                <!-- TODO: If QUIC gets encrypted transport parameters, fill in a non-null value like so:
+                Let <var>serializedOrigin<var> be the empty string ,<code>""</code>.
+                <!-- TODO: Figure out a way to convey the origin in an encrypted manner 
+                           and then use a non-empty value like so:
                 Let <var>serializedOrigin<var> be <var>quictransport<var>'s 
                 <a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">relevant settings object</a>'s
                 <a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-origin">origin</a>,

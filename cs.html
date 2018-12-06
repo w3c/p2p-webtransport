@@ -5,7 +5,7 @@
   <link href="webrtc.css" rel="stylesheet">
   <title>QUIC API for Client-to-Server Connections</title>
   <script class="remove" src="respec-w3c-common.js" type="text/javascript"></script>
-  <script src="respec-config.js" class="remove"></script>
+  <script src="respec-config-cs.js" class="remove"></script>
 </head>
 <body>
   <section id="abstract">
@@ -686,10 +686,10 @@ interface QuicTransport : QuicTransportBase {
                 <!-- TODO: Register the transport parameter with IANA -->
                 and value of <var>serializedOrigin</var>.</li>
                 <li>If the connection succeeds, set
-                the <var>quictransport</var>'s <dfn>[[\QuicTransportState]]</dfn>
+                the <var>quictransport</var>'s <a>[[\QuicTransportState]]</a>
                 internal slot to <code>"connected"</code>.</li>
                 <li>If the connection fails, set
-                the <var>quictransport</var>'s <dfn>[[\QuicTransportState]]</dfn>
+                the <var>quictransport</var>'s <a>[[\QuicTransportState]]</a>
                 internal slot to <code>"failed"</code>.</li>
               </ol>
             </li>
@@ -1479,7 +1479,7 @@ for (msg in messages) {
     Harald Alvestrand, Stefan H&aring;kansson, Bernard Aboba and Dominique
     Haza&euml;l-Massieux, for their support. Contributions to this
     specification were provided by Robin Raymond.</p>
-    <p>The <code><a>nQuicTransport</a></code> and <code><a>QuicStream</a></code> objects
+    <p>The <code><a>QuicTransport</a></code> and <code><a>QuicStream</a></code> objects
     were initially described in the <a href="https://www.w3.org/community/ortc/">W3C ORTC CG</a>,
     and have been adapted for use in this specification.</p>
  </section>

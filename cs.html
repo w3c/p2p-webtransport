@@ -96,6 +96,7 @@
         <pre class="idl">
 interface QuicTransportBase {
     readonly        attribute QuicTransportState    state;
+    readonly        attribute unsigned short        maxDatagramSize;
     void                  stop (QuicTransportStopInfo stopInfo);
     QuicBidirectionalStream         createBidirectionalStream ();
     QuicSendStream                  createSendStream (optional QuicStreamParameters parameters);
@@ -116,6 +117,11 @@ interface QuicTransportBase {
               <p>The current state of the QUIC transport. On getting, it
               <em class="rfc2119" title="MUST">MUST</em> return the value
               of the <a>[[\QuicTransportState]]</a> internal slot.</p>
+            </dd>
+            <dt><dfn><code>maxDatagramSize</code></dfn> of type <span class=
+            "idlAttrType"><a>unsigned short</a></span>, readonly</dt>
+            <dd>
+              <p>The maximum size data that may be passed to sendDatagram.</p>
             </dd>
             <dt><dfn><code>onstatechange</code></dfn> of type <span class=
             "idlAttrType"><a>EventHandler</a></span></dt>

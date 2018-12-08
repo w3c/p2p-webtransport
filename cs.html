@@ -328,8 +328,8 @@ interface QuicTransportBase {
                   <p>Let <var>result</var> be a newly created
                   <code><a>QuicSendDatagramResult</a></code> object
                   with <code>result.blocked</code> set to false,
-		              <code>result.acked</code> set to a new promise,
-		              and <code>result.unblocked</code> set to a null.</p>
+                  <code>result.acked</code> set to a new promise,
+                  and <code>result.unblocked</code> set to a null.</p>
                 </li>
                 <li>
                   <p>If <var>transport</var> is unable to send the datagram due
@@ -339,8 +339,7 @@ interface QuicTransportBase {
                   return <var>result</var> and abort these steps.</p>
                 </li>
                 <li>
-                  <p>Set <code>result.blocked</code> to false,
-                  return <var>result</var> and continue the following steps in
+                  <p>return <var>result</var> and continue the following steps in
                   the background.</p>
                 </li>
                 <li>

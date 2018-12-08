@@ -320,14 +320,14 @@ interface QuicTransportBase {
                   an <code>InvalidStateError</code> and abort these steps.</p>
                 </li>
                 <li>
-                  <p>If <code><var>data</var> is too large to fit into a
+                  <p>If <code><var>data</var></code> is too large to fit into a
                   datagram, <a>throw</a> an <code>InvalidArgumentError</code>
                   and abort these steps.</p>
                 </li>
                 <li>
                   <p>Let <var>result</var> be a newly created
                   <code><a>QuicSendDatagramResult</a></code> object
-                  with <code>result.blocked<code> set to false,
+                  with <code>result.blocked</code> set to false,
 		              <code>result.acked</code> set to a new promise,
 		              and <code>result.unblocked</code> set to a null.</p>
                 </li>
@@ -362,6 +362,7 @@ interface QuicTransportBase {
                 <em>Return type:</em> <code><a>RTCQuicSendStream</a></code>
               </div>
             </dd>
+
           </dl>
         </section>
       </div>
@@ -1607,6 +1608,12 @@ interface QuicTransport : QuicTransportBase {
           firing, the <code><a>QuicBidirectionalStream</a></code> is added to the
           <code><a>QuicTransportBase</a></code>'s <a>[[\QuicTransportReadableStreams]]</a>
           and <a>[[\QuicTransportWritableStreams]]</a> internal slots.</td>
+        </tr>
+        <tr>
+          <td><dfn><code>datagramreceived</code></dfn></td>
+          <td><code><a>DatagramReceivedEvent</a></code></td>
+          <td>The <code><a>QuicTransportBase</a></code> object has received some data
+            as a result of the remote side calling <code>sendDatagram</code></td>
         </tr>
       </tbody>
     </table>

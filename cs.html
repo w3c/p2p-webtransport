@@ -215,32 +215,39 @@ interface QuicTransportBase {
                   on which <code>createBidectionalStream</code> is invoked.</p>
                 </li>
                 <li>
-                  <p>Let <var>p</var> be a new promise.</p>
-                <li>
                   <p>If <code><var>transport</var>'s state</code> is <code>"closed"</code> or
-                  <code>"failed"</code>, immediately <a>reject</a> <var>p</var> with a newly created
-                  <code>InvalidStateError</code> and abort these steps.</p>
+                  <code>"failed"</code>, immediately return a new <a>rejected</a> promise with a
+                  newly created <code>InvalidStateError</code> and abort these steps.</p>
                 </li>
                 <li>
                   <p>If <code><var>transport</var>'s state</code> is <code>connected</code>,
-                  immediately <a>resolve</a> <var>p</var> with a newly created
+                  immediately return a new <a>fulfilled</a> promise with a newly created
                   <code><a>QuicBidirectionalStream</a></code> object,
                   <a>add the QuicBidirectionalStream</a> to the <code><a>QuicTransport</a></code>
                   and abort these steps.</p>
                 </li>
                 <li>
-                  <p>When <code><var>transport</var>'s state</code> transitions to
-                  <code>"connected"</code> and <var>p</var> has not been <a>settled</a>,
-                  <a>resolve</a> <var>p</var> with a newly created
-                  <code><a>QuicBidirectionalStream</a></code> object, and
-                  <a>add the QuicBidirectionalStream</a> to the <code><a>QuicTransport</a></code>.</p>
+                  <p>Let <var>p</var> be a new promise.</p>
                 </li>
                 <li>
-                  <p>When <code><var>transport</var>'s state</code> transitions to
-                  <code>"closed"</code> or <code>"failed"</code> and <var>p</var> has not been
-                  <a>settled</a>, <a>reject</a> <var>p</var> with a newly created
-                  <code>InvalidStateError</code>.</p>
+                  <p>Return <var>p</var> and continue the following steps in
+                  the background.</p>
                 </li>
+                <ol>
+                  <li>
+                    <p>When <code><var>transport</var>'s state</code> transitions to
+                    <code>"connected"</code> and <var>p</var> has not been <a>settled</a>,
+                    <a>fulfill</a> <var>p</var> with a newly created
+                    <code><a>QuicBidirectionalStream</a></code> object, and
+                    <a>add the QuicBidirectionalStream</a> to the <code><a>QuicTransport</a></code>.</p>
+                  </li>
+                  <li>
+                    <p>When <code><var>transport</var>'s state</code> transitions to
+                    <code>"closed"</code> or <code>"failed"</code> and <var>p</var> has not been
+                    <a>settled</a>, <a>reject</a> <var>p</var> with a newly created
+                    <code>InvalidStateError</code>.</p>
+                  </li>
+                </ol>
               </ol>
               <div>
                 <em>No parameters.</em>
@@ -261,31 +268,39 @@ interface QuicTransportBase {
                   on which <code>createSendStream</code> is invoked.</p>
                 </li>
                 <li>
-                  <p>Let <var>p</var> be a new promise.</p>
-                <li>
                   <p>If <code><var>transport</var>'s state</code> is <code>"closed"</code> or
-                  <code>"failed"</code>, immediately <a>reject</a> <var>p</var> with a newly created
-                  <code>InvalidStateError</code> and abort these steps.</p>
+                  <code>"failed"</code>, immediately return a new <a>rejected</a> promise with a
+                  newly created <code>InvalidStateError</code> and abort these steps.</p>
                 </li>
                 <li>
-                  <p>If <code><var>transport</var>'s state</code> is <code>"connected"</code>,
-                  immediately <a>resolve</a> <var>p</var> with a newly created
-                  <code><a>QuicSendStream</a></code> object, <a>add the QuicSendStream</a>
-                  to the <code><a>QuicTransport</a></code> and abort these steps.</p>
+                  <p>If <code><var>transport</var>'s state</code> is <code>connected</code>,
+                  immediately return a new <a>fulfilled</a> promise with a newly created
+                  <code><a>QuicSendStream</a></code> object,
+                  <a>add the QuicSendStream</a> to the <code><a>QuicTransport</a></code>
+                  and abort these steps.</p>
                 </li>
                 <li>
-                  <p>When <code><var>transport</var>'s state</code> transitions to
-                  <code>"connected"</code> and <var>p</var> has not been <a>settled</a>,
-                  <a>resolve</a> <var>p</var> with a newly created
-                  <code><a>QuicSendStream</a></code> object, and
-                  <a>add the QuicSendStream</a> to the <code><a>QuicTransport</a></code>.</p>
+                  <p>Let <var>p</var> be a new promise.</p>
                 </li>
                 <li>
-                  <p>When <code><var>transport</var>'s state</code> transitions to
-                  <code>"closed"</code> or <code>"failed"</code> and <var>p</var> has not been
-                  <a>settled</a>, <a>reject</a> <var>p</var> with a newly created
-                  <code>InvalidStateError</code>.</p>
+                  <p>Return <var>p</var> and continue the following steps in
+                  the background.</p>
                 </li>
+                <ol>
+                  <li>
+                    <p>When <code><var>transport</var>'s state</code> transitions to
+                    <code>"connected"</code> and <var>p</var> has not been <a>settled</a>,
+                    <a>fulfill</a> <var>p</var> with a newly created
+                    <code><a>QuicSendStream</a></code> object, and
+                    <a>add the QuicSendStream</a> to the <code><a>QuicTransport</a></code>.</p>
+                  </li>
+                  <li>
+                    <p>When <code><var>transport</var>'s state</code> transitions to
+                    <code>"closed"</code> or <code>"failed"</code> and <var>p</var> has not been
+                    <a>settled</a>, <a>reject</a> <var>p</var> with a newly created
+                    <code>InvalidStateError</code>.</p>
+                  </li>
+                </ol>
               </ol>
               <div>
                 <em>No parameters.</em>

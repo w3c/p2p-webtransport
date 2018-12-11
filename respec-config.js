@@ -1,5 +1,5 @@
 var respecConfig = {
-  specStatus: "ED",
+  specStatus: "CG-DRAFT",
   // if there a publicly available Editor's Draft, this is the link
   edDraftURI: "https://w3c.github.io/webrtc-quic/",
   shortName: "webrtc-quic",
@@ -9,9 +9,9 @@ var respecConfig = {
   ],
   authors: [
   ],
-  wg: "Web Real-Time Communications Working Group",
-  wgURI: "https://www.w3.org/2011/04/webrtc/",
-  wgPublicList: "public-webrtc",
+  wg: "Object-RTC API Community Group",
+  wgURI: "https://www.w3.org/community/ortc/",
+  wgPublicList: "public-ortc",
   wgPatentURI:  "https://www.w3.org/2004/01/pp-impl/47318/status",
   issueBase: "https://github.com/w3c/webrtc-quic/issues",
   otherLinks: [
@@ -20,7 +20,7 @@ var respecConfig = {
       data: [
         {
           value: "Mailing list",
-          href: "https://lists.w3.org/Archives/Public/public-webrtc/"
+          href: "https://lists.w3.org/Archives/Public/public-ortc/"
         },
         {
           value: "Browse open issues",
@@ -39,6 +39,38 @@ var respecConfig = {
       "href": "https://www.iana.org/assignments/stun-parameters/stun-parameters.xhtml#stun-parameters-6",
       "publisher": "IANA"
     },
+    "ORTC": {
+      "title": "Object RTC (ORTC) API for WebRTC",
+      "href": "https://w3c.github.io/ortc/",
+      "authors": [
+        "Robin Raymond",
+        "Bernard Aboba",
+        "Justin Uberti"
+      ],
+      "status": "03 October 2018 (work in progress)",
+      "publisher": "W3C"
+    },
+    "CS-QUIC": {
+      "title": "QUIC API for Client-Server Connections",
+      "href": "https://w3c.github.io/webrtc-quic/cs.html",
+      "authors": [
+        "Peter Thatcher",
+        "Bernard Aboba"
+      ],
+      "status": "05 December 2018 (work in progress)",
+      "publisher": "W3C"
+    },
+    "QUIC-DATAGRAM": {
+      "title": "An Unreliable Datagram Extension to QUIC",
+      "href": "https://tools.ietf.org/html/draft-pauly-quic-datagram",
+      "authors": [
+        "T. Pauly",
+        "E. Kinnear",
+        "D. Schinazi"
+      ],
+      "status": "10 September 2018. Internet draft (work in progress)",
+      "publisher": "IETF"
+    },
     "QUIC-TRANSPORT": {
       "title": "QUIC: A UDP-Based Multiplexed and Secure Transport",
       "href": "https://tools.ietf.org/html/draft-ietf-quic-transport",
@@ -46,7 +78,7 @@ var respecConfig = {
         "J. Iyengar",
         "M. Thomson"
       ],
-      "status": "13 October 2017. Internet draft (work in progress)",
+      "status": "23 October 2018. Internet draft (work in progress)",
       "publisher": "IETF"
     },
     "QUIC-MULT": {
@@ -57,7 +89,7 @@ var respecConfig = {
         "P. Thatcher",
         "C. Perkins"
       ],
-      "status": "29 October 2017. Internet draft (work in progress)",
+      "status": "23 October 2018. Internet draft (work in progress)",
       "publisher": "IETF"
     },
     "RFC7675": {
@@ -92,7 +124,7 @@ var respecConfig = {
         "C. Jennings",
         "E. Rescorla"
       ],
-      "status": "10 October 2017. Internet Draft (work in progress)",
+      "status": "22 October 2018. Internet Draft (work in progress)",
       "publisher": "IETF"
     },
     "RTCWEB-SECURITY": {
@@ -101,7 +133,7 @@ var respecConfig = {
       "authors": [
         "E. Rescorla"
       ],
-      "status": "29 October 2017. Internet Draft (work in progress)",
+      "status": "22 January 2018. Internet Draft (work in progress)",
       "publisher": "IETF"
     },
     "RTCWEB-SECURITY-ARCH": {
@@ -110,7 +142,7 @@ var respecConfig = {
       "authors": [
         "E. Rescorla"
       ],
-      "status": "30 October 2017. Internet Draft (work in progress)",
+      "status": "17 November 2018. Internet Draft (work in progress)",
       "publisher": "IETF"
     },
     "TLS13": {
@@ -119,7 +151,7 @@ var respecConfig = {
       "authors": [
         "E. Rescorla"
       ],
-      "status": "03 July 2017. Internet Draft (work in progress)",
+      "status": "20 March 2018. Internet Draft (work in progress)",
       "publisher": "IETF"
     },
     "WEBRTC-STATS": {
@@ -129,7 +161,7 @@ var respecConfig = {
         "Harald Alvestrand",
         "Varun Singh"
       ],
-      "status": "29 October 2017 (work in progress)",
+      "status": "07 November 2018 (work in progress)",
       "publisher": "W3C"
     }
   }

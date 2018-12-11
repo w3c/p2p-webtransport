@@ -100,7 +100,8 @@ interface QuicTransportBase {
     void                  stop (QuicTransportStopInfo stopInfo);
     QuicBidirectionalStream         createBidirectionalStream ();
     QuicSendStream                  createSendStream (optional QuicStreamParameters parameters);
-    QuicSendDatagramResult          sendDatagram (Uint8Array data);
+    Promise&lt;void&gt              readyToSendDatagram();
+    Promise&lt;boolean&gt           sendDatagram (Uint8Array data);
                     attribute EventHandler             onstatechange;
                     attribute EventHandler             onerror;
                     attribute EventHandler             onreceivestream;
@@ -301,6 +302,55 @@ interface QuicTransportBase {
                 <em>Return type:</em> <code><a>QuicSendStream</a></code>
               </div>
             </dd>
+            <dt><dfn><code>readyToSendDatagram</code></dfn></dt>
+            <dd>
+              <p>Returns a promise that will be <a>fulfilled</a> when the QuicTransport can send
+              a datagram as defined by [[QUIC-DATAGRAM]].</p>
+              <p>When <code>readyToSend</code> is called, the user agent
+              <em class="rfc2119" title="MUST">MUST</em> run the following
+              steps:</p>
+              <ol>
+                <li>
+                  <p>Let <var>p</var> be a new promise.</p>
+                </li>
+                <li>
+                  <p>Let <var>transport</var> be the
+                  <code><a>QuicTransportBase</a></code> on which
+                  <code>readyToSend</code> is invoked.</p>
+                </li>
+                <li>
+                  <p>Return <var>p</var> and continue the following steps in
+                  the background.</p>
+                </li>
+                <ol>
+                  <li>
+                    <p>If <var>transport</var> can send a datagram, imediately <a>fulfill</a>
+                    <var>p</var> and abort these steps.</p>
+                  </li>
+                  <li>
+                    <p>If <var>transport</var>'s state is <code>failed</code>
+                    or <code>closed</code> immediately <a>reject</a> <var>p</var> with a newly
+                    created <code>InvalidStateError</code> and abort these steps.</p>
+                  </li>
+                  <li>
+                    <p>If <code>transport</code> is blocked from sending a datagram due to
+                    congestion control, <a>fulfill</a> <var>p</var> when <var>transport</var> is
+                    no longer blocked and abort these steps.</p>
+                  </li>
+                  <li>
+                    <p><a>reject</a> <var>p</var> with a newly created
+                    <code>InvalidStateError</code> if the <var>transport</var>'s
+                    state transitions to <code>failed</code> or <code>closed</code>.</p>
+                  </li>
+                </ol>
+              </ol>
+              <div>
+                <em>No parameters.</em>
+              </div>
+              <div>
+                <em>Return type:</em> <code>Promise&lt;void&gt;</code>
+              </div>
+            </dd>
             <dt><dfn><code>sendDatagram</code></dfn></dt>
             <dd>
               <p>Sends a datagram as defined by [[QUIC-DATAGRAM]].</p>
@@ -311,58 +361,69 @@ interface QuicTransportBase {
 	            	<li>Let <var>data</var> be the first argument.</li>
                 <li>
                   <p>Let <var>transport</var> be
-                  the <code><a>RTCQuicTransport</a></code> on
+                  the <code><a>QuicTransportBase</a></code> on
                   which <code>sendDatagram</code> is invoked.</p>
                 </li>
                 <li>
-                  <p>If <code><var>transport</var>'s state</code> is
-                  not <code>connected</code> <a>throw</a>
-                  an <code>InvalidStateError</code> and abort these steps.</p>
+                  <p>If <var>transport</var>'s state is not <code>connected</code> return
+                  a promise <a>rejected</a> with a newly created
+                  <code>InvalidStateError</code> and abort these steps.</p>
                 </li>
                 <li>
                   <p>If <code><var>data</var></code> is too large to fit into a
-                  datagram, <a>throw</a> an <code>InvalidArgumentError</code>
-                  and abort these steps.</p>
-                </li>
-                <li>
-                  <p>Let <var>result</var> be a newly created
-                  <code><a>QuicSendDatagramResult</a></code> object
-                  with <code>result.blocked</code> set to false,
-		              <code>result.acked</code> set to a new promise,
-		              and <code>result.unblocked</code> set to a null.</p>
+                  datagram, return a promise <a>rejected</a> with a newly created
+                  <code>InvalidArgumentError</code> and abort these steps.</p>
                 </li>
                 <li>
                   <p>If <var>transport</var> is unable to send the datagram due
-                  to congestion control, set <code>result.blocked</code> to
-                  true, resolve <code>result.acked</code> to false,
-                  set <code>result.unblocked</code> to a new promise,
-                  return <var>result</var> and abort these steps.</p>
+                  to congestion control, return a promise <a>rejected</a> with
+                  a newly created <code>InvalidStateError</code> and abort these steps.</p>
                 </li>
                 <li>
-                  <p>Set <code>result.blocked</code> to false,
-                  return <var>result</var> and continue the following steps in
+                  <p>Let <var>p</var> be a new promise.</p>
+                </li>
+                <li>
+                  <p>Return <var>p</var> and continue the following steps in
                   the background.</p>
                 </li>
-                <li>
-                  <p>Send <var>data</var> in a QUIC datagram.</p>
-                </li>
-                <li>
-                  <p>When the datagram is acked,
-                  resolve <code>result.acked</code> with <code>true</code>.</p>
-                </li>
-                <li>
-                  <p>When the datagram is detemined to be lost, resolve 
-                  resolve <code>result.acked</code> with <code>false</code>.</p>
-                </li>
+                <ol>
+                  <li>
+                    <p>Send <var>data</var> in a QUIC datagram.</p>
+                  </li>
+                  <li>
+                    <p>When the datagram is acked,
+                    <a>resolve</a> <var>p</var> with <code>true</code>.</p>
+                  </li>
+                  <li>
+                    <p>When the datagram is detemined to be lost, <a>resolve</a>
+                    <var>p</var> with <code>false</code>.</p>
+                  </li>
+                </ol>
               </ol>
+              <table class="parameters">
+               <tbody>
+                  <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Nullable</th>
+                    <th>Optional</th>
+                    <th>Description</th>
+                  </tr>
+                  <tr>
+                    <td class="prmName">data</td>
+                    <td class="prmType"><code>Uint8Array</code></td>
+                    <td class="prmNullFalse"><span role="img" aria-label=
+                    "False">&#10008;</span></td>
+                    <td class="prmOptFalse"><span role="img" aria-label=
+                    "False">&#10008;</span></td>
+                    <td class="prmDesc"></td>
+                  </tr>
+                </tbody>
+              </table>
               <div>
-                <em>No parameters.</em>
-              </div>
-              <div>
-                <em>Return type:</em> <code><a>RTCQuicSendStream</a></code>
+                <em>Return type:</em> <code>Promise&lt;boolean&gt;</code>
               </div>
             </dd>
-
           </dl>
         </section>
       </div>
@@ -1632,6 +1693,22 @@ for (msg in messages) {
 }
 </pre>
  </section>
+
+ <section class="informative" id="datagramexamples*">
+    <h3>Sending QUIC Datagrams</h3>
+    <p>Sending QUIC datagrams can be achieved by using the <code>sendDatagram</code>
+    and <code>readyToSendDatagram</code> methods.</p>
+<pre class="example highlight">
+let quic = getQuicTransport();
+let packets = getPacketsToSend();
+packets.forEach((packet) => {
+  quic.readyToSendDatagram().then(() => {
+    sendDatagram(packet);
+  });
+});
+</pre>
+ </section>
+
 </section>
  <section id="change-log*">
     <h2>Change Log</h2>

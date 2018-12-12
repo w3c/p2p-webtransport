@@ -304,9 +304,9 @@ interface QuicTransportBase {
             </dd>
             <dt><dfn><code>readyToSendDatagram</code></dfn></dt>
             <dd>
-              <p>Returns a promise that will be <a>fulfilled</a> when the QuicTransport can send
+              <p>Returns a promise that will be <a>resolved</a> when the QuicTransport can send
               a datagram as defined by [[QUIC-DATAGRAM]].</p>
-              <p>When <code>readyToSend</code> is called, the user agent
+              <p>When <code>readyToSendDatagram</code> is called, the user agent
               <em class="rfc2119" title="MUST">MUST</em> run the following
               steps:</p>
               <ol>
@@ -316,7 +316,7 @@ interface QuicTransportBase {
                 <li>
                   <p>Let <var>transport</var> be the
                   <code><a>QuicTransportBase</a></code> on which
-                  <code>readyToSend</code> is invoked.</p>
+                  <code>readyToSendDatagram</code> is invoked.</p>
                 </li>
                 <li>
                   <p>Return <var>p</var> and continue the following steps in
@@ -324,23 +324,23 @@ interface QuicTransportBase {
                 </li>
                 <ol>
                   <li>
-                    <p>If <var>transport</var> can send a datagram, imediately <a>fulfill</a>
+                    <p>If <var>transport</var> can send a datagram, imediately <a>resolve</a>
                     <var>p</var> and abort these steps.</p>
                   </li>
                   <li>
-                    <p>If <var>transport</var>'s state is <code>failed</code>
-                    or <code>closed</code> immediately <a>reject</a> <var>p</var> with a newly
+                    <p>If <var>transport</var>'s state is <code>"failed"</code>
+                    or <code>"closed"</code> immediately <a>reject</a> <var>p</var> with a newly
                     created <code>InvalidStateError</code> and abort these steps.</p>
                   </li>
                   <li>
                     <p>If <code>transport</code> is blocked from sending a datagram due to
-                    congestion control, <a>fulfill</a> <var>p</var> when <var>transport</var> is
+                    congestion control, <a>resolve</a> <var>p</var> when <var>transport</var> is
                     no longer blocked and abort these steps.</p>
                   </li>
                   <li>
                     <p><a>reject</a> <var>p</var> with a newly created
                     <code>InvalidStateError</code> if the <var>transport</var>'s
-                    state transitions to <code>failed</code> or <code>closed</code>.</p>
+                    state transitions to <code>"failed"</code> or <code>"closed"</code>.</p>
                   </li>
                 </ol>
               </ol>
@@ -1702,9 +1702,8 @@ for (msg in messages) {
 let quic = getQuicTransport();
 let packets = getPacketsToSend();
 packets.forEach((packet) => {
-  quic.readyToSendDatagram().then(() => {
-    sendDatagram(packet);
-  });
+  await quic.readyToSendDatagram();
+  sendDatagram(packet);
 });
 </pre>
  </section>

@@ -1699,8 +1699,8 @@ for (msg in messages) {
     <p>Sending QUIC datagrams can be achieved by using the <code>sendDatagram</code>
     and <code>readyToSendDatagram</code> methods.</p>
 <pre class="example highlight">
-let quic = getQuicTransport();
-let packets = getPacketsToSend();
+const quic = getQuicTransport();
+const packets = getPacketsToSend();
 packets.forEach((packet) => {
   await quic.readyToSendDatagram();
   sendDatagram(packet);

@@ -211,7 +211,7 @@ interface QuicTransportBase {
               steps:</p>
               <ol>
                 <li>
-                  <p>Let <var>transport</var> be the <code><a>QuicTransport</a></code>
+                  <p>Let <var>transport</var> be the <code><a>QuicTransportBase</a></code>
                   on which <code>createBidectionalStream</code> is invoked.</p>
                 </li>
                 <li>
@@ -239,7 +239,7 @@ interface QuicTransportBase {
                     <code>"connected"</code> and <var>p</var> has not been <a>settled</a>,
                     <a>fulfill</a> <var>p</var> with a newly created
                     <code><a>QuicBidirectionalStream</a></code> object, and
-                    <a>add the QuicBidirectionalStream</a> to the <code><a>QuicTransport</a></code>.</p>
+                    <a>add the QuicBidirectionalStream</a> to the <code><a>QuicTransportBase</a></code>.</p>
                   </li>
                   <li>
                     <p>When <code><var>transport</var>'s state</code> transitions to

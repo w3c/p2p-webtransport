@@ -15,7 +15,6 @@
     specification developed by the IETF QUIC Working Group.</p>
   </section>
   <section id="sotd">
-    <p>The API is based on preliminary work done in the W3C ORTC Community Group.</p>
   </section>
   <section class="informative" id="intro">
     <h2>Introduction</h2>
@@ -97,11 +96,11 @@
 interface QuicTransportBase {
     readonly        attribute QuicTransportState    state;
     readonly        attribute unsigned short        maxDatagramSize;
-    void                  stop (QuicTransportStopInfo stopInfo);
-    QuicBidirectionalStream         createBidirectionalStream ();
-    QuicSendStream                  createSendStream (optional QuicStreamParameters parameters);
-    Promise&lt;void&gt              readyToSendDatagram();
-    Promise&lt;boolean&gt           sendDatagram (Uint8Array data);
+    void                                           stop (QuicTransportStopInfo stopInfo);
+    Promise&lt;QuicBidirectionalStream&gt;         createBidirectionalStream ();
+    Promise&lt;QuicSendStream&gt;                  createSendStream (optional QuicStreamParameters parameters);
+    Promise&lt;void&gt                             readyToSendDatagram();
+    Promise&lt;boolean&gt                          sendDatagram (Uint8Array data);
                     attribute EventHandler             onstatechange;
                     attribute EventHandler             onerror;
                     attribute EventHandler             onreceivestream;
@@ -220,6 +219,7 @@ interface QuicTransportBase {
                 </tbody>
               </table>
             </dd>
+
            <dt><dfn><code>createBidirectionalStream</code></dfn></dt>
             <dd>
               <p>Creates an <code><a>QuicBidirectionalStream</a></code> object.</p>
@@ -232,35 +232,46 @@ interface QuicTransportBase {
                   on which <code>createBidectionalStream</code> is invoked.</p>
                 </li>
                 <li>
-                  <p>If <code><var>transport</var>'s state</code> is not <code>connected</code>
-                  <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</p>
+                  <p>If <code><var>transport</var>'s state</code> is <code>"closed"</code> or
+                  <code>"failed"</code>, immediately return a new <a>rejected</a> promise with a
+                  newly created <code>InvalidStateError</code> and abort these steps.</p>
                 </li>
                 <li>
-                  <p>Let <var>stream</var> be a newly created
-                  <code><a>QuicBidirectionalStream</a></code> object.</p>
+                  <p>If <code><var>transport</var>'s state</code> is <code>"connected"</code>,
+                  immediately return a new <a>resolved</a> promise with a newly created
+                  <code><a>QuicBidirectionalStream</a></code> object,
+                  <a>add the QuicBidirectionalStream</a> to the <var>transport</var>
+                  and abort these steps.</p>
                 </li>
                 <li>
-                  <p>Add <var>stream</var> to <var>transport</var>'s
-                  <a>[[\QuicTransportWritableStreams]]</a> internal slot. </p>
+                  <p>Let <var>p</var> be a new promise.</p>
                 </li>
                 <li>
-                  <p>Add <var>stream</var> to <var>transport</var>'s
-                  <a>[[\QuicTransportReadableStreams]]</a> internal slot. </p>
+                  <p>Return <var>p</var> and continue the following steps in
+                  the background.</p>
                 </li>
-                <li>
-                  <p>Return <var>stream</var> and continue the following steps
-                  in the background.</p>
-                </li>
-                <li>
-                  <p>Create <var>stream</var>'s associated underlying data
-                  transport.</p>
-                </li>
+                <ol>
+                  <li>
+                    <p>When <code><var>transport</var>'s state</code> transitions to
+                    <code>"connected"</code> and <var>p</var> has not been <a>settled</a>,
+                    <a>resolve</a> <var>p</var> with a newly created
+                    <code><a>QuicBidirectionalStream</a></code> object, and
+                    <a>add the QuicBidirectionalStream</a> to the <var>transport</var>
+                    and abort these steps.</p>
+                  </li>
+                  <li>
+                    <p>When <code><var>transport</var>'s state</code> transitions to
+                    <code>"closed"</code> or <code>"failed"</code> and <var>p</var> has not been
+                    <a>settled</a>, <a>reject</a> <var>p</var> with a newly created
+                    <code>InvalidStateError</code>.</p>
+                  </li>
+                </ol>
               </ol>
               <div>
                 <em>No parameters.</em>
               </div>
               <div>
-                <em>Return type:</em> <code><a>QuicStream</a></code>
+                <em>Return type:</em> <code><a>Promise&lt;QuicBidirectionalStream&gt;</a></code>
               </div>
             </dd>
            <dt><dfn><code>createSendStream</code></dfn></dt>
@@ -275,31 +286,46 @@ interface QuicTransportBase {
                   on which <code>createSendStream</code> is invoked.</p>
                 </li>
                 <li>
-                  <p>If <code><var>transport</var>'s state</code> is not <code>connected</code>
-                  <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</p>
+                  <p>If <code><var>transport</var>'s state</code> is <code>"closed"</code> or
+                  <code>"failed"</code>, immediately return a new <a>rejected</a> promise with a
+                  newly created <code>InvalidStateError</code> and abort these steps.</p>
                 </li>
                 <li>
-                  <p>Let <var>stream</var> be a newly created
-                  <code><a>QuicSendStream</a></code> object.</p>
+                  <p>If <code><var>transport</var>'s state</code> is <code>"connected"</code>,
+                  immediately return a new <a>resolved</a> promise with a newly created
+                  <code><a>QuicSendStream</a></code> object,
+                  <a>add the QuicSendStream</a> to the <var>transport</var>
+                  and abort these steps.</p>
                 </li>
                 <li>
-                  <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\QuicTransportWritableStreams]]</a>
-                  internal slot. </p>
+                  <p>Let <var>p</var> be a new promise.</p>
                 </li>
                 <li>
-                  <p>Return <var>stream</var> and continue the following steps
-                  in the background.</p>
+                  <p>Return <var>p</var> and continue the following steps in
+                  the background.</p>
                 </li>
-                <li>
-                  <p>Create <var>stream</var>'s associated underlying data
-                  transport.</p>
-                </li>
+                <ol>
+                  <li>
+                    <p>When <code><var>transport</var>'s state</code> transitions to
+                    <code>"connected"</code> and <var>p</var> has not been <a>settled</a>,
+                    <a>resolve</a> <var>p</var> with a newly created
+                    <code><a>QuicSendStream</a></code> object, and
+                    <a>add the QuicSendStream</a> to the <var>transport</var>
+                    and abort these steps.</p>
+                  </li>
+                  <li>
+                    <p>When <code><var>transport</var>'s state</code> transitions to
+                    <code>"closed"</code> or <code>"failed"</code> and <var>p</var> has not been
+                    <a>settled</a>, <a>reject</a> <var>p</var> with a newly created
+                    <code>InvalidStateError</code>.</p>
+                  </li>
+                </ol>
               </ol>
               <div>
                 <em>No parameters.</em>
               </div>
               <div>
-                <em>Return type:</em> <code><a>QuicSendStream</a></code>
+                <em>Return type:</em> <code><a>Promise&lt;QuicSendStream&gt;</a></code>
               </div>
             </dd>
             <dt><dfn><code>readyToSendDatagram</code></dfn></dt>
@@ -427,6 +453,58 @@ interface QuicTransportBase {
           </dl>
         </section>
       </div>
+    </section>
+    <section id="quictransportbase-procedures*">
+    <h3>Procedures</h3>
+      <section>
+        <h4 id="add-bidirectional-stream-to-transport">Add QuicBidirectionalStream
+        to the QuicTransport</h4>
+        <p>To <dfn>add the QuicBidirectionalStream</dfn> to the <code><a>QuicTransportBase</a></code>
+        run the following steps:</p>
+        <ol>
+          <li>
+            <p>Let <var>stream</var> be the newly created
+            <code><a>QuicBidirectionalStream</a></code> object.</p>
+          </li>
+          <li>
+            <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\QuicTransportReadableStreams]]</a>
+            internal slot. </p>
+          </li>
+          <li>
+            <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\QuicTransportWritableStreams]]</a>
+            internal slot. </p>
+          </li>
+          <li>
+            <p>Continue the following steps in the background.</p>
+          </li>
+          <li>
+            <p>Create <var>stream</var>'s associated underlying data
+            transport.</p>
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h4 id="add-send-stream-to-transport">Add QuicSendStream to the QuicTransportBase</h4>
+        <p>To <dfn>add the QuicSendStream</dfn> to the <code><a>QuicTransportBase</a></code>
+        run the following steps:</p>
+        <ol>
+          <li>
+            <p>Let <var>stream</var> be the newly created
+            <code><a>QuicSendStream</a></code> object.</p>
+          </li>
+          <li>
+            <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\QuicTransportWritableStreams]]</a>
+            internal slot. </p>
+          </li>
+          <li>
+            <p>Continue the following steps in the background.</p>
+          </li>
+          <li>
+            <p>Create <var>stream</var>'s associated underlying data
+            transport.</p>
+          </li>
+        </ol>
+      </section>
     </section>
     <section id="streamparameters*">
       <h3><dfn>QuicStreamParameters</dfn> Dictionary</h3>
@@ -1693,7 +1771,6 @@ for (msg in messages) {
 }
 </pre>
  </section>
-
  <section class="informative" id="datagramexamples*">
     <h3>Sending QUIC Datagrams</h3>
     <p>Sending QUIC datagrams can be achieved by using the <code>sendDatagram</code>

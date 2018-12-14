@@ -1,17 +1,18 @@
 var respecConfig = {
-  specStatus: "ED",
+  specStatus: "CG-DRAFT",
   // if there a publicly available Editor's Draft, this is the link
   edDraftURI: "https://w3c.github.io/webrtc-quic/cs.html",
-  shortName: "webrtc-quic-cs",
+  shortName: "webrtc-quic-cs",     
   editors: [
     { name: "Peter Thatcher", company: "Google", w3cid: "68236" },
-    { name: "Bernard Aboba", company: "Microsoft Corporation", w3cid: "65611" } 
+    { name: "Bernard Aboba", company: "Microsoft Corporation", w3cid: "65611" },
+    { name: "Robin Raymond", company: "Optical Tone Ltd." }
   ],
   authors: [
   ],
-  wg: "Web Real-Time Communications Working Group",
-  wgURI: "https://www.w3.org/2011/04/webrtc/",
-  wgPublicList: "public-webrtc",
+  wg: "Object-RTC API Community Group",
+  wgURI: "https://www.w3.org/community/ortc/",
+  wgPublicList: "public-ortc",
   wgPatentURI:  "https://www.w3.org/2004/01/pp-impl/47318/status",
   issueBase: "https://github.com/w3c/webrtc-quic/issues",
   otherLinks: [

@@ -360,8 +360,8 @@ interface QuicTransportBase {
                   </li>
                   <li>
                     <p>If <code>transport</code> is blocked from sending a datagram due to
-                    congestion control, <a>resolve</a> <var>p</var> when <var>transport</var> is
-                    no longer blocked and abort these steps.</p>
+                    congestion control or connection-level flow control, <a>resolve</a>
+                    <var>p</var> when <var>transport</var> is no longer blocked.</p>
                   </li>
                   <li>
                     <p><a>reject</a> <var>p</var> with a newly created
@@ -402,8 +402,9 @@ interface QuicTransportBase {
                 </li>
                 <li>
                   <p>If <var>transport</var> is unable to send the datagram due
-                  to congestion control, return a promise <a>rejected</a> with
-                  a newly created <code>InvalidStateError</code> and abort these steps.</p>
+                  to congestion control or connection level flow control, return a
+                  promise <a>rejected</a> with a newly created <code>InvalidStateError</code>
+                  and abort these steps.</p>
                 </li>
                 <li>
                   <p>Let <var>p</var> be a new promise.</p>
@@ -1757,34 +1758,51 @@ interface QuicTransport : QuicTransportBase {
       </tbody>
     </table>
   </section>
- <section id="examples*">
+  <section id="examples*">
     <h2>Examples</h2>
- <section class="informative" id="unreliableexamples*">
-    <h3>Unreliable delivery</h3>
-    <p>Unreliable delivery can be achieved by creating many streams with retransmissions disabled,
-    each transporting a single small message.</p>
-<pre class="example highlight">
-let quic = getQuicTransport();
-let messages = getMessages();
-for (msg in messages) {
-  quic.createSendStream({disableRetransmissions: true}).write({data: msg, finished: true});
-}
-</pre>
- </section>
- <section class="informative" id="datagramexamples*">
-    <h3>Sending QUIC Datagrams</h3>
-    <p>Sending QUIC datagrams can be achieved by using the <code>sendDatagram</code>
-    and <code>readyToSendDatagram</code> methods.</p>
-<pre class="example highlight">
-const quic = getQuicTransport();
-const packets = getPacketsToSend();
-packets.forEach((packet) => {
-  await quic.readyToSendDatagram();
-  sendDatagram(packet);
-});
-</pre>
- </section>
-
+    <section class="informative" id="unreliableexamples*">
+      <h3>Unreliable delivery</h3>
+      <p>Unreliable delivery can be achieved by creating many streams with retransmissions disabled,
+      each transporting a single small message.</p>
+      <pre class="example highlight">
+      let quic = getQuicTransport();
+      let messages = getMessages();
+      for (msg in messages) {
+        quic.createSendStream({disableRetransmissions: true}).write({data: msg, finished: true});
+      }
+      </pre>
+  </section>
+  <section class="informative" id="datagramexample1*">
+    <h3>Sending a buffer of QUIC Datagrams</h3>
+    <p>Sending a buffer of QUIC datagrams can be achieved by using the
+    <code>sendDatagram</code> and <code>readyToSendDatagram</code> methods. In
+    the following example datagrams are only sent if the
+    <code>RTCQuicTransport</code> is ready to send, however the sending is not
+    blocked on the ACK promise returned from <code>sendDatagram</code> (these are
+    ignored in this example).</p>
+    <pre class="example highlight">
+    const quic = getQuicTransport();
+    const datagrams = getDatagramsToSend();
+    datagrams.forEach((datagram) => {
+      await quic.readyToSendDatagram();
+      quic.sendDatagram(datagram);
+    });
+    </pre>
+  </section>
+  <section class="informative" id="datagramexample2*">
+    <h3>Sending QUIC Datagrams at a rate</h3>
+    <p>Sending QUIC datagrams at a rate regardless if the transport is ready to
+    send can be achieved by simply using <code>sendDatagram</code> and not using
+    the <code>readyToSendDatagram</code> method. More complex scenarios can utilize
+    the <code>readyToSendDatagram</code> method.</p>
+    <pre class="example highlight">
+    // Sends datagrams every 100 ms.
+    const quic = getQuicTransport();
+    setInterval(() => {
+      quic.sendDatagram(createDatagram());
+    }, 100);
+    </pre>
+  </section>
 </section>
  <section id="change-log*">
     <h2>Change Log</h2>

@@ -299,6 +299,9 @@ interface RTCQuicTransport : QuicTransportBase {
             <dd>
               <p>Start QUIC transport negotiation with the parameters of the remote QUIC
               transport, including verification of the remote fingerprint.
+              During connection establishment, use of this API must be indicated 
+              by selecting the ALPN token "q2q" in the crypto handshake.
+              <!-- TODO: register "q2q" with IANA. -->
               Only a single QUIC transport can be multiplexed over an ICE transport.
               Therefore if a <code><a>RTCQuicTransport</a></code> object
               <var>quicTransportB</var> is constructed with an

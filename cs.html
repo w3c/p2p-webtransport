@@ -672,19 +672,23 @@ interface QuicTransport : QuicTransportBase {
             </li>
             <li>Run these steps in parallel:
               <ol>
-                Let <var>serializedOrigin<var> be the empty string ,<code>""</code>.
+                
                 <!-- TODO: Figure out a way to convey the origin in an encrypted manner
                            and then use a non-empty value like so:
+                Let <var>serializedOrigin<var> be the empty string ,<code>""</code>.
                 Let <var>serializedOrigin<var> be <var>quictransport<var>'s 
                 <a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">relevant settings object</a>'s
                 <a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-origin">origin</a>,
                 <a href="https://html.spec.whatwg.org/multipage/origin.html#ascii-serialisation-of-an-origin">serialized</a>.
+                The user agent MUST include a QUIC transport parameter with ID of web_origin(0x3330) 
+                and value of <var>serializedOrigin</var>.
                 -->
                 <li>Establish a QUIC connection to the address identified by the
-                <var>parsedUrl</var>'s host and port.  The user agent MUST
-                include a QUIC transport parameter with ID of web_origin(0x330) 
-                <!-- TODO: Register the transport parameter with IANA -->
-                and value of <var>serializedOrigin</var>.</li>
+                <var>parsedUrl</var>'s host and port.  
+                During connection establishment, use of this API must be indicated 
+                by selecting the ALPN token "wq" in the crypto handshake.
+                <!-- TODO: register "wq" with IANA. -->  
+                </li>
                 <li>If the connection succeeds, set
                 the <var>quictransport</var>'s <a>[[\QuicTransportState]]</a>
                 internal slot to <code>"connected"</code>.</li>

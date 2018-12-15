@@ -929,7 +929,7 @@ interface DatagramReceivedEvent : Event {
   </section>
   <section id="quic-transport*">
     <h2><dfn>QuicTransport</dfn> Interface</h2>
-    <p>The <code>QuicTransport</code> is a subclass of
+    <p>The <code>QuicTransportBase</code> is a subclass of
     <code>QuicTransportBase</code> focused on client/server use cases.</p>
     <section id="quictransport-interface-definition*">
       <h3>Interface Definition</h3>
@@ -1777,7 +1777,7 @@ interface QuicTransport : QuicTransportBase {
     <p>Sending a buffer of QUIC datagrams can be achieved by using the
     <code>sendDatagram</code> and <code>readyToSendDatagram</code> methods. In
     the following example datagrams are only sent if the
-    <code>RTCQuicTransport</code> is ready to send, however the sending is not
+    <code>QuicTransport</code> is ready to send, however the sending is not
     blocked on the ACK promise returned from <code>sendDatagram</code> (these are
     ignored in this example).</p>
     <pre class="example highlight">
@@ -1790,8 +1790,8 @@ interface QuicTransport : QuicTransportBase {
     </pre>
   </section>
   <section class="informative" id="datagramexample2*">
-    <h3>Sending QUIC Datagrams at a rate</h3>
-    <p>Sending QUIC datagrams at a rate regardless if the transport is ready to
+    <h3>Sending QUIC Datagrams at a fixed rate</h3>
+    <p>Sending QUIC datagrams at a fixed rate regardless if the transport is ready to
     send can be achieved by simply using <code>sendDatagram</code> and not using
     the <code>readyToSendDatagram</code> method. More complex scenarios can utilize
     the <code>readyToSendDatagram</code> method.</p>

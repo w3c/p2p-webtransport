@@ -360,8 +360,8 @@ interface QuicTransportBase {
                   </li>
                   <li>
                     <p>If <code>transport</code> is blocked from sending a datagram due to
-                    congestion control or connection-level flow control, <a>resolve</a>
-                    <var>p</var> when <var>transport</var> is no longer blocked.</p>
+                    congestion control, <a>resolve</a> <var>p</var> when <var>transport</var>
+                    is no longer blocked.</p>
                   </li>
                   <li>
                     <p><a>reject</a> <var>p</var> with a newly created
@@ -402,9 +402,9 @@ interface QuicTransportBase {
                 </li>
                 <li>
                   <p>If <var>transport</var> is unable to send the datagram due
-                  to congestion control or connection level flow control, return a
-                  promise <a>rejected</a> with a newly created <code>InvalidStateError</code>
-                  and abort these steps.</p>
+                  to congestion control, return a promise <a>rejected</a> with
+                  a newly created <code>InvalidStateError</code> and abort
+                  these steps.</p>
                 </li>
                 <li>
                   <p>Let <var>p</var> be a new promise.</p>

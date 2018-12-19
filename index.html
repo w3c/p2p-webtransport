@@ -247,7 +247,6 @@ interface RTCQuicTransport : QuicTransportBase {
                  <li>Let <var>quicTransport</var> be the <code><a>RTCQuicTransport</a></code>.</li>
                  <li>Set <var>quicTransport</var>'s <a>[[\QuicTransportState]]</a> to
                  <code>"closed"</code>.</li>
-                 <li>Fire an event named <code><a>statechange</a></code> at <var>quicTransport</var>.</li>
                  <li>Let <code><var>stopInfo</var>.errorCode</code> be zero.</li>
                  <li>Let <code><var>stopInfo</var>.reason</code> be "RTCIceTransport closed".</li>
                  <li>Start the <a>Immediate Close</a> procedure by sending an CONNECTION_CLOSE frame

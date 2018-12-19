@@ -129,7 +129,9 @@ interface QuicTransportBase {
               <em class="rfc2119" title="MUST">MUST</em> be fired on reception of a QUIC
               error; an implementation <em class="rfc2119" title=
               "SHOULD">SHOULD</em> include QUIC error information in
-              <var>error.message</var> (defined in [[!HTML51]] Section 7.1.3.8.2).</p>
+              <var>error.message</var> (defined in [[!HTML51]] Section 7.1.3.8.2). This
+              event <em class="rfc2119" title="MUST">MUST</em> be fired before the
+              <a><code>onstatechange</code></a> event.</p>
             </dd>
             <dt><dfn><code>onreceivestream</code></dfn> of type <span class=
             "idlAttrType"><a>EventHandler</a></span></dt>

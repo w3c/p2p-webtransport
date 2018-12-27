@@ -686,7 +686,7 @@ interface QuicTransport : QuicTransportBase {
                 <li>Establish a QUIC connection to the address identified by the
                 <var>parsedUrl</var>'s host and port.  
                 During connection establishment, use of this API must be indicated 
-                by selecting the ALPN token "wq" in the crypto handshake.
+                by selecting the ALPN [[!ALPN]] token "wq" in the crypto handshake.
                 <!-- TODO: register "wq" with IANA. -->  
                 </li>
                 <li>If the connection succeeds, set

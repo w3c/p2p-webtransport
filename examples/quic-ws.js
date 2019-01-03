@@ -12,6 +12,7 @@ class QuicWebSocketBase {
     this._hostname = hostname;
     this._port = port
     this._readyState = 0;
+    this._binaryType = "uint8array";
     this.onopen = null;
     this.onerror = null;
     this.onclose = null;
@@ -44,11 +45,15 @@ class QuicWebSocketBase {
   }
 
   get binaryType() {
-    return "Uint8Array"
+    return this._binaryType;
   }
 
-  set binaryType(t) {
-    throw new TypeError("Only supports Uint8Array");
+  set binaryType(type) {
+    if (type == "blob" || type == "arraybuffer" || type == "uint8array") {
+      this._binaryType = type;
+      return;
+    }
+    throw TypeError("binaryType must by blob, arraybuffer, or uint8array.");
   }
 
   close(code, reason) {
@@ -63,7 +68,7 @@ class QuicWebSocketBase {
       return;
     }
     this.onmessage(new MessageEvent("message", {
-      data: data,
+      data: fromUint8Array(data, this.binaryType),
     }));
   }
 
@@ -132,10 +137,8 @@ class QuicUnreliableDatagramWebSocket extends QuicWebSocketBase {
     return 0;
   }
 
-  send(data) {
-    if (!(data instanceof Uint8Array)) {
-      throw new TypeError("Can only send Uint8Array.");
-    }
+  async send(data) {
+    data = await toUint8Array(data);
     if (data.length > this._quic.maxDatagramSize) {
       throw new TypeError("Message too big.");
     }
@@ -162,9 +165,7 @@ class QuicUnreliableStreamWebSocket extends QuicWebSocketBase {
   }
 
   async send(data) {
-    if (!(data instanceof Uint8Array)) {
-      throw new TypeError("Can only send Uint8Array.");
-    }
+    data = await toUint8Array(data);
     let stream = await this._quic.createSendStream({
       disableRetransmissions: true
     });
@@ -198,4 +199,49 @@ class QuicUnreliableStreamWebSocket extends QuicWebSocketBase {
 
     this._recvStreams.delete(stream);
   }
+}
+
+function fromUint8Array(array, binaryType) {
+  if (binaryType == "uint8array") {
+    return array;
+  }
+  if (binaryType == "blob") {
+    if (array.buffer.byteLength > array.length) {
+      return copyToBlob(array);
+    }
+    return new Blob([array.buffer]);
+  }
+  if (binaryType == "arraybuffer") {
+    if (array.buffer.byteLength > array.length) {
+      return copyToArrayBuffer(array);
+    }
+    return array.buffer;
+  }
+  return array;
+}
+
+function copyToBlob(values) {
+  return new Blob([copyToArrayBuffer(values)]);
+}
+
+function copyToArrayBuffer(values) {
+  const array = new Uint8Array(values);
+  return array.buffer;
+}
+
+async function toUint8Array(data) {
+  if (data instanceof Blob) {
+    data = await readBlob(data);
+  }
+  return new Uint8Array(data);
+}
+
+async function readBlob(blob) {
+  const reader = new FileReader();
+  const loadend = new Promise((resolve, reject) => {
+    reader.onloadend = resolve;
+  })
+  reader.readAsArrayBuffer(blob);
+  await loadend;
+  return reader.result;
 }

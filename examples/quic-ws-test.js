@@ -20,19 +20,10 @@ async function testWebSocket(ws) {
   }
   ws.send(msg1);
   console.log("ws.bufferedAmount: " + ws.bufferedAmount);  
-  await sleep(100);
   ws.close(500, "We failed");
 
   console.log("ws.readyState: " + ws.readyState);
 }
 
-function sleep (time) {
-  return new Promise((resolve) => setTimeout(resolve, time));
-}
-
-async function test() {
-  await testWebSocket(new QuicUnreliableDatagramWebSocket("datagram.us", 12345))
-  await testWebSocket(new QuicUnreliableStreamWebSocket("stream.us", 54321))
-}
-
-test();
+testWebSocket(new QuicUnreliableDatagramWebSocket("datagram.us", 12345))
+testWebSocket(new QuicUnreliableStreamWebSocket("stream.us", 54321))

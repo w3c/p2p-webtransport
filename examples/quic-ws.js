@@ -139,6 +139,9 @@ class QuicUnreliableDatagramWebSocket extends QuicWebSocketBase {
 
   async send(data) {
     data = await toUint8Array(data);
+    if (data.length == 0) {
+      throw new TypeError("Empty messages not supported.");
+    }
     if (data.length > this._quic.maxDatagramSize) {
       throw new TypeError("Message too big.");
     }
@@ -166,6 +169,9 @@ class QuicUnreliableStreamWebSocket extends QuicWebSocketBase {
 
   async send(data) {
     data = await toUint8Array(data);
+    if (data.length == 0) {
+      throw new TypeError("Empty messages not supported.");
+    }
     let stream = await this._quic.createSendStream({
       disableRetransmissions: true
     });
@@ -230,13 +236,22 @@ function copyToArrayBuffer(values) {
 }
 
 async function toUint8Array(data) {
-  if (data instanceof Blob) {
-    data = await readBlob(data);
+  if (data instanceof Uint8Array) {
+    return data;
   }
-  return new Uint8Array(data);
+  if (data instanceof ArrayBuffer) {
+    return new Uint8Array(data);
+  }
+  if (data instanceof Blob) {
+    return new Uint8Array(await readBlobAsArrayBuffer(data));
+  }
+  if (typeof data == "string") {
+    return utf8encode(data);
+  }
+  return Uint8Array.from(data);
 }
 
-async function readBlob(blob) {
+async function readBlobAsArrayBuffer(blob) {
   const reader = new FileReader();
   const loadend = new Promise((resolve, reject) => {
     reader.onloadend = resolve;
@@ -244,4 +259,12 @@ async function readBlob(blob) {
   reader.readAsArrayBuffer(blob);
   await loadend;
   return reader.result;
+}
+
+function utf8encode(str) {
+  return Uint8Array.from(Array.from(unescape(encodeURIComponent(str))).map(c => c.codePointAt(0)))
+}
+
+function utf8decode(bytes) {
+  return decodeURIComponent(escape(Array.from(bytes).map(cp => String.fromCodePoint(cp)).join("")));
 }

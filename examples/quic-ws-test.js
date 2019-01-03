@@ -19,13 +19,17 @@ async function testWebSocket(ws) {
   console.log("ws.readyState: " + ws.readyState);
   console.log("ws.binaryType: " + ws.binaryType);
 
+  const msg0 = Uint8Array.from([0, 1, 2, 3]);
+  ws.send(msg0);
+
   const msg1 = copyToArrayBuffer([1, 2, 3, 4]);
   ws.send(msg1);
-  console.log("ws.bufferedAmount: " + ws.bufferedAmount);  
 
-  const msg2 = copyToBlob(repeat([1, 2, 3, 4], 100));
+  const msg2 = copyToBlob(repeat([3, 4, 5, 6], 100));
   ws.send(msg2);
-  console.log("ws.bufferedAmount: " + ws.bufferedAmount);  
+
+  const msg3 = "Hello, \u2603.";
+  ws.send(msg3);
 
   await sleep(10);  // Let that send happen before we close.
   ws.close(500, "We failed");

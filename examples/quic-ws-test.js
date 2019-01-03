@@ -1,5 +1,4 @@
 async function testWebSocket(ws) {
-  ws.binaryType = "uint8array";
   console.log(ws);
   ws.onopen = () => {
     console.log("onopen");
@@ -28,10 +27,12 @@ async function testWebSocket(ws) {
   const msg2 = copyToBlob(repeat([3, 4, 5, 6], 100));
   ws.send(msg2);
 
+  await sleep(10);  // Let previous sends happen before we change binary type.
+  ws.binaryType = "string";
   const msg3 = "Hello, \u2603.";
   ws.send(msg3);
 
-  await sleep(10);  // Let that send happen before we close.
+  await sleep(10);  // Let previous sends happen before we close.
   ws.close(500, "We failed");
   console.log("ws.readyState: " + ws.readyState);
 }

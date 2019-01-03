@@ -49,7 +49,7 @@ class QuicWebSocketBase {
   }
 
   set binaryType(type) {
-    if (type == "blob" || type == "arraybuffer" || type == "uint8array") {
+    if (type == "blob" || type == "arraybuffer" || type == "uint8array" || type == "string") {
       this._binaryType = type;
       return;
     }
@@ -207,34 +207,6 @@ class QuicUnreliableStreamWebSocket extends QuicWebSocketBase {
   }
 }
 
-function fromUint8Array(array, binaryType) {
-  if (binaryType == "uint8array") {
-    return array;
-  }
-  if (binaryType == "blob") {
-    if (array.buffer.byteLength > array.length) {
-      return copyToBlob(array);
-    }
-    return new Blob([array.buffer]);
-  }
-  if (binaryType == "arraybuffer") {
-    if (array.buffer.byteLength > array.length) {
-      return copyToArrayBuffer(array);
-    }
-    return array.buffer;
-  }
-  return array;
-}
-
-function copyToBlob(values) {
-  return new Blob([copyToArrayBuffer(values)]);
-}
-
-function copyToArrayBuffer(values) {
-  const array = new Uint8Array(values);
-  return array.buffer;
-}
-
 async function toUint8Array(data) {
   if (data instanceof Uint8Array) {
     return data;
@@ -259,6 +231,41 @@ async function readBlobAsArrayBuffer(blob) {
   reader.readAsArrayBuffer(blob);
   await loadend;
   return reader.result;
+}
+
+function fromUint8Array(array, binaryType) {
+  if (binaryType == "uint8array") {
+    return array;
+  }
+  if (binaryType == "blob") {
+    if (array.buffer.byteLength > array.length) {
+      return copyToBlob(array);
+    }
+    return new Blob([array.buffer]);
+  }
+  if (binaryType == "arraybuffer") {
+    if (array.buffer.byteLength > array.length) {
+      return copyToArrayBuffer(array);
+    }
+    return array.buffer;
+  }
+  if (binaryType == "string") {
+    try {
+      return utf8decode(array);
+    } catch {
+      return "";
+    }
+  }
+  return array;
+}
+
+function copyToBlob(values) {
+  return new Blob([copyToArrayBuffer(values)]);
+}
+
+function copyToArrayBuffer(values) {
+  const array = new Uint8Array(values);
+  return array.buffer;
 }
 
 function utf8encode(str) {

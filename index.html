@@ -247,10 +247,10 @@ interface RTCQuicTransport : QuicTransportBase {
                  <li>Let <var>quicTransport</var> be the <code><a>RTCQuicTransport</a></code>.</li>
                  <li>Set <var>quicTransport</var>'s <a>[[\QuicTransportState]]</a> to
                  <code>"closed"</code>.</li>
-                 <li>Let <code><var>stopInfo</var>.errorCode</code> be zero.</li>
+                 <li>Let <code><var>stopInfo</var>.errorCode</code> be 0x01.</li>
                  <li>Let <code><var>stopInfo</var>.reason</code> be "RTCIceTransport closed".</li>
                  <li>Start the <a>Immediate Close</a> procedure by sending an CONNECTION_CLOSE frame
-                  with its error code value set to the value of <var>stopInfo</var>.errorCode
+                  with a type of 0x1d with its error code value set to the value of <var>stopInfo</var>.errorCode
                   and its reason value set to the value of <var>stopInfo</var>.reason.
                  </li>
               </ol>

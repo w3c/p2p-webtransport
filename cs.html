@@ -105,7 +105,7 @@ interface QuicTransportBase {
                     attribute EventHandler             onerror;
                     attribute EventHandler             onreceivestream;
                     attribute EventHandler             onbidirectionalstream;
-                    attribute EventHandler             ondatagramreceived;
+                    attribute EventHandler             ondatagramsreceived;
 };</pre>
         <section>
           <h2>Attributes</h2>
@@ -159,11 +159,11 @@ interface QuicTransportBase {
               first time.
               </p>
             </dd>
-            <dt><dfn><code>ondatagramreceived</code></dfn> of type <span class=
+            <dt><dfn><code>ondatagramsreceived</code></dfn> of type <span class=
               "idlAttrType"><a>EventHandler</a></span></dt>
               <dd>
                 <p>This event handler, of event handler event type
-                <code><a>datagramreceived</a></code>,
+                <code><a>datagramsreceived</a></code>,
                 <em class="rfc2119" title="MUST">MUST</em> be fired when data is received
                 from a received datagram.
                 </p>
@@ -418,7 +418,7 @@ interface QuicTransportBase {
                     <p>Send <var>data</var> in a QUIC datagram.</p>
                   </li>
                   <li>
-                    <p>When the datagram is acked,
+                    <p>When an ack is received for the sent datagram,
                     <a>resolve</a> <var>p</var> with <code>true</code>.</p>
                   </li>
                   <li>
@@ -696,20 +696,20 @@ interface BidirectionalStreamEvent : Event {
       </div>
     </section>
     <section>
-      <h3><dfn>DatagramReceivedEvent</dfn></h3>
-      <p>The <code><a>datagramreceived</a></code> event uses the
-      <code><a>DatagramReceivedEvent</a></code> interface.</p>
+      <h3><dfn>DatagramsReceivedEvent</dfn></h3>
+      <p>The <code><a>datagramsreceived</a></code> event uses the
+      <code><a>DatagramsReceivedEvent</a></code> interface.</p>
       <div>
         <pre class="idl">
-        [ Constructor (DOMString type, DatagramReceivedEventInit eventInitDict), Exposed=Window]
-interface DatagramReceivedEvent : Event {
-    readonly        attribute Uint8Array data;
+        [ Constructor (DOMString type, DatagramsReceivedEventInit eventInitDict), Exposed=Window]
+interface DatagramsReceivedEvent : Event {
+    readonly        attribute sequence<Uint8Array?> datagrams;
 };</pre>
         <section>
           <h2>Constructors</h2>
-          <dl data-link-for="DatagramReceivedEvent" data-dfn-for="DatagramReceivedEvent"
+          <dl data-link-for="DatagramsReceivedEvent" data-dfn-for="DatagramsReceivedEvent"
           class="constructors">
-            <dt><code>DatagramReceivedEvent</code></dt>
+            <dt><code>DatagramsReceivedEvent</code></dt>
             <dd>
               <table class="parameters">
                 <tbody>
@@ -731,7 +731,7 @@ interface DatagramReceivedEvent : Event {
                   </tr>
                   <tr>
                     <td class="prmName">eventInitDict</td>
-                    <td class="prmType"><code><a>DatagramReceivedEventInit</a></code></td>
+                    <td class="prmType"><code><a>DatagramsReceivedEventInit</a></code></td>
                     <td class="prmNullFalse"><span role="img" aria-label=
                     "False">&#10008;</span></td>
                     <td class="prmOptFalse"><span role="img" aria-label=
@@ -745,31 +745,47 @@ interface DatagramReceivedEvent : Event {
         </section>
         <section>
           <h2>Attributes</h2>
-          <dl data-link-for="DatagramReceivedEvent" data-dfn-for="DatagramReceivedEvent"
+          <dl data-link-for="DatagramsReceivedEvent" data-dfn-for="DatagramsReceivedEvent"
           class="attributes">
             <dt><code>data</code> of type <span class=
             "idlAttrType"><a>Uint8Array</a></span>, readonly</dt>
             <dd>
-              <p>The <dfn id="dom-datagramreceivedevent-data"><code>data</code></dfn>
+              <p>The <dfn id="dom-datagramsreceivedevent-data"><code>data</code></dfn>
               attribute represents the <code><a>data</a></code> received. </p>
             </dd>
           </dl>
         </section>
       </div>
       <div>
-          <p>The <dfn><code>DatagramReceivedEventInit</code></dfn> dictionary includes
-          information to construct a DatagramReceivedEvent .</p>
-        <pre class="idl">dictionary DatagramReceivedEventInit : EventInit {
+          <p>The <dfn><code>DatagramsReceivedEventInit</code></dfn> dictionary includes
+          information to construct a DatagramsReceivedEvent .</p>
+        <pre class="idl">dictionary DatagramsReceivedEventInit : EventInit {
              Uint8Array data;
 };</pre>
         <section>
-          <h2>Dictionary DatagramReceivedEventInit Members</h2>
-          <dl data-link-for="DatagramReceivedEventInit" data-dfn-for=
-          "DatagramReceivedEventInit" class="dictionary-members">
+          <h2>Dictionary DatagramsReceivedEventInit Members</h2>
+          <dl data-link-for="DatagramsReceivedEventInit" data-dfn-for=
+          "DatagramsReceivedEventInit" class="dictionary-members">
             <dt><dfn><code>data</code></dfn> of type <span class=
-            "idlMemberType"><a>Uint8Array</a></span></dt>
+            "idlMemberType"><a>sequence&ltUint8Array?&gt</a></span></dt>
             <dd>
-              <p>The data received.</p>
+              <p>The payloads of the datagrams received, with possible null
+              values. </p>
+              <p>A null value indicates that the user agent dropped 1 or more
+              datagrams after receiving and acking them because the event
+              handler was not able to handle incoming datagrams quickly enough
+              and the user agent has decided that dropping them is
+              better than buffering them.  How much to buffer before dropping is
+              left to the implementation of the user agent to decide, but
+              implementations should seek to minimize buffering and assume that
+              event handlers will be able to handle dropped datagrams.</p>
+              <p> The event provides a sequence of datagrams (rather than a
+              single datagram) to support a high throughput of datagrams. To
+              reduce the number of events necessary to process the datagrams,
+              implementations should provide all the datagrams received since
+              the last event was fired and handled. But implementations should
+              also seek to minimize buffering and not delay firing the events in
+              order to fire fewer events. </p>
             </dd>
           </dl>
         </section>
@@ -1750,8 +1766,8 @@ interface QuicTransport : QuicTransportBase {
           and <a>[[\QuicTransportWritableStreams]]</a> internal slots.</td>
         </tr>
         <tr>
-          <td><dfn><code>datagramreceived</code></dfn></td>
-          <td><code><a>DatagramReceivedEvent</a></code></td>
+          <td><dfn><code>datagramsreceived</code></dfn></td>
+          <td><code><a>DatagramsReceivedEvent</a></code></td>
           <td>The <code><a>QuicTransportBase</a></code> object has received some data
             as a result of the remote side calling <code>sendDatagram</code></td>
         </tr>
@@ -1803,6 +1819,26 @@ interface QuicTransport : QuicTransportBase {
     }, 100);
     </pre>
   </section>
+  <section class="informative" id="datagramexample3*">
+      <h3>Receiving QUIC datagrams</h3>
+      <p>Receiving QUIC datagrams can be achieved by simply listening to the
+      <code>datagramsreceived</code>, remembering to check for null values
+      indicating the event handler is not processing the events quickly enough.
+      </p>
+      <pre class="example highlight">
+      const quic = getQuicTransport();
+      quic.ondatagramsreceived = (evt) {
+        for (const data of evt.datagrams) {
+          if (data == null) {
+           // Log that datagrams were lost. Look into making the event handler faster
+           // or reducing the send rate of the remote side.
+          } else {
+            // Process the data
+          }
+        }
+      };
+      </pre>
+    </section>
 </section>
  <section id="change-log*">
     <h2>Change Log</h2>

@@ -748,26 +748,7 @@ interface DatagramsReceivedEvent : Event {
           <dl data-link-for="DatagramsReceivedEvent" data-dfn-for="DatagramsReceivedEvent"
           class="attributes">
             <dt><code>data</code> of type <span class=
-            "idlAttrType"><a>Uint8Array</a></span>, readonly</dt>
-            <dd>
-              <p>The <dfn id="dom-datagramsreceivedevent-data"><code>data</code></dfn>
-              attribute represents the <code><a>data</a></code> received. </p>
-            </dd>
-          </dl>
-        </section>
-      </div>
-      <div>
-          <p>The <dfn><code>DatagramsReceivedEventInit</code></dfn> dictionary includes
-          information to construct a DatagramsReceivedEvent .</p>
-        <pre class="idl">dictionary DatagramsReceivedEventInit : EventInit {
-             Uint8Array data;
-};</pre>
-        <section>
-          <h2>Dictionary DatagramsReceivedEventInit Members</h2>
-          <dl data-link-for="DatagramsReceivedEventInit" data-dfn-for=
-          "DatagramsReceivedEventInit" class="dictionary-members">
-            <dt><dfn><code>data</code></dfn> of type <span class=
-            "idlMemberType"><a>sequence&ltUint8Array?&gt</a></span></dt>
+            "idlAttrType"><a>sequence&ltUint8Array?&gt</a></span>, readonly</dt>
             <dd>
               <p>The payloads of the datagrams received, with possible null
               values. </p>
@@ -787,6 +768,24 @@ interface DatagramsReceivedEvent : Event {
               also seek to minimize buffering and not delay firing the events in
               order to fire fewer events. </p>
             </dd>
+          </dl>
+        </section>
+      </div>
+      <div>
+          <p>The <dfn><code>DatagramsReceivedEventInit</code></dfn> dictionary includes
+          information to construct a DatagramsReceivedEvent .</p>
+        <pre class="idl">dictionary DatagramsReceivedEventInit : EventInit {
+            sequence<Uint8Array?> datagrams;;
+};</pre>
+        <section>
+          <h2>Dictionary DatagramsReceivedEventInit Members</h2>
+          <dl data-link-for="DatagramsReceivedEventInit" data-dfn-for=
+          "DatagramsReceivedEventInit" class="dictionary-members">
+            <dt><dfn><code>data</code></dfn> of type <span class=
+            "idlMemberType"><a>sequence&ltUint8Array?&gt</a></span></dt>
+            <dd>
+                <p>The payloads of the datagrams received.</p>
+            <dd>
           </dl>
         </section>
       </div>

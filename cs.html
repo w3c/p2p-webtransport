@@ -99,13 +99,13 @@ interface QuicTransportBase {
     void                                           stop (QuicTransportStopInfo stopInfo);
     Promise&lt;QuicBidirectionalStream&gt;         createBidirectionalStream ();
     Promise&lt;QuicSendStream&gt;                  createSendStream (optional QuicStreamParameters parameters);
-    Promise&lt;void&gt                             readyToSendDatagram();
+    Promise&lt;void&gt                             readyToSendDatagram ();
     Promise&lt;boolean&gt                          sendDatagram (Uint8Array data);
+    Promise&lt;sequence&lt;Uint8Array&gt;&gt;      receiveDatagrams ();
                     attribute EventHandler             onstatechange;
                     attribute EventHandler             onerror;
                     attribute EventHandler             onreceivestream;
                     attribute EventHandler             onbidirectionalstream;
-                    attribute EventHandler             ondatagramsreceived;
 };</pre>
         <section>
           <h2>Attributes</h2>
@@ -159,15 +159,6 @@ interface QuicTransportBase {
               first time.
               </p>
             </dd>
-            <dt><dfn><code>ondatagramsreceived</code></dfn> of type <span class=
-              "idlAttrType"><a>EventHandler</a></span></dt>
-              <dd>
-                <p>This event handler, of event handler event type
-                <code><a>datagramsreceived</a></code>,
-                <em class="rfc2119" title="MUST">MUST</em> be fired when data is received
-                from a received datagram.
-                </p>
-              </dd>
           </dl>
         </section>
         <section>
@@ -449,6 +440,74 @@ interface QuicTransportBase {
               </table>
               <div>
                 <em>Return type:</em> <code>Promise&lt;boolean&gt;</code>
+              </div>
+            </dd>
+            <dt><dfn><code>receiveDatagrams</code></dfn></dt>
+            <dd>
+              <p>Deque and return all QUIC datagrams that have been received.</p>
+              <p>When <code>receiveDatagrams</code> is called, the user agent
+                <em class="rfc2119" title="MUST">MUST</em> run the following
+                steps:</p>
+              <ol>
+                <li>
+                    <p>If <code>[[\QuicTransportReceiveDatagramsPromise]]</code> is not null, 
+                    return a new promise rejected with an <code>InvalidStateError</code>.</p>
+                </li>
+                <li>
+                  <p>Deque all datagrams from <code>[[\QuicTransportReceivedDatagrams]]</code>.
+                  Let <var>dequedDatagrams</var> be the dequed datagrams.</p>
+                </li>
+                <li>
+                  <p>If <var>dequedDatagrams</var> has at least one datagram,
+                  return a new promise resolved with <var>dequedDatagrams</var>.
+                </li>
+                <li>
+                    <p>Set <code>[[\QuicTransportReceiveDatagramsPromise]]</code> to a
+                    new promise.</p>
+                </li>
+                <li>
+                  <p>Return <var>[[\QuicTransportReceiveDatagramsPromise]].</p>
+                </li>
+              <ol>
+              <p>When a datagram is received, the user agent
+                 <em class="rfc2119" title="MUST">MUST</em> run the following
+                 steps:</p>
+              <ol>
+                <li>
+                  <p>Let <code>receivedDatagram</code> be the received datagram.</p>
+                </li>
+                <li>
+                  If <code>[[\QuicTransportReceivedDatagrams]]</code> is too
+                  large (determining how large is too large is implementation
+                  specific), queue <code>null</code> onto
+                  [[\QuicTransportReceivedDatagrams]] and abort these steps.  
+                  If [[\QuicTransportReceivedDatagrams]] has multiple 
+                  <code>null</code> values at the end of the queue, they may be 
+                  coalesced into one <code>null</code> value.
+                </li>
+                <li>
+                  <p>Queue <code>receivedDatagram</code> onto
+                  <code>[[\QuicTransportReceivedDatagrams]]</code>.</p>
+                </li>
+                <li>
+                  <p>If <code>[[\QuicTransportReceiveDatagramsPromise]]</code> is null, 
+                  abort these steps.</p>
+                </li>
+                <li>
+                  <p>Deque all datagrams from <code>[[\QuicTransportReceivedDatagrams]]</code>.
+                    Let <var>dequedDatagrams</var> be the dequed datagrams.</p>
+                  </li>
+                <li>
+                  <p>Resolve <code>[[\QuicTransportReceiveDatagramsPromise]]</code> 
+                  with <var>dequedDatagrams</var>.
+                </li>
+                <li>
+                    <p>Set <code>[[\QuicTransportReceiveDatagramsPromise]]</code> 
+                    to <var>null</var>.
+                </li>
+              </ol>
+              <div>
+                <em>Return type:</em> <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;</code>
               </div>
             </dd>
           </dl>
@@ -982,6 +1041,13 @@ interface QuicTransport : QuicTransportBase {
             <li>
               Let <var>quictransport</var> have a <dfn>[[\QuicTransportState]]</dfn>
               internal slot, initialized to <code>"connecting"</code>.
+            </li>
+            <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportReceivedDatagrams]]</dfn>
+              internal slot representing a queue of <code>Uint8Array</code>, initialized to empty.
+            </li>
+            <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportReceiveDatagramsPromise]]</dfn>
+              internal slot representing a <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;?</code>,
+              initialized to null.
             </li>
             <li>Run these steps in parallel:
               <ol>
@@ -1826,14 +1892,13 @@ interface QuicTransport : QuicTransportBase {
       </p>
       <pre class="example highlight">
       const quic = getQuicTransport();
-      quic.ondatagramsreceived = (evt) {
-        for (const data of evt.datagrams) {
-          if (data == null) {
-           // Log that datagrams were lost. Look into making the event handler faster
-           // or reducing the send rate of the remote side.
-          } else {
-            // Process the data
-          }
+      const datagrams = await quic.receiveDatagrams();
+      for (let data of datagrams) {
+        if (data == null) {
+          // Log that datagrams were lost. Look into making the event handler faster
+          // or reducing the send rate of the remote side.
+        } else {
+          // Process the data
         }
       };
       </pre>

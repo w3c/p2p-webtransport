@@ -35,7 +35,7 @@ var respecConfig = {
     }
   ],
   localBiblio: {
-      "QUIC-DATAGRAM": {
+    "QUIC-DATAGRAM": {
       "title": "An Unreliable Datagram Extension to QUIC",
       "href": "https://tools.ietf.org/html/draft-pauly-quic-datagram",
       "authors": [
@@ -63,6 +63,18 @@ var respecConfig = {
         "E. Rescorla"
       ],
       "status": "20 March 2018. Internet Draft (work in progress)",
+      "publisher": "IETF"
+    },
+    "ALPN": {
+      "title": "Transport Layer Security (TLS) Application-Layer Protocol Negotiation Extension",
+      "href": "https://tools.ietf.org/html/rfc7301",
+      "authors": [
+        "S. Friedl",
+        "A. Popov",
+        "A. Langley",
+        "E. Stephan"
+      ],
+      "status": "Internet Standards Track document",
       "publisher": "IETF"
     }
   }

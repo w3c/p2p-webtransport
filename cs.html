@@ -454,7 +454,8 @@ interface QuicTransportBase {
               <ol>
                 <li>
                     <p>If <code>[[\QuicTransportReceiveDatagramsPromise]]</code> is not null, 
-                    return a new promise rejected with an <code>InvalidStateError</code>.</p>
+                    return a new promise rejected with an <code>InvalidStateError</code>
+                    and abort these steps.</p>
                 </li>
                 <li>
                   <p>Deque all datagrams from <code>[[\QuicTransportReceivedDatagrams]]</code>.
@@ -462,7 +463,8 @@ interface QuicTransportBase {
                 </li>
                 <li>
                   <p>If <var>dequedDatagrams</var> has at least one datagram,
-                  return a new promise resolved with <var>dequedDatagrams</var>.
+                  return a new promise resolved with <var>dequedDatagrams</var>
+                  and abort these steps.</p>
                 </li>
                 <li>
                     <p>Set <code>[[\QuicTransportReceiveDatagramsPromise]]</code> to a

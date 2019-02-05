@@ -727,6 +727,10 @@ interface QuicTransport : QuicTransportBase {
           following steps:
           <ol>
             <li>
+                If <var>port</var> is 0,
+                <a>throw</a> an <code>NotSupportedError</code> and abort these steps.
+            </li>
+            <li>
               Let <var>quictransport</var> be a newly constructed
               <code><a>QuicTransport</a></code> object.
             </li>

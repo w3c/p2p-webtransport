@@ -3,31 +3,36 @@
 <head>
   <meta charset="utf-8">
   <link href="webrtc.css" rel="stylesheet">
-  <title>QUIC API for Client-to-Server Connections</title>
+  <title>API for Client-to-Server Data Transport</title>
   <script class="remove" src="respec-w3c-common.js" type="text/javascript"></script>
   <script src="respec-config-cs.js" class="remove"></script>
 </head>
 <body>
   <section id="abstract">
     <p>This document defines a set of ECMAScript APIs in WebIDL to allow data to be sent
-    and received between a browser and server implementing the QUIC
+    and received between a browser and server implementing pluggable 
+    protocols underneath with common APIs on top.  APIs specific to QUIC are also provided
     protocol. This specification is being developed in conjunction with a protocol
     specification developed by the IETF QUIC Working Group.</p>
   </section>
+  
   <section id="sotd">
   </section>
+
   <section class="informative" id="intro">
     <h2>Introduction</h2>
-    <p>This specification uses QUIC [[!QUIC-TRANSPORT]] to send data
+    <p>This specification uses pluggable protocols, with 
+    QUIC [[!QUIC-TRANSPORT]] as one such protocol, to send data
     to and receive data from servers.  It can be used like WebSockets
     but with support for multiple streams, unidirectional streams,
     out-or-order deliver, and unreliable delivery.</p>
-    <p class="note">The QUIC API presented in this specification
+    <p class="note">The API presented in this specification
     represents a preliminary proposal based on work-in-progress
     within the IETF QUIC WG. Since the QUIC transport specification is
     a work-in-progress, both the protocol and API are likely to
     change significantly going forward.</p>
   </section>
+
   <section id="conformance">
     <p>This specification defines conformance criteria that apply to a single
     product: the <dfn>user agent</dfn> that implements the interfaces that it
@@ -42,6 +47,7 @@
     specification [[!WEBIDL-1]], as this specification uses that specification
     and terminology.</p>
   </section>
+
   <section>
     <h2>Terminology</h2>
      <p>The <code><a href=
@@ -75,490 +81,110 @@
       <dfn data-lt="settled">settled</dfn> used in the context of Promises are defined in
       [[!ECMASCRIPT-6.0]].</p>
   </section>
-  <section id="quic-transportbase*">
-    <h2><dfn>QuicTransportBase</dfn> Interface</h2>
-    <p>The <code>QuicTransportBase</code> is the base interface
-      for <code>QuicTransport</code>.  Most of the functionality of a
-      QuicTransport is in the base class to allow for other
-      subclasses (such as a p2p variant) to share the same interface.
-    </p>
-    <section id="quictransportbase-overview*">
-      <h3>Overview</h3>
-      <p>An <code><a>QuicTransportBase</a></code> instance can be associated to
-      one or more <code><a>QuicBidirectionalStream</a></code>,
-      <code><a>QuicSendStream</a></code>, or <code><a>QuicReceiveStream</a></code>
-      instances.</p>
-    </section>
-    <section id="quictransportbase-interface-definition*">
-      <h3>Interface Definition</h3>
-      <div>
-        <pre class="idl">
-interface QuicTransportBase {
-    readonly        attribute QuicTransportState    state;
-    readonly        attribute unsigned short        maxDatagramSize;
-    void                                           stop (QuicTransportStopInfo stopInfo);
-    Promise&lt;QuicBidirectionalStream&gt;         createBidirectionalStream ();
-    Promise&lt;QuicSendStream&gt;                  createSendStream (optional QuicStreamParameters parameters);
-    Promise&lt;void&gt                             readyToSendDatagram ();
-    Promise&lt;boolean&gt                          sendDatagram (Uint8Array data);
-    Promise&lt;sequence&lt;Uint8Array&gt;&gt;      receiveDatagrams ();
-                    attribute EventHandler             onstatechange;
-                    attribute EventHandler             onerror;
-                    attribute EventHandler             onreceivestream;
-                    attribute EventHandler             onbidirectionalstream;
-};</pre>
-        <section>
-          <h2>Attributes</h2>
-          <dl data-link-for="QuicTransportBase" data-dfn-for="QuicTransportBase" class=
-          "attributes">
-            <dt><dfn><code>state</code></dfn> of type <span class=
-            "idlAttrType"><a>QuicTransportState</a></span>, readonly</dt>
-            <dd>
-              <p>The current state of the QUIC transport. On getting, it
-              <em class="rfc2119" title="MUST">MUST</em> return the value
-              of the <a>[[\QuicTransportState]]</a> internal slot.</p>
-            </dd>
-            <dt><dfn><code>maxDatagramSize</code></dfn> of type <span class=
-            "idlAttrType"><a>unsigned short</a></span>, readonly</dt>
-            <dd>
-              <p>The maximum size data that may be passed to sendDatagram.</p>
-            </dd>
-            <dt><dfn><code>onstatechange</code></dfn> of type <span class=
-            "idlAttrType"><a>EventHandler</a></span></dt>
-            <dd>
-              <p>This event handler, of event handler event type
-              <code><a>statechange</a></code>, <em class="rfc2119" title="MUST">MUST</em>
-              be fired any time the <a>[[\QuicTransportState]]</a> slot changes, unless
-              the state changes due to calling <a><code>stop</code></a>.</p>
-            </dd>
-            <dt><dfn><code>onerror</code></dfn> of type <span class=
-            "idlAttrType"><a>EventHandler</a></span></dt>
-            <dd>
-              <p>This event handler, of event handler event type <code>error</code>,
-              <em class="rfc2119" title="MUST">MUST</em> be fired on reception of a QUIC
-              error; an implementation <em class="rfc2119" title=
-              "SHOULD">SHOULD</em> include QUIC error information in
-              <var>error.message</var> (defined in [[!HTML51]] Section 7.1.3.8.2). This
-              event <em class="rfc2119" title="MUST">MUST</em> be fired before the
-              <a><code>onstatechange</code></a> event.</p>
-            </dd>
-            <dt><dfn><code>onreceivestream</code></dfn> of type <span class=
-            "idlAttrType"><a>EventHandler</a></span></dt>
-            <dd>
-              <p>This event handler, of event handler event type
-              <code><a>receivestream</a></code>,
-              <em class="rfc2119" title="MUST">MUST</em> be fired on when data is received
-              from a newly created remote <code><a>QuicReceiveStream</a></code> for the
-              first time.
-              </p>
-            </dd>
-            <dt><dfn><code>onbidirectionalstream</code></dfn> of type <span class=
-            "idlAttrType"><a>EventHandler</a></span></dt>
-            <dd>
-              <p>This event handler, of event handler event type
-              <code><a>bidirectionalstream</a></code>,
-              <em class="rfc2119" title="MUST">MUST</em> be fired when data is received
-              from a newly created remote <code><a>QuicBidirectionalStream</a></code> for the
-              first time.
-              </p>
-            </dd>
-          </dl>
-        </section>
-        <section>
-          <h2>Methods</h2>
-          <dl data-link-for="QuicTransportBase" data-dfn-for="QuicTransportBase" class=
-          "methods">
-            <dt><dfn><code>stop</code></dfn></dt>
-            <dd>
-              <p>Stops and closes the <code><a>QuicTransportBase</a></code> object.
-              This triggers an <dfn>Immediate Close</dfn> as described in [[QUIC-TRANSPORT]] section 10.3.
-              <p>When <code>stop</code> is called, the user agent <em class="rfc2119" title="MUST">MUST</em>
-              run the following steps:</p>
-              <ol>
-                <li>Let <var>transport</var> be the <code><a>QuicTransportBase</a></code>
-                on which <code>stop</code> is invoked.</li>
-                <li>If <var>transport</var>'s <a>[[\QuicTransportState]]</a> is <code>"closed"</code>
-                then abort these steps.</li>
-                <li>Set <var>transport</var>'s <a>[[\QuicTransportState]]</a> to
-                <code>"closed"</code>.</li>
-                <li>Let <code>stopInfo</code> be the first argument.</li>
-                <li>Start the <a>Immediate Close</a> procedure by sending an CONNECTION_CLOSE frame
-                with its error code value set to the value of <var>stopInfo</var>.errorCode
-                and its reason value set to the value of <var>stopInfo</var>.reason.</li>
-              </ol>
-              <div>
-                <em>No parameters.</em>
-              </div>
-              <div>
-                <em>Return type:</em> <code>void</code>
-              </div>
-              <table class="parameters">
-                <tbody>
-                  <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Nullable</th>
-                    <th>Optional</th>
-                    <th>Description</th>
-                  </tr>
-                  <tr>
-                    <td class="prmName">stopInfo</td>
-                    <td class="prmType"><code>QuicTransportStopInfo</code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                </tbody>
-              </table>
-            </dd>
 
-           <dt><dfn><code>createBidirectionalStream</code></dfn></dt>
-            <dd>
-              <p>Creates an <code><a>QuicBidirectionalStream</a></code> object.</p>
-              <p>When <code>createBidectionalStream</code> is called, the user agent
-              <em class="rfc2119" title="MUST">MUST</em> run the following
-              steps:</p>
-              <ol>
-                <li>
-                  <p>Let <var>transport</var> be the <code><a>QuicTransportBase</a></code>
-                  on which <code>createBidectionalStream</code> is invoked.</p>
-                </li>
-                <li>
-                  <p>If <code><var>transport</var>'s state</code> is <code>"closed"</code> or
-                  <code>"failed"</code>, immediately return a new <a>rejected</a> promise with a
-                  newly created <code>InvalidStateError</code> and abort these steps.</p>
-                </li>
-                <li>
-                  <p>If <code><var>transport</var>'s state</code> is <code>"connected"</code>,
-                  immediately return a new <a>resolved</a> promise with a newly created
-                  <code><a>QuicBidirectionalStream</a></code> object,
-                  <a>add the QuicBidirectionalStream</a> to the <var>transport</var>
-                  and abort these steps.</p>
-                </li>
-                <li>
-                  <p>Let <var>p</var> be a new promise.</p>
-                </li>
-                <li>
-                  <p>Return <var>p</var> and continue the following steps in
-                  the background.</p>
-                </li>
-                <ol>
-                  <li>
-                    <p>When <code><var>transport</var>'s state</code> transitions to
-                    <code>"connected"</code> and <var>p</var> has not been <a>settled</a>,
-                    <a>resolve</a> <var>p</var> with a newly created
-                    <code><a>QuicBidirectionalStream</a></code> object, and
-                    <a>add the QuicBidirectionalStream</a> to the <var>transport</var>
-                    and abort these steps.</p>
-                  </li>
-                  <li>
-                    <p>When <code><var>transport</var>'s state</code> transitions to
-                    <code>"closed"</code> or <code>"failed"</code> and <var>p</var> has not been
-                    <a>settled</a>, <a>reject</a> <var>p</var> with a newly created
-                    <code>InvalidStateError</code>.</p>
-                  </li>
-                </ol>
-              </ol>
-              <div>
-                <em>No parameters.</em>
-              </div>
-              <div>
-                <em>Return type:</em> <code><a>Promise&lt;QuicBidirectionalStream&gt;</a></code>
-              </div>
-            </dd>
-           <dt><dfn><code>createSendStream</code></dfn></dt>
-            <dd>
-              <p>Creates an <code><a>QuicSendStream</a></code> object.</p>
-              <p>When <code>createSendStream</code> is called, the user agent
-              <em class="rfc2119" title="MUST">MUST</em> run the following
-              steps:</p>
-              <ol>
-                <li>
-                  <p>Let <var>transport</var> be the <code><a>QuicTransportBase</a></code>
-                  on which <code>createSendStream</code> is invoked.</p>
-                </li>
-                <li>
-                  <p>If <code><var>transport</var>'s state</code> is <code>"closed"</code> or
-                  <code>"failed"</code>, immediately return a new <a>rejected</a> promise with a
-                  newly created <code>InvalidStateError</code> and abort these steps.</p>
-                </li>
-                <li>
-                  <p>If <code><var>transport</var>'s state</code> is <code>"connected"</code>,
-                  immediately return a new <a>resolved</a> promise with a newly created
-                  <code><a>QuicSendStream</a></code> object,
-                  <a>add the QuicSendStream</a> to the <var>transport</var>
-                  and abort these steps.</p>
-                </li>
-                <li>
-                  <p>Let <var>p</var> be a new promise.</p>
-                </li>
-                <li>
-                  <p>Return <var>p</var> and continue the following steps in
-                  the background.</p>
-                </li>
-                <ol>
-                  <li>
-                    <p>When <code><var>transport</var>'s state</code> transitions to
-                    <code>"connected"</code> and <var>p</var> has not been <a>settled</a>,
-                    <a>resolve</a> <var>p</var> with a newly created
-                    <code><a>QuicSendStream</a></code> object, and
-                    <a>add the QuicSendStream</a> to the <var>transport</var>
-                    and abort these steps.</p>
-                  </li>
-                  <li>
-                    <p>When <code><var>transport</var>'s state</code> transitions to
-                    <code>"closed"</code> or <code>"failed"</code> and <var>p</var> has not been
-                    <a>settled</a>, <a>reject</a> <var>p</var> with a newly created
-                    <code>InvalidStateError</code>.</p>
-                  </li>
-                </ol>
-              </ol>
-              <div>
-                <em>No parameters.</em>
-              </div>
-              <div>
-                <em>Return type:</em> <code><a>Promise&lt;QuicSendStream&gt;</a></code>
-              </div>
-            </dd>
-            <dt><dfn><code>readyToSendDatagram</code></dfn></dt>
-            <dd>
-              <p>Returns a promise that will be <a>resolved</a> when the QuicTransport can send
-              a datagram as defined by [[QUIC-DATAGRAM]].</p>
-              <p>When <code>readyToSendDatagram</code> is called, the user agent
-              <em class="rfc2119" title="MUST">MUST</em> run the following
-              steps:</p>
-              <ol>
-                <li>
-                  <p>Let <var>p</var> be a new promise.</p>
-                </li>
-                <li>
-                  <p>Let <var>transport</var> be the
-                  <code><a>QuicTransportBase</a></code> on which
-                  <code>readyToSendDatagram</code> is invoked.</p>
-                </li>
-                <li>
-                  <p>Return <var>p</var> and continue the following steps in
-                  the background.</p>
-                </li>
-                <ol>
-                  <li>
-                    <p>If <var>transport</var> can send a datagram, imediately <a>resolve</a>
-                    <var>p</var> and abort these steps.</p>
-                  </li>
-                  <li>
-                    <p>If <var>transport</var>'s state is <code>"failed"</code>
-                    or <code>"closed"</code> immediately <a>reject</a> <var>p</var> with a newly
-                    created <code>InvalidStateError</code> and abort these steps.</p>
-                  </li>
-                  <li>
-                    <p>If <code>transport</code> is blocked from sending a datagram due to
-                    congestion control, <a>resolve</a> <var>p</var> when <var>transport</var>
-                    is no longer blocked.</p>
-                  </li>
-                  <li>
-                    <p><a>reject</a> <var>p</var> with a newly created
-                    <code>InvalidStateError</code> if the <var>transport</var>'s
-                    state transitions to <code>"failed"</code> or <code>"closed"</code>.</p>
-                  </li>
-                </ol>
-              </ol>
-              <div>
-                <em>No parameters.</em>
-              </div>
-              <div>
-                <em>Return type:</em> <code>Promise&lt;void&gt;</code>
-              </div>
-            </dd>
-            <dt><dfn><code>sendDatagram</code></dfn></dt>
-            <dd>
-              <p>Sends a datagram as defined by [[QUIC-DATAGRAM]].</p>
-              <p>When <code>sendDatagram</code> is called, the user agent
-              <em class="rfc2119" title="MUST">MUST</em> run the following
-              steps:</p>
-              <ol>
-	            	<li>Let <var>data</var> be the first argument.</li>
-                <li>
-                  <p>Let <var>transport</var> be
-                  the <code><a>QuicTransportBase</a></code> on
-                  which <code>sendDatagram</code> is invoked.</p>
-                </li>
-                <li>
-                  <p>If <var>transport</var>'s state is not <code>connected</code> return
-                  a promise <a>rejected</a> with a newly created
-                  <code>InvalidStateError</code> and abort these steps.</p>
-                </li>
-                <li>
-                  <p>If <code><var>data</var></code> is too large to fit into a
-                  datagram, return a promise <a>rejected</a> with a newly created
-                  <code>InvalidArgumentError</code> and abort these steps.</p>
-                </li>
-                <li>
-                  <p>If <var>transport</var> is unable to send the datagram due
-                  to congestion control, return a promise <a>rejected</a> with
-                  a newly created <code>InvalidStateError</code> and abort
-                  these steps.</p>
-                </li>
-                <li>
-                  <p>Let <var>p</var> be a new promise.</p>
-                </li>
-                <li>
-                  <p>Return <var>p</var> and continue the following steps in
-                  the background.</p>
-                </li>
-                <ol>
-                  <li>
-                    <p>Send <var>data</var> in a QUIC datagram.</p>
-                  </li>
-                  <li>
-                    <p>When an ack is received for the sent datagram,
-                    <a>resolve</a> <var>p</var> with <code>true</code>.</p>
-                  </li>
-                  <li>
-                    <p>When the datagram is detemined to be lost, <a>resolve</a>
-                    <var>p</var> with <code>false</code>.</p>
-                  </li>
-                </ol>
-              </ol>
-              <table class="parameters">
-               <tbody>
-                  <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Nullable</th>
-                    <th>Optional</th>
-                    <th>Description</th>
-                  </tr>
-                  <tr>
-                    <td class="prmName">data</td>
-                    <td class="prmType"><code>Uint8Array</code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                </tbody>
-              </table>
-              <div>
-                <em>Return type:</em> <code>Promise&lt;boolean&gt;</code>
-              </div>
-            </dd>
-            <dt><dfn><code>receiveDatagrams</code></dfn></dt>
-            <dd>
-              <p>Deque and return all QUIC datagrams that have been received.</p>
-              <p>When <code>receiveDatagrams</code> is called, the user agent
-                <em class="rfc2119" title="MUST">MUST</em> run the following
-                steps:</p>
-              <ol>
-                <li>
-                    <p>If <code>[[\QuicTransportReceiveDatagramsPromise]]</code> is not null, 
-                    return a new promise rejected with an <code>InvalidStateError</code>
-                    and abort these steps.</p>
-                </li>
-                <li>
-                  <p>Deque all datagrams from <code>[[\QuicTransportReceivedDatagrams]]</code>.
-                  Let <var>dequedDatagrams</var> be the dequed datagrams.</p>
-                </li>
-                <li>
-                  <p>If <var>dequedDatagrams</var> has at least one datagram,
-                  return a new promise resolved with <var>dequedDatagrams</var>
-                  and abort these steps.</p>
-                </li>
-                <li>
-                    <p>Set <code>[[\QuicTransportReceiveDatagramsPromise]]</code> to a
-                    new promise.</p>
-                </li>
-                <li>
-                  <p>Return <var>[[\QuicTransportReceiveDatagramsPromise]].</p>
-                </li>
-              <ol>
-              <p>When a datagram is received, the user agent
-                 <em class="rfc2119" title="MUST">MUST</em> run the following
-                 steps:</p>
-              <ol>
-                <li>
-                  <p>Let <code>receivedDatagram</code> be the received datagram.</p>
-                </li>
-                <li>
-                  If <code>[[\QuicTransportReceivedDatagrams]]</code> is too
-                  large (determining how large is too large is implementation
-                  specific), queue <code>null</code> onto
-                  [[\QuicTransportReceivedDatagrams]] and abort these steps.  
-                  If [[\QuicTransportReceivedDatagrams]] has multiple 
-                  <code>null</code> values at the end of the queue, they may be 
-                  coalesced into one <code>null</code> value.
-                </li>
-                <li>
-                  <p>Queue <code>receivedDatagram</code> onto
-                  <code>[[\QuicTransportReceivedDatagrams]]</code>.</p>
-                </li>
-                <li>
-                  <p>If <code>[[\QuicTransportReceiveDatagramsPromise]]</code> is null, 
-                  abort these steps.</p>
-                </li>
-                <li>
-                  <p>Deque all datagrams from <code>[[\QuicTransportReceivedDatagrams]]</code>.
-                    Let <var>dequedDatagrams</var> be the dequed datagrams.</p>
-                  </li>
-                <li>
-                  <p>Resolve <code>[[\QuicTransportReceiveDatagramsPromise]]</code> 
-                  with <var>dequedDatagrams</var>.
-                </li>
-                <li>
-                    <p>Set <code>[[\QuicTransportReceiveDatagramsPromise]]</code> 
-                    to <var>null</var>.
-                </li>
-              </ol>
-              <div>
-                <em>Return type:</em> <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;</code>
-              </div>
-            </dd>
-          </dl>
-        </section>
-      </div>
+  <section id="unidirectional-streams-transport*">
+    <h2><dfn>UnidirectionalStreamsTransport</dfn> Mixin</h2>    
+    <p>
+      A <code>UnidirectionalStreamsTransport</code> can send an receive unidirectional streams.
+      Data within a stream is delivered in order, but data between streams may be delivered out of order.
+      Data is generally sent reliably, but retransmissions may be disabled 
+      or the stream may aborted to produce a form of unreliability.
+      All stream data is encrypted and congestion-controlled.
+    </p>
+    <pre class="idl">
+interface UnidirectionalStreamsTransport {
+  Promise&lt;SendStream&gt; createSendStream (optional SendStreamParameters parameters);
+  attribute EventHandler    onreceivestream;
+};</pre>
+    <section>
+      <h2>Attributes</h2>
+      <dl data-link-for="UnidirectionalStreamsTransport" data-dfn-for="UnidirectionalStreamsTransport" class=
+      "attributes">
+        <dt><dfn><code>onreceivestream</code></dfn> of type <span class=
+          "idlAttrType"><a>EventHandler</a></span></dt>
+        <dd>
+          <p>This event handler, of event handler event type
+          <code><a>receivestream</a></code>,
+          <em class="rfc2119" title="MUST">MUST</em> be fired on when data is received
+          from a newly created remote <code><a>ReceiveStream</a></code> for the
+          first time.
+          </p>
+        </dd>
+      </dl>
     </section>
-    <section id="quictransportbase-procedures*">
-    <h3>Procedures</h3>
+    <section>
+      <h2>Methods</h2>
+      <dl data-link-for="UnidirectionalStreamsTransport" data-dfn-for="UnidirectionalStreamsTransport" class=
+      "methods">
+        <dt><dfn><code>createSendStream</code></dfn></dt>
+          <dd>
+          <p>Creates an <code><a>SendStream</a></code> object.</p>
+          <p>When <code>createSendStream</code> is called, the user agent
+          <em class="rfc2119" title="MUST">MUST</em> run the following
+          steps:</p>
+          <ol>
+            <li>
+              <p>Let <var>transport</var> be the <code><a>UnidirectionalStreamsTransport</a></code>
+              on which <code>createSendStream</code> is invoked.</p>
+            </li>
+            <li>
+              <p>If <code><var>transport</var>'s state</code> is <code>"closed"</code> or
+              <code>"failed"</code>, immediately return a new <a>rejected</a> promise with a
+              newly created <code>InvalidStateError</code> and abort these steps.</p>
+            </li>
+            <li>
+              <p>If <code><var>transport</var>'s state</code> is <code>"connected"</code>,
+              immediately return a new <a>resolved</a> promise with a newly created
+              <code><a>SendStream</a></code> object,
+              <a>add the SendStream</a> to the <var>transport</var>
+              and abort these steps.</p>
+            </li>
+            <li>
+              <p>Let <var>p</var> be a new promise.</p>
+            </li>
+            <li>
+              <p>Return <var>p</var> and continue the following steps in
+              the background.</p>
+            </li>
+            <ol>
+              <li>
+                <p>When <code><var>transport</var>'s state</code> transitions to
+                <code>"connected"</code> and <var>p</var> has not been <a>settled</a>,
+                <a>resolve</a> <var>p</var> with a newly created
+                <code><a>SendStream</a></code> object, and
+                <a>add the SendStream</a> to the <var>transport</var>
+                and abort these steps.</p>
+              </li>
+              <li>
+                <p>When <code><var>transport</var>'s state</code> transitions to
+                <code>"closed"</code> or <code>"failed"</code> and <var>p</var> has not been
+                <a>settled</a>, <a>reject</a> <var>p</var> with a newly created
+                <code>InvalidStateError</code>.</p>
+              </li>
+            </ol>
+          </ol>
+          <div>
+            <em>No parameters.</em>
+          </div>
+          <div>
+            <em>Return type:</em> <code><a>Promise&lt;SendStream&gt;</a></code>
+          </div>
+        </dd>
+      </dl>
+    </section>
+    <section id="UnidirectionalStreamsTransport-procedures*">
+      <h3>Procedures</h3>
       <section>
-        <h4 id="add-bidirectional-stream-to-transport">Add QuicBidirectionalStream
-        to the QuicTransport</h4>
-        <p>To <dfn>add the QuicBidirectionalStream</dfn> to the <code><a>QuicTransportBase</a></code>
+        <h4 id="add-send-stream-to-transport">Add SendStream to the UnidirectionalStreamsTransport</h4>
+        <p>To <dfn>add the SendStream</dfn> to the <code><a>UnidirectionalStreamsTransport</a></code>
         run the following steps:</p>
         <ol>
           <li>
             <p>Let <var>stream</var> be the newly created
-            <code><a>QuicBidirectionalStream</a></code> object.</p>
+            <code><a>SendStream</a></code> object.</p>
           </li>
           <li>
-            <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\QuicTransportReadableStreams]]</a>
-            internal slot. </p>
-          </li>
-          <li>
-            <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\QuicTransportWritableStreams]]</a>
-            internal slot. </p>
-          </li>
-          <li>
-            <p>Continue the following steps in the background.</p>
-          </li>
-          <li>
-            <p>Create <var>stream</var>'s associated underlying data
-            transport.</p>
-          </li>
-        </ol>
-      </section>
-      <section>
-        <h4 id="add-send-stream-to-transport">Add QuicSendStream to the QuicTransportBase</h4>
-        <p>To <dfn>add the QuicSendStream</dfn> to the <code><a>QuicTransportBase</a></code>
-        run the following steps:</p>
-        <ol>
-          <li>
-            <p>Let <var>stream</var> be the newly created
-            <code><a>QuicSendStream</a></code> object.</p>
-          </li>
-          <li>
-            <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\QuicTransportWritableStreams]]</a>
+            <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\OutgoingStreams]]</a>
             internal slot. </p>
           </li>
           <li>
@@ -572,16 +198,16 @@ interface QuicTransportBase {
       </section>
     </section>
     <section id="streamparameters*">
-      <h3><dfn>QuicStreamParameters</dfn> Dictionary</h3>
+      <h3><dfn>SendStreamParameters</dfn> Dictionary</h3>
       <p>The <code>QuicStreamParameters</code> dictionary includes information
-      relating to QUIC stream configuration.</p>
+      relating to stream configuration.</p>
       <div>
-        <pre class="idl">dictionary QuicStreamParameters {
-             bool disableRetransmissions = false;
+        <pre class="idl">dictionary SendStreamParameters {
+              bool disableRetransmissions = false;
 };</pre>
         <section>
-          <h2>Dictionary <a class="idlType">QuicStreamParameters</a> Members</h2>
-          <dl data-link-for="QuicStreamParameters" data-dfn-for="QuicStreamParameters" class=
+          <h2>Dictionary <a class="idlType">SendStreamParameters</a> Members</h2>
+          <dl data-link-for="SendStreamParameters" data-dfn-for="SendStreamParameters" class=
           "dictionary-members">
             <dt><dfn><code>disableRetransmissions</code></dfn> of type <span class=
             "idlMemberType"><a>bool</a></span>, defaulting to
@@ -603,7 +229,7 @@ interface QuicTransportBase {
         <pre class="idl">
         [ Constructor (DOMString type, ReceiveStreamEventInit eventInitDict), Exposed=Window]
 interface ReceiveStreamEvent : Event {
-    readonly        attribute QuicReceiveStream stream;
+    readonly attribute ReceiveStream stream;
 };</pre>
         <section>
           <h2>Constructors</h2>
@@ -648,34 +274,157 @@ interface ReceiveStreamEvent : Event {
           <dl data-link-for="ReceiveStreamEvent" data-dfn-for="ReceiveStreamEvent"
           class="attributes">
             <dt><code>stream</code> of type <span class=
-            "idlAttrType"><a>QuicReceiveStream</a></span>, readonly</dt>
+            "idlAttrType"><a>ReceiveStream</a></span>, readonly</dt>
             <dd>
               <p>The <dfn id="dom-receivequicstreamevent-stream"><code>stream</code></dfn>
-              attribute represents the <code><a>QuicReceiveStream</a></code> object
+              attribute represents the <code><a>ReceiveStream</a></code> object
               associated with the event.</p>
             </dd>
           </dl>
         </section>
       </div>
       <div>
-          <p>The <dfn><code>ReceiveStreamEventInit</code></dfn> dictionary includes
-          information on the configuration of the QUIC stream.</p>
-        <pre class="idl">dictionary ReceiveStreamEventInit : EventInit {
-             QuicReceiveStream stream;
+        <p>The <dfn><code>ReceiveStreamEventInit</code></dfn> dictionary includes
+          information on the configuration of the stream.</p>
+        <pre class="idl">
+dictionary ReceiveStreamEventInit : EventInit {
+              ReceiveStream stream;
 };</pre>
         <section>
           <h2>Dictionary ReceiveStreamEventInit Members</h2>
           <dl data-link-for="ReceiveStreamEventInit" data-dfn-for=
           "ReceiveStreamEventInit" class="dictionary-members">
             <dt><dfn><code>stream</code></dfn> of type <span class=
-            "idlMemberType"><a>QuicReceiveStream</a></span></dt>
+            "idlMemberType"><a>ReceiveStream</a></span></dt>
             <dd>
-              <p>The <code><a>QuicReceiveStream</a></code> object associated with the
+              <p>The <code><a>ReceiveStream</a></code> object associated with the
               event.</p>
             </dd>
           </dl>
         </section>
       </div>
+    </section>
+  </section>
+
+  <section id="bidirectional-streams-transport*">
+    <h2><dfn>BidirectionalStreamsTransport</dfn> Mixin</h2>    
+    <p>
+      A <code>BidirectionalStreamsTransport</code> can send and receive bidirectional streams.
+      Data within a stream is delivered in order, but data between streams may be delivered out of order.
+      Data is generally sent reliably, but retransmissions may be disabled 
+      or the stream may aborted to produce a form of unreliability.
+      All stream data is encrypted and congestion-controlled.
+    </p>
+    <pre class="idl">
+interface BidirectionalStreamsTransport {
+    Promise&lt;BidirectionalStream&gt; createBidirectionalStream ();
+    attribute EventHandler             onbidirectionalstream;
+};</pre>
+    <section>
+      <h2>Attributes</h2>
+      <dl data-link-for="BidirectionalStreamsTransport" data-dfn-for="BidirectionalStreamsTransport" class=
+      "attributes">
+        <dt><dfn><code>onbidirectionalstream</code></dfn> of type <span class=
+        "idlAttrType"><a>EventHandler</a></span></dt>
+        <dd>
+          <p>This event handler, of event handler event type
+          <code><a>bidirectionalstream</a></code>,
+          <em class="rfc2119" title="MUST">MUST</em> be fired when data is received
+          from a newly created remote <code><a>BidirectionalStream</a></code> for the
+          first time.
+          </p>
+        </dd>
+      </dl>
+    </section>
+    <section>
+      <h2>Methods</h2>
+      <dl data-link-for="BidirectionalStreamsTransport" data-dfn-for="BidirectionalStreamsTransport" class=
+      "methods">
+       <dt><dfn><code>createBidirectionalStream</code></dfn></dt>
+        <dd>
+          <p>Creates an <code><a>BidirectionalStream</a></code> object.</p>
+          <p>When <code>createBidectionalStream</code> is called, the user agent
+          <em class="rfc2119" title="MUST">MUST</em> run the following
+          steps:</p>
+          <ol>
+            <li>
+              <p>Let <var>transport</var> be the <code><a>BidirectionalStreamsTransport</a></code>
+              on which <code>createBidectionalStream</code> is invoked.</p>
+            </li>
+            <li>
+              <p>If <code><var>transport</var>'s state</code> is <code>"closed"</code> or
+              <code>"failed"</code>, immediately return a new <a>rejected</a> promise with a
+              newly created <code>InvalidStateError</code> and abort these steps.</p>
+            </li>
+            <li>
+              <p>If <code><var>transport</var>'s state</code> is <code>"connected"</code>,
+              immediately return a new <a>resolved</a> promise with a newly created
+              <code><a>BidirectionalStream</a></code> object,
+              <a>add the BidirectionalStream</a> to the <var>transport</var>
+              and abort these steps.</p>
+            </li>
+            <li>
+              <p>Let <var>p</var> be a new promise.</p>
+            </li>
+            <li>
+              <p>Return <var>p</var> and continue the following steps in
+              the background.</p>
+            </li>
+            <ol>
+              <li>
+                <p>When <code><var>transport</var>'s state</code> transitions to
+                <code>"connected"</code> and <var>p</var> has not been <a>settled</a>,
+                <a>resolve</a> <var>p</var> with a newly created
+                <code><a>BidirectionalStream</a></code> object, and
+                <a>add the BidirectionalStream</a> to the <var>transport</var>
+                and abort these steps.</p>
+              </li>
+              <li>
+                <p>When <code><var>transport</var>'s state</code> transitions to
+                <code>"closed"</code> or <code>"failed"</code> and <var>p</var> has not been
+                <a>settled</a>, <a>reject</a> <var>p</var> with a newly created
+                <code>InvalidStateError</code>.</p>
+              </li>
+            </ol>
+          </ol>
+          <div>
+            <em>No parameters.</em>
+          </div>
+          <div>
+            <em>Return type:</em> <code><a>Promise&lt;BidirectionalStream&gt;</a></code>
+          </div>
+        </dd>
+      </dl>
+    </section>
+    <section id="BidirectionalStreamsTransport-procedures*">
+      <h3>Procedures</h3>
+      <section>
+        <h4 id="add-bidirectional-stream-to-transport">Add BidirectionalStream
+        to the BidirectionalStreamsTransport</h4>
+        <p>To <dfn>add the BidirectionalStream</dfn> to the <code><a>BidirectionalStreamsTransport</a></code>
+        run the following steps:</p>
+        <ol>
+          <li>
+            <p>Let <var>stream</var> be the newly created
+            <code><a>BidirectionalStream</a></code> object.</p>
+          </li>
+          <li>
+            <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\IncomingStreams]]</a>
+            internal slot. </p>
+          </li>
+          <li>
+            <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\OutgoingStreams]]</a>
+            internal slot. </p>
+          </li>
+          <li>
+            <p>Continue the following steps in the background.</p>
+          </li>
+          <li>
+            <p>Create <var>stream</var>'s associated underlying data
+            transport.</p>
+          </li>
+        </ol>
+      </section>
     </section>
     <section>
       <h3><dfn>BidirectionalStreamEvent</dfn></h3>
@@ -685,7 +434,7 @@ interface ReceiveStreamEvent : Event {
         <pre class="idl">
         [ Constructor (DOMString type, BidirectionalStreamEventInit eventInitDict), Exposed=Window]
 interface BidirectionalStreamEvent : Event {
-    readonly        attribute QuicBidirectionalStream stream;
+    readonly        attribute BidirectionalStream stream;
 };</pre>
         <section>
           <h2>Constructors</h2>
@@ -730,10 +479,10 @@ interface BidirectionalStreamEvent : Event {
           <dl data-link-for="BidirectionalStreamEvent" data-dfn-for="BidirectionalStreamEvent"
           class="attributes">
             <dt><code>stream</code> of type <span class=
-            "idlAttrType"><a>QuicBidirectionalStream</a></span>, readonly</dt>
+            "idlAttrType"><a>BidirectionalStream</a></span>, readonly</dt>
             <dd>
               <p>The <dfn id="dom-bidirectionalquicstreamevent-stream"><code>stream</code></dfn>
-              attribute represents the <code><a>QuicBidirectionalStream</a></code> object
+              attribute represents the <code><a>BidirectionalStream</a></code> object
               associated with the event.</p>
             </dd>
           </dl>
@@ -741,23 +490,251 @@ interface BidirectionalStreamEvent : Event {
       </div>
       <div>
           <p>The <dfn><code>BidirectionalStreamEventInit</code></dfn> dictionary includes
-          information on the configuration of the QUIC stream.</p>
-        <pre class="idl">dictionary BidirectionalStreamEventInit : EventInit {
-             QuicBidirectionalStream stream;
+          information on the configuration of the stream.</p>
+        <pre class="idl">
+dictionary BidirectionalStreamEventInit : EventInit {
+    BidirectionalStream stream;
 };</pre>
         <section>
           <h2>Dictionary BidirectionalStreamEventInit Members</h2>
           <dl data-link-for="BidirectionalStreamEventInit" data-dfn-for=
           "BidirectionalStreamEventInit" class="dictionary-members">
             <dt><dfn><code>stream</code></dfn> of type <span class=
-            "idlMemberType"><a>QuicBidirectionalStream</a></span></dt>
+            "idlMemberType"><a>BidirectionalStream</a></span></dt>
             <dd>
-              <p>The <code><a>QuicBidirectionalStream</a></code> object associated with the
+              <p>The <code><a>BidirectionalStream</a></code> object associated with the
               event.</p>
             </dd>
           </dl>
         </section>
       </div>
+    </section>
+  </section>
+
+  <section id="datagram-transport*">
+    <h2><dfn>DatagramTransport</dfn> Mixin</h2>    
+    <p>
+      A <code>DatagramTransport</code> can send and receive datagrams.
+      Datagrams are sent out of order, unreliably, and have a limited maximum size.
+      Datagrams are encrypted and congestion controlled.
+      </p>
+      <pre class="idl">
+interface DatagramTransport {
+    readonly attribute unsigned short         maxDatagramSize;
+    Promise&lt;void&gt                        readyToSendDatagram ();
+    Promise&lt;boolean&gt                     sendDatagram (Uint8Array data);
+    Promise&lt;sequence&lt;Uint8Array&gt;&gt; receiveDatagrams ();
+};</pre>
+    <section>
+      <h2>Attributes</h2>
+      <dl data-link-for="DatagramTransport" data-dfn-for="DatagramTransport" class=
+        "attributes">
+
+        <dt><dfn><code>maxDatagramSize</code></dfn> of type <span class=
+        "idlAttrType"><a>unsigned short</a></span>, readonly</dt>
+        <dd>
+          <p>The maximum size data that may be passed to sendDatagram.</p>
+        </dd>
+      </dl>
+    </section>
+    <section>
+      <h2>Methods</h2>
+      <dl data-link-for="DatagramTransport" data-dfn-for="DatagramTransport" class=
+      "methods">
+        <dt><dfn><code>readyToSendDatagram</code></dfn></dt>
+        <dd>
+          <p>Returns a promise that will be <a>resolved</a> when the DatagramTransport can send
+          a datagram.</p>
+          <p>When <code>readyToSendDatagram</code> is called, the user agent
+          <em class="rfc2119" title="MUST">MUST</em> run the following
+          steps:</p>
+          <ol>
+            <li>
+              <p>Let <var>p</var> be a new promise.</p>
+            </li>
+            <li>
+              <p>Let <var>transport</var> be the
+              <code><a>DatagramTransport</a></code> on which
+              <code>readyToSendDatagram</code> is invoked.</p>
+            </li>
+            <li>
+              <p>Return <var>p</var> and continue the following steps in
+              the background.</p>
+            </li>
+            <ol>
+              <li>
+                <p>If <var>transport</var> can send a datagram, imediately <a>resolve</a>
+                <var>p</var> and abort these steps.</p>
+              </li>
+              <li>
+                <p>If <var>transport</var>'s state is <code>"failed"</code>
+                or <code>"closed"</code> immediately <a>reject</a> <var>p</var> with a newly
+                created <code>InvalidStateError</code> and abort these steps.</p>
+              </li>
+              <li>
+                <p>If <code>transport</code> is blocked from sending a datagram due to
+                congestion control, <a>resolve</a> <var>p</var> when <var>transport</var>
+                is no longer blocked.</p>
+              </li>
+              <li>
+                <p><a>reject</a> <var>p</var> with a newly created
+                <code>InvalidStateError</code> if the <var>transport</var>'s
+                state transitions to <code>"failed"</code> or <code>"closed"</code>.</p>
+              </li>
+            </ol>
+          </ol>
+          <div>
+            <em>No parameters.</em>
+          </div>
+          <div>
+            <em>Return type:</em> <code>Promise&lt;void&gt;</code>
+          </div>
+        </dd>
+        <dt><dfn><code>sendDatagram</code></dfn></dt>
+        <dd>
+          <p>Sends a datagram.</p>
+          <p>When <code>sendDatagram</code> is called, the user agent
+          <em class="rfc2119" title="MUST">MUST</em> run the following
+          steps:</p>
+          <ol>
+            <li>Let <var>data</var> be the first argument.</li>
+            <li>
+              <p>Let <var>transport</var> be
+              the <code><a>DatagramTransport</a></code> on
+              which <code>sendDatagram</code> is invoked.</p>
+            </li>
+            <li>
+              <p>If <var>transport</var>'s state is not <code>connected</code> return
+              a promise <a>rejected</a> with a newly created
+              <code>InvalidStateError</code> and abort these steps.</p>
+            </li>
+            <li>
+              <p>If <code><var>data</var></code> is too large to fit into a
+              datagram, return a promise <a>rejected</a> with a newly created
+              <code>InvalidArgumentError</code> and abort these steps.</p>
+            </li>
+            <li>
+              <p>If <var>transport</var> is unable to send the datagram due
+              to congestion control, return a promise <a>rejected</a> with
+              a newly created <code>InvalidStateError</code> and abort
+              these steps.</p>
+            </li>
+            <li>
+              <p>Let <var>p</var> be a new promise.</p>
+            </li>
+            <li>
+              <p>Return <var>p</var> and continue the following steps in
+              the background.</p>
+            </li>
+            <ol>
+              <li>
+                <p>Send <var>data</var> in a datagram.</p>
+              </li>
+              <li>
+                <p>When an ack is received for the sent datagram,
+                <a>resolve</a> <var>p</var> with <code>true</code>.</p>
+              </li>
+              <li>
+                <p>When the datagram is detemined to be lost, <a>resolve</a>
+                <var>p</var> with <code>false</code>.</p>
+              </li>
+            </ol>
+          </ol>
+          <table class="parameters">
+          <tbody>
+              <tr>
+                <th>Parameter</th>
+                <th>Type</th>
+                <th>Nullable</th>
+                <th>Optional</th>
+                <th>Description</th>
+              </tr>
+              <tr>
+                <td class="prmName">data</td>
+                <td class="prmType"><code>Uint8Array</code></td>
+                <td class="prmNullFalse"><span role="img" aria-label=
+                "False">&#10008;</span></td>
+                <td class="prmOptFalse"><span role="img" aria-label=
+                "False">&#10008;</span></td>
+                <td class="prmDesc"></td>
+              </tr>
+            </tbody>
+          </table>
+          <div>
+            <em>Return type:</em> <code>Promise&lt;boolean&gt;</code>
+          </div>
+        </dd>
+        <dt><dfn><code>receiveDatagrams</code></dfn></dt>
+        <dd>
+          <p>Deque and return all datagrams that have been received.</p>
+          <p>When <code>receiveDatagrams</code> is called, the user agent
+            <em class="rfc2119" title="MUST">MUST</em> run the following
+            steps:</p>
+          <ol>
+            <li>
+                <p>If <code>[[\ReceiveDatagramsPromise]]</code> is not null, 
+                return a new promise rejected with an <code>InvalidStateError</code>
+                and abort these steps.</p>
+            </li>
+            <li>
+              <p>Deque all datagrams from <code>[[\ReceivedDatagrams]]</code>.
+              Let <var>dequedDatagrams</var> be the dequed datagrams.</p>
+            </li>
+            <li>
+              <p>If <var>dequedDatagrams</var> has at least one datagram,
+              return a new promise resolved with <var>dequedDatagrams</var>
+              and abort these steps.</p>
+            </li>
+            <li>
+                <p>Set <code>[[\ReceiveDatagramsPromise]]</code> to a
+                new promise.</p>
+            </li>
+            <li>
+              <p>Return <var>[[\ReceiveDatagramsPromise]].</p>
+            </li>
+          <ol>
+          <p>When a datagram is received, the user agent
+            <em class="rfc2119" title="MUST">MUST</em> run the following
+            steps:</p>
+          <ol>
+            <li>
+              <p>Let <code>receivedDatagram</code> be the received datagram.</p>
+            </li>
+            <li>
+              If <code>[[\ReceivedDatagrams]]</code> is too
+              large (determining how large is too large is implementation
+              specific), queue <code>null</code> onto
+              [[\ReceivedDatagrams]] and abort these steps.  
+              If [[\DatagramransportReceivedDatagrams]] has multiple 
+              <code>null</code> values at the end of the queue, they may be 
+              coalesced into one <code>null</code> value.
+            </li>
+            <li>
+              <p>Queue <code>receivedDatagram</code> onto
+              <code>[[\ReceivedDatagrams]]</code>.</p>
+            </li>
+            <li>
+              <p>If <code>[[\ReceiveDatagramsPromise]]</code> is null, 
+              abort these steps.</p>
+            </li>
+            <li>
+              <p>Deque all datagrams from <code>[[\ReceivedDatagrams]]</code>.
+                Let <var>dequedDatagrams</var> be the dequed datagrams.</p>
+              </li>
+            <li>
+              <p>Resolve <code>[[\ReceiveDatagramsPromise]]</code> 
+              with <var>dequedDatagrams</var>.
+            </li>
+            <li>
+                <p>Set <code>[[\ReceiveDatagramsPromise]]</code> 
+                to <var>null</var>.
+            </li>
+          </ol>
+          <div>
+            <em>Return type:</em> <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;</code>
+          </div>
+        </dd>
+      </dl>
     </section>
     <section>
       <h3><dfn>DatagramsReceivedEvent</dfn></h3>
@@ -854,118 +831,220 @@ interface DatagramsReceivedEvent : Event {
         </section>
       </div>
     </section>
-    <section id="quictransportstate*">
-      <h3><dfn>QuicTransportState</dfn> Enum</h3>
-      <p><code>QuicTransportState</code> indicates the state of the QUIC
+  </section>
+
+  <section id="data-transport*">
+    <h2><dfn>DataTransport</dfn> Mixin</h2>   
+    <p>
+      The <code>DataTransport</code> includes the methods common to all data transports,
+      such as state, state changes, and the ability to stop the transport.
+    </p>
+    <pre class="idl">
+interface DataTransport {
+  readonly attribute TransportState state;
+  void                                  stop (DataTransportStopInfo stopInfo);
+           attribute EventHandler       onstatechange;
+           attribute EventHandler       onerror;
+};</pre>
+    <section>
+      <h2>Attributes</h2>
+      <dl data-link-for="DataTransport" data-dfn-for="DataTransport" class=
+      "attributes">
+        <dt><dfn><code>state</code></dfn> of type <span class=
+        "idlAttrType"><a>TransportState</a></span>, readonly</dt>
+        <dd>
+          <p>The current state of the transport. On getting, it
+          <em class="rfc2119" title="MUST">MUST</em> return the value
+          of the <a>[[\TransportState]]</a> internal slot.</p>
+        </dd>
+
+        <dt><dfn><code>onstatechange</code></dfn> of type <span class=
+        "idlAttrType"><a>EventHandler</a></span></dt>
+        <dd>
+          <p>This event handler, of event handler event type
+          <code><a>statechange</a></code>, <em class="rfc2119" title="MUST">MUST</em>
+          be fired any time the <a>[[\TransportState]]</a> slot changes, unless
+          the state changes due to calling <a><code>stop</code></a>.</p>
+        </dd>
+
+        <dt><dfn><code>onerror</code></dfn> of type <span class=
+        "idlAttrType"><a>EventHandler</a></span></dt>
+        <dd>
+          <p>This event handler, of event handler event type <code>error</code>,
+          <em class="rfc2119" title="MUST">MUST</em> be fired on reception of an
+          error; an implementation <em class="rfc2119" title=
+          "SHOULD">SHOULD</em> include error information in
+          <var>error.message</var> (defined in [[!HTML51]] Section 7.1.3.8.2). This
+          event <em class="rfc2119" title="MUST">MUST</em> be fired before the
+          <a><code>onstatechange</code></a> event.</p>
+        </dd>
+      </dl>
+    </section>
+    <section>
+      <h2>Methods</h2>
+      <dl data-link-for="DataTransport" data-dfn-for="DataTransport" class=
+      "methods">
+        <!-- TODO: Should this be moved out of DataTransport?  
+             It might different for each type of data transport. -->
+        <dt><dfn><code>stop</code></dfn></dt>
+        <dd>
+          <p>Stops and closes the <code><a>DataTransport</a></code> object.
+          <!-- TODO: move reference to QUIC under QuicTransportBase. -->
+          For QUIC, this triggers an <dfn>Immediate Close</dfn> as described in [[QUIC-TRANSPORT]] section 10.3.
+          <p>When <code>stop</code> is called, the user agent <em class="rfc2119" title="MUST">MUST</em>
+          run the following steps:</p>
+          <ol>
+            <li>Let <var>transport</var> be the <code><a>DataTransport</a></code>
+            on which <code>stop</code> is invoked.</li>
+            <li>If <var>transport</var>'s <a>[[\TransportState]]</a> is <code>"closed"</code>
+            then abort these steps.</li>
+            <li>Set <var>transport</var>'s <a>[[\TransportState]]</a> to
+            <code>"closed"</code>.</li>
+            <li>Let <code>stopInfo</code> be the first argument.</li>
+            <!-- TODO: move reference to QUIC under QuicTransportBase. -->
+            <li>For QUIC, start the <a>Immediate Close</a> procedure by sending an CONNECTION_CLOSE frame
+            with its error code value set to the value of <var>stopInfo</var>.errorCode
+            and its reason value set to the value of <var>stopInfo</var>.reason.</li>
+          </ol>
+          <div>
+            <em>No parameters.</em>
+          </div>
+          <div>
+            <em>Return type:</em> <code>void</code>
+          </div>
+          <table class="parameters">
+            <tbody>
+              <tr>
+                <th>Parameter</th>
+                <th>Type</th>
+                <th>Nullable</th>
+                <th>Optional</th>
+                <th>Description</th>
+              </tr>
+              <tr>
+                <td class="prmName">stopInfo</td>
+                <td class="prmType"><code>DataTransportStopInfo</code></td>
+                <td class="prmNullFalse"><span role="img" aria-label=
+                "False">&#10008;</span></td>
+                <td class="prmOptFalse"><span role="img" aria-label=
+                "False">&#10008;</span></td>
+                <td class="prmDesc"></td>
+              </tr>
+            </tbody>
+          </table>
+        </dd>
+      </dl>
+    </section>
+    <section id="DataTransportState*">
+      <h3><dfn>DataTransportState</dfn> Enum</h3>
+      <p><code>DataTransportState</code> indicates the state of the
       transport.</p>
       <div>
-        <pre class="idl">enum QuicTransportState {
+        <pre class="idl">
+enum DataTransportState {
     "new",
     "connecting",
     "connected",
     "closed",
     "failed"
 };</pre>
-        <table data-link-for="QuicTransportState" data-dfn-for="QuicTransportState"
+        <table data-link-for="DataTransportState" data-dfn-for="DataTransportState"
         class="simple">
           <tbody>
             <tr>
               <th colspan="2">Enumeration description</th>
             </tr>
             <tr>
-              <td><dfn><code id="idl-def-QuicTransportState.new">new</code></dfn></td>
+              <td><dfn><code id="idl-def-DataTransportState.new">new</code></dfn></td>
               <td>
-                <p>The <code><a>QuicTransportBase</a></code> object has been created and
+                <p>The <code><a>DataTransport</a></code> object has been created and
                 has not started negotiating yet.</p>
               </td>
             </tr>
             <tr>
               <td><dfn><code id=
-              "idl-def-QuicTransportState.connecting">connecting</code></dfn></td>
+              "idl-def-DataTransportState.connecting">connecting</code></dfn></td>
               <td>
-                <p>QUIC is in the process of negotiating a secure connection.
-                Once a secure connection is negotiated
-                (but prior to verification of the remote fingerprint, enabled by calling
-                <code>start()</code>), incoming data can flow through.</p>
+                <p>The transport is in the process of negotiating a secure connection.
+                Once a secure connection is negotiated, incoming data can flow through.</p>
               </td>
             </tr>
             <tr>
               <td><dfn><code id=
-              "idl-def-QuicTransportState.connected">connected</code></dfn></td>
+              "idl-def-DataTransportState.connected">connected</code></dfn></td>
               <td>
-                <p>QUIC has completed negotiation of a secure connection.
+                <p>The transport has completed negotiation of a secure connection.
                 Outgoing data and media can now flow through.</p>
               </td>
             </tr>
             <tr>
               <td><dfn><code id=
-              "idl-def-QuicTransportState.closed">closed</code></dfn></td>
+              "idl-def-DataTransportState.closed">closed</code></dfn></td>
               <td>
-                <p>The QUIC connection has been closed intentionally via a call to
-                <code>stop()</code> or receipt of a closing frame as described in
-                [[QUIC-TRANSPORT]]. When the <code><a>QuicTransportBase</a></code>'s
-                internal <a>[[\QuicTransportState]]</a> slot transitions to
+                <p>The transport has been closed intentionally via a call to
+                <code>stop()</code> or receipt of a closing message from the remote side.
+                When the <code><a>DataTransport</a></code>'s
+                internal <a>[[\TransportState]]</a> slot transitions to
                 <code>closed</code> the user agent <em class="rfc2119" title="MUST">MUST</em>
                 run the following steps:</p>
                 <ol>
-                  <li>Let <var>transport</var> be the <code><a>QuicTransportBase</a></code>.
-                  <li>For each <code><a>QuicReadableStream</a></code> in <var>transport</var>'s
-                  <a>[[\QuicTransportReadableStreams]]</a> internal slot run the
+                  <li>Let <var>transport</var> be the <code><a>DataTransportBase</a></code>.
+                  <li>For each <code><a>IncomingStream</a></code> in <var>transport</var>'s
+                  <a>[[\IncomingStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
-                    <li>Let <var>stream</var> be the <code><a>QuicReadableStream</a></code>.</li>
+                    <li>Let <var>stream</var> be the <code><a>IncomingStream</a></code>.</li>
                     <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to
                     <code>false</code>.</li>
                     <li>Clear the <var>stream</var>'s read buffer.</li>
                     <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                    <a>[[\QuicTransportReadableStreams]]</a> internal slot.
+                    <a>[[\IncomingStreams]]</a> internal slot.
                   </ol>
-                  <li>For each <code><a>QuicWritableStream</a></code> in <var>transport</var>'s
-                  <a>[[\QuicTransportWritableStreams]]</a> internal slot run the
+                  <li>For each <code><a>OutgoingStream</a></code> in <var>transport</var>'s
+                  <a>[[\OutgoingStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
-                    <li>Let <var>stream</var> be the <code><a>QuicWritableStream</a></code>.</li>
+                    <li>Let <var>stream</var> be the <code><a>OutgoingStream</a></code>.</li>
                     <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to
                     <code>false</code>.</li>
                     <li>Clear the <var>stream</var>'s write buffer.</li>
                     <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                    <a>[[\QuicTransportWritableStreams]]</a> internal slot.
+                    <a>[[\OutgoingStreams]]</a> internal slot.
                   </ol>
                 </ol>
               </td>
             </tr>
             <tr>
               <td><dfn><code id=
-              "idl-def-QuicTransportState.failed">failed</code></dfn></td>
+              "idl-def-DataTransportState.failed">failed</code></dfn></td>
               <td>
-                <p>The QUIC connection has been closed as the result of an error (such as
-                receipt of an error alert or a failure to validate the remote
-                fingerprint). When the <code><a>QuicTransportBase</a></code>'s
-                internal <a>[[\QuicTransportState]]</a> slot transitions to
+                <p>The transport has been closed as the result of an error (such as
+                receipt of an error alert). When the <code><a>DatraTransport/a></code>'s
+                internal <a>[[\TransportState]]</a> slot transitions to
                 <code>failed</code> the user agent <em class="rfc2119" title="MUST">MUST</em>
                 run the following steps:</p>
                 <ol>
-                  <li>Let <var>transport</var> be the <code><a>QuicTransportBase</a></code>.
-                  <li>For each <code><a>QuicReadableStream</a></code> in <var>transport</var>'s
-                  <a>[[\QuicTransportReadableStreams]]</a> internal slot run the
+                  <li>Let <var>transport</var> be the <code><a>DataransportBase</a></code>.
+                  <li>For each <code><a>IncomingStream</a></code> in <var>transport</var>'s
+                  <a>[[\IncomingStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
-                    <li>Let <var>stream</var> be the <code><a>QuicReadableStream</a></code>.</li>
+                    <li>Let <var>stream</var> be the <code><a>IncomingStream</a></code>.</li>
                     <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to
                     <code>false</code>.</li>
                     <li>Clear the <var>stream</var>'s read buffer.</li>
                     <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                    <a>[[\QuicTransportReadableStreams]]</a> internal slot.
+                    <a>[[\IncomingStreams]]</a> internal slot.
                   </ol>
-                  <li>For each <code><a>QuicWritableStream</a></code> in <var>transport</var>'s
-                  <a>[[\QuicTransportWritableStreams]]</a> internal slot run the
+                  <li>For each <code><a>OutgoingStream</a></code> in <var>transport</var>'s
+                  <a>[[\OutgoingStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
                     <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to
                     <code>false</code>.</li>
                     <li>Clear the <var>stream</var>'s write buffer.</li>
                     <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                    <a>[[\QuicTransportWritableStreams]]</a> internal slot.
+                    <a>[[\OutgoingStreams]]</a> internal slot.
                   </ol>
                 </ol>
               </td>
@@ -974,47 +1053,81 @@ interface DatagramsReceivedEvent : Event {
         </table>
       </div>
     </section>
-    <section id="quictransportstopinfo*">
-      <h3><dfn>QuicTransportStopInfo</dfn> Dictionary</h3>
-      <p>The <code>QuicTransportStopInfo</code> dictionary includes information
-      relating to the error code for stopping a <code><a>QuicTransportBase</a></code>.
-      This information is used to set the error code and reason for an CONNECTION_CLOSE
+    <section id="datatransportstopinfo*">
+      <h3><dfn>DataTransportStopInfo</dfn> Dictionary</h3>
+      <p>The <code>DataTransportStopInfo</code> dictionary includes information
+      relating to the error code for stopping a <code><a>DataTransport</a></code>.
+      For QUIC, this information is used to set the error code and reason for an CONNECTION_CLOSE
       frame.</p>
       <div>
-        <pre class="idl">dictionary QuicTransportStopInfo {
-             unsigned short errorCode = 0;
-             DOMString reason = "";
-        };
-        </pre>
+        <pre class="idl">
+dictionary DataTransportStopInfo {
+    unsigned short errorCode = 0;
+    DOMString reason = "";
+};</pre>
         <section>
-          <h2>Dictionary <a class="idlType">QuicTransportStopInfo</a> Members</h2>
-          <dl data-link-for="QuicTransportStopInfo" data-dfn-for="QuicTransportStopInfo" class=
+          <h2>Dictionary <a class="idlType">DataTransportStopInfo</a> Members</h2>
+          <dl data-link-for="DataTransportStopInfo" data-dfn-for="DataTransportStopInfo" class=
           "dictionary-members">
             <dt><dfn><code>errorCode</code></dfn> of type <span class=
             "idlMemberType"><a>unsigned short</a></span>, defaulting to
             <code>0</code>.</dt>
             <dd>
-              <p>The error code used in CONNECTION_CLOSE frame.</p>
+              <p>The error code.</p>
             </dd>
             <dt><dfn><code>reason</code></dfn> of type <span class=
             "idlMemberType"><a>DOMString</a></span>, defaulting to <code>""</code></dt>
             <dd>
-              <p>The reason for stopping the <code><a>QuicTransportBase</a></code></p>
+              <p>The reason for stopping the <code><a>DataTransport/a></code></p>
             </dd>
           </dl>
         </section>
       </div>
     </section>
   </section>
+
+  <section id="quic-transport-base*">
+    <h2><dfn>QuicTransportBase</dfn> Interface</h2>
+    <p>The <code>QuicTransportBase</code> is the base interface
+      for <code>QuicTransport</code>.  Most of the functionality of a
+      QuicTransport is in the base class to allow for other
+      subclasses (such as a p2p variant) to share the same interface.
+    </p>
+    <section id="quictransportbase-overview*">
+      <h3>Overview</h3>
+      <p>A <code><a>QuicTransportBase</a></code> is a
+      <code>UnidirectionalStreamsTransport</code>, a
+      <code>BidirectionalStreamsTransport</code>, and a
+      <code>DatagramTransport</code>.  
+      SendStreams and ReceiveStreams are implemented with unidirectional QUIC streams as defined in [[!QUIC-TRANSPORT]].
+      BidirectionalStreams are implemented with bidirectional QUIC streams as defined in [[!QUIC-TRANSPORT]].
+      Datagrams are implemented with QUIC datagrams as defined in [[QUIC-DATAGRAM]].
+      </p>
+    </section>
+    <section id="quictransportbase-interface-definition*">
+      <h3>Interface Definition</h3>
+      <div>
+        <pre class="idl">
+interface QuicTransportBase {
+};
+
+QuicTransportBase includes UnidirectionalStreamsTransport;
+QuicTransportBase includes BidirectionalStreamsTransport;
+QuicTransportBase includes DatagramTransport;
+QuicTransportBase includes DataTransport;</pre>
+      </div>
+    </section>
+  </section>
+
   <section id="quic-transport*">
     <h2><dfn>QuicTransport</dfn> Interface</h2>
-    <p>The <code>QuicTransportBase</code> is a subclass of
+    <p>The <code>QuicTransport</code> is a subclass of
     <code>QuicTransportBase</code> focused on client/server use cases.</p>
     <section id="quictransport-interface-definition*">
       <h3>Interface Definition</h3>
       <div>
         <pre class="idl">
-        [ Constructor (DOMString host, unsigned short port), Exposed=Window]
+[ Constructor (DOMString host, unsigned short port), Exposed=Window]
 interface QuicTransport : QuicTransportBase {
 };</pre>
         <section>
@@ -1031,22 +1144,22 @@ interface QuicTransport : QuicTransportBase {
               Let <var>quictransport</var> be a newly constructed
               <code><a>QuicTransport</a></code> object.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportWritableStreams]]</dfn>
-            internal slot representing a sequence of <code><a>QuicWritableStream</a></code>
+            <li>Let <var>quictransport</var> have a <dfn>[[\OutgoingStreams]]</dfn>
+            internal slot representing a sequence of <code><a>OutgoingStream</a></code>
             objects, initialized to empty.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportReadableStreams]]</dfn>
-            internal slot representing a sequence of <code><a>QuicReadableStream</a></code>
+            <li>Let <var>quictransport</var> have a <dfn>[[\IncomingStreams]]</dfn>
+            internal slot representing a sequence of <code><a>IncomingStream</a></code>
             objects, initialized to empty.
             </li>
             <li>
-              Let <var>quictransport</var> have a <dfn>[[\QuicTransportState]]</dfn>
+              Let <var>quictransport</var> have a <dfn>[[\TransportState]]</dfn>
               internal slot, initialized to <code>"connecting"</code>.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportReceivedDatagrams]]</dfn>
+            <li>Let <var>quictransport</var> have a <dfn>[[\ReceivedDatagrams]]</dfn>
               internal slot representing a queue of <code>Uint8Array</code>, initialized to empty.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportReceiveDatagramsPromise]]</dfn>
+            <li>Let <var>quictransport</var> have a <dfn>[[\ReceiveDatagramsPromise]]</dfn>
               internal slot representing a <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;?</code>,
               initialized to null.
             </li>
@@ -1070,10 +1183,10 @@ interface QuicTransport : QuicTransportBase {
                 <!-- TODO: register "wq" with IANA. -->  
                 </li>
                 <li>If the connection succeeds, set
-                the <var>quictransport</var>'s <a>[[\QuicTransportState]]</a>
+                the <var>quictransport</var>'s <a>[[\TransportState]]</a>
                 internal slot to <code>"connected"</code>.</li>
                 <li>If the connection fails, set
-                the <var>quictransport</var>'s <a>[[\QuicTransportState]]</a>
+                the <var>quictransport</var>'s <a>[[\TransportState]]</a>
                 internal slot to <code>"failed"</code>.</li>
               </ol>
             </li>
@@ -1112,672 +1225,659 @@ interface QuicTransport : QuicTransportBase {
       </div>
     </section>
   </section>
-  <section id="quicstream*">
-    <h2><dfn>QUIC Stream API</dfn></h2>
-    <p>The <code>QUIC Stream API</code> includes information relating
-    to a QUIC stream. </p>
-    <section id="quicstream-overview*">
-      <h3>Overview</h3>
-      <p><code><a>QuicBidirectionalStream</a></code>, <code><a>QuicSendStream</a></code>,
-      and <code><a>QuicReceiveStream</a></code> instances are associated to
-      a <code><a>QuicTransportBase</a></code> instance.</p>
-    </section>
-    <section id="quicstream-operation*">
-      <h3>Operation</h3>
-      <p>An <code><a>QuicBidirectionalStream</a></code> can be created in the following ways:</p>
-      <ol>
-        <li>Using the <code><a>QuicTransportBase</a></code>'s <code>createBidirectionalStream</code> method.</li>
-        <li>Getting a <code><a>bidirectionalstream</a></code> event on the
-        <code><a>QuicTransportBase</a></code>.</li>
-      </ol>
-      <p>An <code><a>QuicSendStream</a></code> can be created in the following ways:</p>
-      <ol>
-        <li>Using the <code><a>QuicTransportBase</a></code>'s </code>createSendStream</code> method.</li>
-      </ol>
-      <p>An <code><a>QuicReceiveStream</a></code> can be created in the following
-      ways:</p>
-      <ol>
-        <li>Getting a <code><a>receivestream</a></code> event on the
-        <code><a>QuicTransportBase</a></code>.</li>
-      </ol>
-    </section>
-    <section id="quicwritablestream-interface-mixin-definition*">
-      <h3>Interface Mixin <dfn>QuicWritableStream</dfn></h3>
-      <div>
-        <pre class="idl">
-        [ Exposed=Window ]
-        interface mixin QuicWritableStream {
-            readonly attribute boolean writable;
-            readonly attribute unsigned long writeBufferedAmount;
-            readonly attribute Promise&lt;QuicStreamAbortInfo&gt; writingAborted;
-            void write (QuicStreamWriteParameters data);
-            void abortWriting (QuicStreamAbortInfo abortInfo);
-            Promise&lt;void&gt; waitForWriteBufferedAmountBelow(unsigned long threshold);
-        };
-        </pre>
-        <section>
-          <h2>Overview</h2>
-          <p>The <code><a>QuicWritableStream</a></code> will initialize with
-          the following:</p>
-          <ol>
-            <li>Let <var>stream</var> be the <code><a>QuicWritableStream</a></code>.</li>
-            <li>Let <var>stream</var> have a <dfn>[[\Writable]]</dfn> internal
-            slot initialized to <code>true</code>.</li>
-            <li>Let <var>stream</var> have a <dfn>[[\WriteBufferedAmount]]</dfn> internal
-            slot initialized to zero.</li>
-          </ol>
-        </section>
-        <section>
-          <h2>Attributes</h2>
-          <dl data-link-for="QuicWritableStream" data-dfn-for="QuicWritableStream" class=
-          "attributes">
-            <dt><code>writable</code> of type <span class="idlAttriType"><a>boolean</a>
-            readonly</dt>
-            <dd>
-              <p>The <dfn id="dom-quicwritablestream-writable"><code>writable</code></dfn>
-              attribute represents whether data can be written to the
-              <code><a>QuicWritableStream</a></code>. On getting it
-              <em class="rfc2119" title="MUST">MUST</em> return the value of the
-              <a>[[\Writable]]</a> slot.</p>
-            </dd>
-            <dt><code>writeBufferedAmount</code> of type <span class="idlAttrType"><a>unsigned
-            long</a></span>, readonly</dt>
-            <dd>
-              <p>The <dfn id="dom-quicwritablestream-writable"><code>writeBufferedAmount</code></dfn>
-              attribute represents the number of bytes of application data
-              that have been queued using <code>write</code> but that, as of the last
-              time the event loop started executing a task, had not yet been transmitted
-              to the network. This includes any data sent during the execution of the
-              current task, regardless of whether the <a>user agent</a> is able to
-              transmit text asynchronously with script execution. This does not
-              include framing overhead incurred by the protocol, or buffering done
-              by the operating system or network hardware. On getting, it
-              <em class="rfc2119" title="MUST">MUST</em> return the value of the
-              <code><a>QuicWritableStream</a></code>'s <a>[[\WriteBufferedAmount]]</a> internal slot.
-            </dd>
-            <dt><code>writingAborted</code> of type <span class="idlAttriType"><a>QuicStreamAbortInfo</a>
-            readonly</dt>
-            <dd>
-              <p>The <dfn id="dom-quicwritablestream-writingAborted"><code>writingAborted</code></dfn>
-              attribute represents a promise that <a>resolves</a> when the
-              STOP_SENDING frame is received from the <code><a>QuicReadableStream</a></code>.
-              When the <var>stream</var> receives a STOP_SENDING frame from its corresponding
-              <code><a>QuicReadableStream</a></code>, the <a>user agent</a>
-              <em class="rfc2119" title="MUST">MUST</em> run the following:
+
+  <section id="outgoing-stream*">
+    <h2>Interface Mixin <dfn>OutgoingStream</dfn></h2>
+    <p>
+      An OutgoingStream is a stream that can be written to, 
+      as either a <code>SendStream </code>or a <code>BidirectionalStream</code>
+    </p>
+    <div>
+      <pre class="idl">
+      [ Exposed=Window ]
+interface mixin OutgoingStream {
+    readonly attribute boolean writable;
+    readonly attribute unsigned long writeBufferedAmount;
+    readonly attribute Promise&lt;StreamAbortInfo&gt; writingAborted;
+    void write (StreamWriteParameters data);
+    void abortWriting (StreamAbortInfo abortInfo);
+    Promise&lt;void&gt; waitForWriteBufferedAmountBelow(unsigned long threshold);
+};</pre>
+      <section>
+        <h3>Overview</h3>
+        <p>The <code><a>OutgoingStream</a></code> will initialize with
+        the following:</p>
+        <ol>
+          <li>Let <var>stream</var> be the <code><a>OutgoingStream</a></code>.</li>
+          <li>Let <var>stream</var> have a <dfn>[[\Writable]]</dfn> internal
+          slot initialized to <code>true</code>.</li>
+          <li>Let <var>stream</var> have a <dfn>[[\WriteBufferedAmount]]</dfn> internal
+          slot initialized to zero.</li>
+        </ol>
+      </section>
+      <section>
+        <h3>Attributes</h3>
+        <dl data-link-for="OutgoingStream" data-dfn-for="OutgoingStream" class=
+        "attributes">
+          <dt><code>writable</code> of type <span class="idlAttriType"><a>boolean</a>
+          readonly</dt>
+          <dd>
+            <p>The <dfn id="dom-outgoingstream-writable"><code>writable</code></dfn>
+            attribute represents whether data can be written to the
+            <code><a>OutgoingStream</a></code>. On getting it
+            <em class="rfc2119" title="MUST">MUST</em> return the value of the
+            <a>[[\Writable]]</a> slot.</p>
+          </dd>
+          <dt><code>writeBufferedAmount</code> of type <span class="idlAttrType"><a>unsigned
+          long</a></span>, readonly</dt>
+          <dd>
+            <p>The <dfn id="dom-outgoingstream-writable"><code>writeBufferedAmount</code></dfn>
+            attribute represents the number of bytes of application data
+            that have been queued using <code>write</code> but that, as of the last
+            time the event loop started executing a task, had not yet been transmitted
+            to the network. This includes any data sent during the execution of the
+            current task, regardless of whether the <a>user agent</a> is able to
+            transmit text asynchronously with script execution. This does not
+            include framing overhead incurred by the protocol, or buffering done
+            by the operating system or network hardware. On getting, it
+            <em class="rfc2119" title="MUST">MUST</em> return the value of the
+            <code><a>OutgoingStream</a></code>'s <a>[[\WriteBufferedAmount]]</a> internal slot.
+          </dd>
+          <dt><code>writingAborted</code> of type <span class="idlAttriType"><a>StreamAbortInfo</a>
+          readonly</dt>
+          <dd>
+            <p>The <dfn id="dom-outgoingstream-writingAborted"><code>writingAborted</code></dfn>
+            attribute represents a promise that <a>resolves</a> when the
+            a message from the remote side aborting the stream is received.
+            For QUIC, that message is a STOP_SENDING frame.
+            When the <var>stream</var> receives this mesage, the <a>user agent</a>
+            <em class="rfc2119" title="MUST">MUST</em> run the following:
+            <ol>
+              <li>Let <var>stream</var> be the <code><a>OutgoingStream</a></code> object.
+              <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to <code>false</code>.</li>
+              <li>Clear the <var>stream</var>'s write buffer.</li>
+              <li>Let <var>transport</var> be the <code><a>DataTransport</a></code>,
+              which the <var>stream</var> was created from.
+              <li>Remove the <var>stream</var> from the <var>transport</var>'s
+              <a>[[\OutgoingStreams]]</a> internal slot.</li>
+              <li><a>resolve</a> the promise with the resulting
+              <code><a>StreamAbortInfo</a></code> with the <code>errorCode</code>
+              set to the value from the aborting message from the remote side.</li>
+            </ol>
+          </dd>
+        </dl>
+      </section>
+      <section>
+        <h3>Methods</h3>
+        <dl data-link-for="OutgoingStream" data-dfn-for="OutgoingStream" class=
+        "methods">
+          <dt><dfn><code>write</code></dfn></dt>
+          <dd>
+            <p>Writes data to the stream. When the remote <code><a>DataTransport</a></code>
+            receives data for this stream for the first time, it will trigger the
+            creation of the corresponding remote <code>IncomingStream</code>. 
+            When the <code>write</code> method is
+            called, the <a>user agent</a> <em class="rfc2119" title="MUST">MUST</em>
+            run the following steps:</p>
+            <ol>
+              <li>Let <var>data</var> be the first argument.</li>
+              <li>Let <var>stream</var> be the <code><a>OutgoingStream</a></code>
+              object on which <var>data</var> is to be sent.</li>
+              <li>if length of <var>data</var>.data is 0 and <var>data</var>.finished is
+              <code>false</code>, <a>throw</a> a <code>NotSupportedError</code> and abort
+              these steps.</li>
+              <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is <code>false</code>,
+              <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>
+              <li>Increase the value of <var>stream</var>'s
+              <a>[[\WriteBufferedAmount]]</a> slot by the length of
+              <var>data</var>.data in bytes.</li>
+              <li>Queue <var>data</var>.data for transmission on <var>stream</var>'s
+              underlying data transport.</li>
+              <li>if <var>data</var>.finish is set to <code>true</code>, run the
+              following:</li>
               <ol>
-                <li>Let <var>stream</var> be the <code><a>QuicWritableStream</a></code> object.
-                <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to <code>false</code>.</li>
-                <li>Clear the <var>stream</var>'s write buffer.</li>
-                <li>Let <var>transport</var> be the <code><a>QuicTransportBase</a></code>,
-                which the <var>stream</var> was created from.
-                <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                <a>[[\QuicTransportWritableStreams]]</a> internal slot.</li>
-                <li><a>resolve</a> the promise with the resulting
-                <code><a>QuicStreamAbortInfo</a></code> with the <code>errorCode</code>
-                set to the value from the STOP_SENDING frame.</li>
-              </ol>
-            </dd>
-          </dl>
-       </section>
-       <section>
-          <h2>Methods</h2>
-          <dl data-link-for="QuicWritableStream" data-dfn-for="QuicWritableStream" class=
-          "methods">
-            <dt><dfn><code>write</code></dfn></dt>
-            <dd>
-              <p>Writes data to the stream. When the remote <code><a>QuicTransportBase</a></code>
-              receives the STREAM frame from this stream for the first time, it will trigger the
-              creation of the corresponding remote stream. When the <code>write</code> method is
-              called, the <a>user agent</a> <em class="rfc2119" title="MUST">MUST</em>
-              run the following steps:</p>
-              <ol>
-               <li>Let <var>data</var> be the first argument.</li>
-               <li>Let <var>stream</var> be the <code><a>QuicWritableStream</a></code>
-               object on which <var>data</var> is to be sent.</li>
-               <li>if length of <var>data</var>.data is 0 and <var>data</var>.finished is
-               <code>false</code>, <a>throw</a> a <code>NotSupportedError</code> and abort
-               these steps.</li>
-               <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is <code>false</code>,
-               <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>
-               <li>Increase the value of <var>stream</var>'s
-               <a>[[\WriteBufferedAmount]]</a> slot by the length of
-               <var>data</var>.data in bytes.</li>
-               <li>Queue <var>data</var>.data for transmission on <var>stream</var>'s
-               underlying data transport.</li>
-               <li>if <var>data</var>.finish is set to <code>true</code>, run the
-               following:</li>
-               <ol>
-                 <li>Queue a STREAM frame with the FIN bit set.</li>
-                 <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to
-                 <code>false</code>.</li>
-                 <li>Let <var>transport</var> be the <code><a>QuicTransportBase</a></code>,
-                 which the <var>stream</var> was created from.</li>
-                 <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                 <a>[[\QuicTransportWritableStreams]]</a> internal slot.</li>
-               </ol>
-               <div class="note">The actual transmission of data occurs in
-               parallel. If sending data leads to a QUIC-level error, the
-               application will be notified asynchronously through the
-               <code><a>QuicTransportBase</a></code>'s <code><a>onerror</a></code>
-               EventHandler.</div>
-              </ol>
-              <table class="parameters">
-                <tbody>
-                  <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Nullable</th>
-                    <th>Optional</th>
-                    <th>Description</th>
-                  </tr>
-                  <tr>
-                    <td class="prmName">data</td>
-                    <td class="prmType"><code>QuicStreamWriteParameters</code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                </tbody>
-              </table>
-              <div>
-                <em>Return type:</em> <code>void</code>
-              </div>
-            </dd>
-            <dt><dfn><code>abortWriting</code></dfn></dt>
-            <dd>
-              <p>A hard shutdown of the <code><a>QuicWritableStream</a></code>. It may be called
-              regardless of whether the <code><a>QuicWritableStream</a></code>
-              was created by the local or remote peer. When the <code>abortWriting()</code>
-              method is called, the user agent <em class="rfc2119" title="MUST">MUST</em>
-              run the following steps:</p>
-              <ol>
-                <li>Let <var>stream</var> be the <code><a>QuicWritableStream</a></code> object
-                which is about to abort writing.</li>
-                <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is <code>false</code>,
-                <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>
-                <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to <code>false</code>.</li>
-                <li>Clear the <var>stream</var>'s write buffer.</li>
-                <li>Let <var>transport</var> be the <code><a>QuicTransportBase</a></code>,
+                <li>Queue a message with an indication that this is the last data for the stream (
+                  for QUIC, this is a STREAM frame with the FIN bit set.)</li>
+                <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to
+                <code>false</code>.</li>
+                <li>Let <var>transport</var> be the <code><a>DataTransport</a></code>,
                 which the <var>stream</var> was created from.</li>
                 <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                <a>[[\QuicTransportWritableStreams]]</a> internal slot.</li>
-                <li>Let <var>abortInfo</var> be the first argument.</li>
-                <li>Start the closing procedure by sending a RST_STREAM frame with its error
-                code set to the value of <var>abortInfo</var>.errorCode.</li>
+                <a>[[\OutgoingStreams]]</a> internal slot.</li>
               </ol>
-              <table class="parameters">
-                <tbody>
-                  <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Nullable</th>
-                    <th>Optional</th>
-                    <th>Description</th>
-                  </tr>
-                  <tr>
-                    <td class="prmName">abortInfo</td>
-                    <td class="prmType"><code>QuicStreamAbortInfo</code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                </tbody>
-              </table>
-              <div>
-                <em>Return type:</em> <code>void</code>
-              </div>
-            </dd>
-            <dt><dfn><code>waitForWriteBufferedAmountBelow</code></dfn></dt>
-            <dd>
-              <p><code>waitForWriteBufferedAmountBelow</code> <a>resolves</a> the promise when
-              the data queued in the write buffer falls below the given threshold.
-              If <code>waitForWriteBufferedAmountBelow</code>
-              is called multiple times, multiple promises could be resolved when the
-              write buffer falls below the threshold for each promise. The Promise will
-              be <a>rejected</a> with a newly created <code>InvalidStateError</code> if the
-              <var>stream</var>'s <a>[[\Writable]]</a> slot transitions from true to false
-              and the promise isn't <a>settled</a>. When the <code>waitForWriteBufferedAmountBelow</code> method
-              is called, the <a>user agent</a> <em class="rfc2119" title="MUST">MUST</em> run
-              the following steps:</p>
-              <ol>
-                <li>Let <var>stream</var> be the <code><a>QuicWritableStream</a></code>
-                object on which <code>waitForWriteBufferedAmountBelow</code> was invoked.</li>
-                <li>Let <var>p</var> be a new promise.</li>
-                <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is
-                <code>false</code>, <a>reject</a> <var>p</var> with a
-                newly created <code>InvalidStateError</code> and abort
-                these steps.</li>
-                <li>Let <var>threshold</var> be the first argument.</li>
-                <li>When <var>stream</var>'s <a>[[\WriteBufferedAmount]]]</a> slot decreases
-                from above <var>threshold</var> to less than or equal to it,
-                <a>resolve</a> <var>p</var> with <code>undefined</code>.</li>
-              </ol>
-              <table class="parameters">
-                <tbody>
-                  <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Nullable</th>
-                    <th>Optional</th>
-                    <th>Description</th>
-                  </tr>
-                  <tr>
-                    <td class="prmName">threshold</td>
-                    <td class="prmType"><code>unsigned long</code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                </tbody>
-              </table>
-              <div>
-                <em>Return type:</em> <code>Promise&lt;void&gt;</code>
-              </div>
-            </dd>
+              <div class="note">The actual transmission of data occurs in
+              parallel. If sending data leads to a transport-level error, the
+              application will be notified asynchronously through the
+              <code><a>DataTransport</a></code>'s <code><a>onerror</a></code>
+              EventHandler.</div>
+            </ol>
+            <table class="parameters">
+              <tbody>
+                <tr>
+                  <th>Parameter</th>
+                  <th>Type</th>
+                  <th>Nullable</th>
+                  <th>Optional</th>
+                  <th>Description</th>
+                </tr>
+                <tr>
+                  <td class="prmName">data</td>
+                  <td class="prmType"><code>StreamWriteParameters</code></td>
+                  <td class="prmNullFalse"><span role="img" aria-label=
+                  "False">&#10008;</span></td>
+                  <td class="prmOptFalse"><span role="img" aria-label=
+                  "False">&#10008;</span></td>
+                  <td class="prmDesc"></td>
+                </tr>
+              </tbody>
+            </table>
+            <div>
+              <em>Return type:</em> <code>void</code>
+            </div>
+          </dd>
+          <dt><dfn><code>abortWriting</code></dfn></dt>
+          <dd>
+            <p>A hard shutdown of the <code><a>OutgoingStream</a></code>. It may be called
+            regardless of whether the <code><a>OutgoingStream</a></code>
+            was created by the local or remote peer. When the <code>abortWriting()</code>
+            method is called, the user agent <em class="rfc2119" title="MUST">MUST</em>
+            run the following steps:</p>
+            <ol>
+              <li>Let <var>stream</var> be the <code><a>OutgoingStream</a></code> object
+              which is about to abort writing.</li>
+              <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is <code>false</code>,
+              <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>
+              <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to <code>false</code>.</li>
+              <li>Clear the <var>stream</var>'s write buffer.</li>
+              <li>Let <var>transport</var> be the <code><a>DataTransport</a></code>,
+              which the <var>stream</var> was created from.</li>
+              <li>Remove the <var>stream</var> from the <var>transport</var>'s
+              <a>[[\OutgoingStreams]]</a> internal slot.</li>
+              <li>Let <var>abortInfo</var> be the first argument.</li>
+              <li>Start the closing procedure by sending a RST_STREAM frame with its error
+              code set to the value of <var>abortInfo</var>.errorCode.</li>
+            </ol>
+            <table class="parameters">
+              <tbody>
+                <tr>
+                  <th>Parameter</th>
+                  <th>Type</th>
+                  <th>Nullable</th>
+                  <th>Optional</th>
+                  <th>Description</th>
+                </tr>
+                <tr>
+                  <td class="prmName">abortInfo</td>
+                  <td class="prmType"><code>StreamAbortInfo</code></td>
+                  <td class="prmNullFalse"><span role="img" aria-label=
+                  "False">&#10008;</span></td>
+                  <td class="prmOptFalse"><span role="img" aria-label=
+                  "False">&#10008;</span></td>
+                  <td class="prmDesc"></td>
+                </tr>
+              </tbody>
+            </table>
+            <div>
+              <em>Return type:</em> <code>void</code>
+            </div>
+          </dd>
+          <dt><dfn><code>waitForWriteBufferedAmountBelow</code></dfn></dt>
+          <dd>
+            <p><code>waitForWriteBufferedAmountBelow</code> <a>resolves</a> the promise when
+            the data queued in the write buffer falls below the given threshold.
+            If <code>waitForWriteBufferedAmountBelow</code>
+            is called multiple times, multiple promises could be resolved when the
+            write buffer falls below the threshold for each promise. The Promise will
+            be <a>rejected</a> with a newly created <code>InvalidStateError</code> if the
+            <var>stream</var>'s <a>[[\Writable]]</a> slot transitions from true to false
+            and the promise isn't <a>settled</a>. When the <code>waitForWriteBufferedAmountBelow</code> method
+            is called, the <a>user agent</a> <em class="rfc2119" title="MUST">MUST</em> run
+            the following steps:</p>
+            <ol>
+              <li>Let <var>stream</var> be the <code><a>OutgoingStream</a></code>
+              object on which <code>waitForWriteBufferedAmountBelow</code> was invoked.</li>
+              <li>Let <var>p</var> be a new promise.</li>
+              <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is
+              <code>false</code>, <a>reject</a> <var>p</var> with a
+              newly created <code>InvalidStateError</code> and abort
+              these steps.</li>
+              <li>Let <var>threshold</var> be the first argument.</li>
+              <li>When <var>stream</var>'s <a>[[\WriteBufferedAmount]]]</a> slot decreases
+              from above <var>threshold</var> to less than or equal to it,
+              <a>resolve</a> <var>p</var> with <code>undefined</code>.</li>
+            </ol>
+            <table class="parameters">
+              <tbody>
+                <tr>
+                  <th>Parameter</th>
+                  <th>Type</th>
+                  <th>Nullable</th>
+                  <th>Optional</th>
+                  <th>Description</th>
+                </tr>
+                <tr>
+                  <td class="prmName">threshold</td>
+                  <td class="prmType"><code>unsigned long</code></td>
+                  <td class="prmNullFalse"><span role="img" aria-label=
+                  "False">&#10008;</span></td>
+                  <td class="prmOptFalse"><span role="img" aria-label=
+                  "False">&#10008;</span></td>
+                  <td class="prmDesc"></td>
+                </tr>
+              </tbody>
+            </table>
+            <div>
+              <em>Return type:</em> <code>Promise&lt;void&gt;</code>
+            </div>
+          </dd>
         </dl>
       </section>
-      </div>
-    </section>
-    <section id="quicreadablestream-interface-mixin-definition*">
-      <h3>Interface Mixin <dfn>QuicReadableStream</dfn></h3>
-      <div>
-        <pre class="idl">
-        [ Exposed=Window ]
-        interface mixin QuicReadableStream {
-            readonly attribute boolean readable;
-            readonly attribute unsigned long readableAmount;
-            readonly attribute Promise&lt;QuicStreamAbortInfo&gt; readingAborted;
-            QuicStreamReadResult readInto (Uint8Array data);
-            void abortReading (QuicStreamAbortInfo abortInfo);
-            Promise&lt;void&gt;   waitForReadable(unsigned long amount);
-        };
-        </pre>
-        <section>
-          <h2>Overview</h2>
-          <p>The <code><a>QuicReadableStream</a></code> will initialize with
-          the following:</p>
-          <ol>
-            <li>Let <var>stream</var> be the <code><a>QuicReadableStream</a></code>.</li>
-            <li>Let <var>stream</var> have a <dfn>[[\Readable]]</dfn> internal
-            slot initialized to <code>true</code>.</li>
-            <li>Let <var>stream</var> have a <dfn>[[\ReadableAmount]]</dfn> internal
-            slot initialized to zero.</li>
-          </ol>
-        </section>
-        <section>
-          <h2>Attributes</h2>
-          <dl data-link-for="QuicReadableStream" data-dfn-for="QuicReadableStream" class=
-          "attributes">
-            <dt><code>readable</code> of type <span class="idlAttrType"><a>boolean</a></span>,
-            readonly</dt>
-            <dd>
-              <p>The <dfn id="dom-quicreadablestream-readableamount"><code>readable</code></dfn>
-              attribute represents whether data can be read from the <code><a>QuicReadableStream</a></code>.
-              On getting, it <em class="rfc2119" title="MUST">MUST</em> return the value of the
-              <code><a>QuicReadableStream</a></code>'s <a>[[\Readable]]</a> slot.
-            </dd>
-            <dt><code>readableAmount</code> of type <span class="idlAttrType"><a>unsigned
-            long</a></span>, readonly</dt>
-            <dd>
-              <p>The <dfn id="dom-quicreadablestream-readableamount"><code>readableAmount</code></dfn>
-              attribute represents the number of bytes buffered for access by
-              <code>readInto</code> but that, as of the last time the event loop
-              started executing a task, had not yet been read. This does not include
-              framing overhead incurred by the protocol, or buffers associated with
-              the network hardware. On getting, it <em class="rfc2119" title="MUST">MUST</em>
-              return the value of the <code><a>QuicReadableStream</a></code>'s
-              <a>[[\ReadableAmount]]</a> internal slot.</p>
-            </dd>
-            <dt><code>readingAborted</code> of type <span class="idlAttriType"><a>QuicStreamAbortInfo</a>
-            readonly</dt>
-            <dd>
-              <p>The <dfn id="dom-quicreadablestream-readingAborted"><code>readingAborted</code></dfn>
-              attribute represents a promise that <a>resolves</a> when the
-              RST_STREAM frame is received from the <code><a>QuicWritableStream</a></code>.
-              When the <var>stream</var> receives a RST_STREAM frame from its corresponding
-              <code><a>QuicWritableStream</a></code>, the <a>user agent</a>
-              <em class="rfc2119" title="MUST">MUST</em> run the following:
-              <ol>
-                <li>Let <var>stream</var> be the <code><a>QuicReadableStream</a></code>
-                object</li>
-                <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to <code>false</code>.</li>
-                <li>Clear the <var>stream</var>'s read buffer.</li>
-                <li>Let <var>transport</var> be the <code><a>QuicTransportBase</a></code>,
-                which the <var>stream</var> was created from.
-                <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                <a>[[\QuicTransportReadableStreams]]</a> internal slot.</li>
-                <li><a>resolve</a> the promise with the resulting
-                <code><a>QuicStreamAbortInfo</a></code> with <code>errorCode</code>
-                set to the value of the errror code from the RST_STREAM frame.</li>
-              </ol>
-            </dd>
-          </dl>
-       </section>
-       <section>
-          <h2>Methods</h2>
-          <dl data-link-for="QuicReadableStream" data-dfn-for="QuicReadableStream" class=
-          "methods">
-            <dt><dfn><code>readInto</code></dfn></dt>
-            <dd>
-              <p>Reads from the <code><a>QuicReadableStream</a></code> into the buffer specified
-              by the first argument and returns <code><a>QuicStreamReadResult</a></code>.
-              When the <code>readInto</code> method is called, the user agent
-              <em class="rfc2119" title="MUST">MUST</em> run the following steps:</p>
-              <ol>
-               <li>Let <var>stream</var> be the <code><a>QuicReadableStream</a></code> object
-               on which <code>readInto</code> is invoked.</li>
-               <li>If <var>stream</var>'s <a>[[\Readable]]</a> slot is <code>false</code>,
-               <a>throw</a> an <code>InvalidStateError</code>, then abort these steps.</li>
-               <li>Let <var>data</var> be the first argument.</li>
-               <li>Let <var>result</var> be the <code><a>QuicStreamReadResult</a></code>
-               to be returned.</li>
-               <li>If <var>stream</var> has <a>finished reading</a>, return
-               <var>result</var> with <code>amount</code> set to 0 and <code>finished</code> set to
-               <code>true</code> and abort these steps.</li>
-               <li>Transfer data from the read buffer into <var>data</var>.</li>
-               <li>Decrease the value of <var>stream</var>'s <a>[[\ReadableAmount]]</a>
-               slot by the length of <var>data</var> in bytes.</li>
-               <li>Set <var>result</var>'s <code>amount</code> to the size of
-               <var>data</var> in bytes.</li>
-               <li>If the <var>data</var> includes up to the FIN bit being read, then
-               run the following steps:</li>
-               <ol>
-                 <li>Set <var>result</var>'s <code>finished</code> to <code>true</code>.</li>
-                 <li>Set the <var>stream</var>'s <a>[[\Readable]]</a> slot to
-                 <code>false</code>.</li>
-                 <li>Let <var>transport</var> be the <code><a>QuicTransportBase</a></code>,
-                 which the <var>stream</var> was created from.
-                 <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                 <a>[[\QuicTransportReadableStreams]]</a> internal slot.</li>
-               </ol>
-               <li>Else, set <var>result</var>'s <code>finished</code> to false.</li>
-               <li>Return <var>result</var>.
-              </ol>
-              <table class="parameters">
-               <tbody>
-                  <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Nullable</th>
-                    <th>Optional</th>
-                    <th>Description</th>
-                  </tr>
-                  <tr>
-                    <td class="prmName">data</td>
-                    <td class="prmType"><code>Uint8Array</code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                </tbody>
-              </table>
-              <div>
-                <em>Return type:</em> <code><a>QuicStreamReadResult</a></code>
-              </div>
-            </dd>
-            <dt><dfn><code>abortReading</code></dfn></dt>
-            <dd>
-              <p>A hard shutdown of the <code><a>QuicReadableStream</a></code>. It may be called
-              regardless of whether the <code><a>QuicReadableStream</a></code> object
-              was created by the local or remote peer. When the <code>abortReading()</code>
-              method is called, the user agent <em class="rfc2119" title="MUST">MUST</em>
-              run the following steps:</p>
-              <ol>
-                <li>Let <var>stream</var> be the <code><a>QuicReadableStream</a></code> object
-                which is about to abort reading.</li>
-                <li>If <var>stream</var>'s <a>[[\Readable]]</a> slot is <code>false</code>,
-                <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>
-                <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to <code>false</code>.</li>
-                <li>Clear the <var>stream</var>'s read buffer.</li>
-                <li>Let <var>transport</var> be the <code><a>QuicTransportBase</a></code>,
-                which the <var>stream</var> was created from.
-                <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                <a>[[\QuicTransportReadableStreams]]</a> internal slot.</li>
-                <li>Let <var>abortInfo</var> be the first argument.</li>
-                <li>Start the closing procedure by sending a STOP_SENDING frame with its error
-                code set to the value of <var>abortInfo</var>.errorCode.</li>
-              </ol>
-              <table class="parameters">
-                <tbody>
-                  <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Nullable</th>
-                    <th>Optional</th>
-                    <th>Description</th>
-                  </tr>
-                  <tr>
-                    <td class="prmName">abortInfo</td>
-                    <td class="prmType"><code>QuicStreamAbortInfo</code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                </tbody>
-              </table>
-              <div>
-                <em>Return type:</em> <code>void</code>
-              </div>
-            </dd>
-           <dt><dfn><code>waitForReadable</code></dfn></dt>
-            <dd>
-              <p><code>waitForReadable</code> waits for data to become available, or
-              for the <code><a>QuicReadableStream</a></code> to be finished reading.  It
-              <a>resolves</a> the promise when the data queued in the read buffer
-              increases above the amount provided as an argument or when a STREAM frame
-              with the FIN bit set has been received. If <code>waitForReadable</code>
-              is called multiple times, multiple promises could be resolved.
-              The Promise will be <a>rejected</a> with a newly created
-              <code>InvalidStateError</code> if the <var>stream</var>'s
-              <a>[[\Readable]]</a> slot transitions from true to false and the promise
-              isn't <a>settled</a>. When the <code>waitForReadable</code> method is
-              called, the <a>user agent</a> <em class="rfc2119" title="MUST">MUST</em>
-              run the following steps:</p>
-              <ol>
-                <li>Let <var>stream</var> be the <code><a>QuicReadableStream</a></code>
-                on which <code>waitForReadable</code> is invoked.</li>
-                <li>Let <var>p</var> be a new promise.</li>
-                <li>If <var>stream</var>'s <a>[[\Readable]]</a> slot is
-                <code>false</code>, <a>reject</a> <var>p</var> with a
-                newly created <code>InvalidStateError</code> and abort
-                these steps.</li>
-                <li>Let <var>amount</var> be the first argument.</li>
-                <li><a>Resolve</a> <var>p</var> with <code>undefined</code> when
-                any of the following conditions are met:
-                  <ol>
-                    <li>The <a>[[\ReadableAmount]]</a> increases from
-                    below the value of <var>amount</var> to greater than or equal
-                    to it.</li>
-                    <li><var>stream</var> receives a STREAM frame with the
-                    FIN bit set and <a>[[\ReadableAmount]]</a> is less than
-                    <var>amount</var>.</li>
-                  </ol>
-                </li>
-              </ol>
-              <table class="parameters">
-                <tbody>
-                  <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Nullable</th>
-                    <th>Optional</th>
-                    <th>Description</th>
-                  </tr>
-                  <tr>
-                    <td class="prmName">amount</td>
-                    <td class="prmType"><code>unsigned long</code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                </tbody>
-              </table>
-              <div>
-                <em>Return type:</em> <code>Promise&lt;void&gt;</code>
-              </div>
-            </dd>
-        </dl>
+      <section id="streamwriteparameters*">
+        <h3><dfn>StreamWriteParameters</dfn> Dictionary</h3>
+        <p>The <code>StreamWriteParameters</code> dictionary includes information
+        relating to the data to be written with <code><a>OutgoingStream</a>.write</code>.</p>
+        <div>
+          <pre class="idl">
+dictionary StreamWriteParameters {
+  Uint8Array data;
+  boolean finished = false;
+};</pre>
+          <section>
+            <h2>Dictionary <a class="idlType">StreamWriteParameters</a> Members</h2>
+            <dl data-link-for="StreamWriteParameters" data-dfn-for="StreamWriteParameters" class=
+            "dictionary-members">
+              <dt><dfn><code>data</code></dfn> of type <span class=
+              "idlMemberType"><a>Uint8Array</a></span>.</dt>
+              <dd>
+                <p>The data to be written.</p>
+              </dd>
+              <dt><dfn><code>finished</code></dfn> of type <span class=
+              "idlMemberType">boolean</span>.</dt>
+              <dd>
+                <p>Set to <code>true</code> if this is the last data to be written.
+                For QUIC, this will result in a STREAM frame with the FIN bit set.</p>
+              </dd>
+            </dl>
+          </section>
+        </div>
       </section>
-      </div>
-    </section>
-    <section id="quicstream-interface-definition*">
-      <h3>Interface <dfn>QuicStream</dfn></h3>
-      <div>
-        <pre class="idl">
-        [ Exposed=Window ]
-        interface QuicStream {
-            readonly attribute unsigned long long streamId;
-            readonly attribute QuicTransportBase transport;
-        };
-        </pre>
-        <section>
-          <h2>Attributes</h2>
-          <dl data-link-for="QuicStream" data-dfn-for="QuicStream" class=
-          "attributes">
-            <dt><dfn><code>streamId</code></dfn> of type <span class=
-            "idlAttrType"><a>unsigned long long</a></span>, readonly</dt>
-            <dd>
-              <p>The readonly attribute referring to the ID of the
-              <code><a>QuicStream</a></code> object.</p>
-            </dd>
-            <dt><dfn><code>transport</code></dfn> of type <span class=
-            "idlAttrType"><a>QuicTransportBase</a></span>, readonly</dt>
-            <dd>
-              <p>The readonly attribute referring to the related <code><a>QuicTransportBase</a></code> object.</p>
-            </dd>
-          </dl>
-       </section>
-      </div>
-    </section>
-    <section id="quicbidirectionalstream-interface-definition*">
-      <h3>Interface <dfn>QuicBidirectionalStream</dfn></h3>
-      <div>
-        <pre class="idl">
-        [ Exposed=Window ]
-        interface QuicBidirectionalStream : QuicStream {
-        };
-        QuicBidirectionalStream includes QuicWritableStream;
-        QuicBidirectionalStream includes QuicReadableStream;
-        </pre>
-      </div>
-    </section>
-    <section id="quicsendstream-interface-definition*">
-      <h3>Interface <dfn>QuicSendStream</dfn></h3>
-      <div>
-        <pre class="idl">
-        [ Exposed=Window ]
-        interface QuicSendStream : QuicStream {
-        };
-        QuicSendStream includes QuicWritableStream;
-        </pre>
-      </div>
-    </section>
-    <section id="quicreceivestream-interface-definition*">
-      <h3>Interface <dfn>QuicReceiveStream</dfn></h3>
-      <div>
-        <pre class="idl">
-        [ Exposed=Window ]
-        interface QuicReceiveStream : QuicStream {
-        };
-        QuicReceiveStream includes QuicReadableStream;
-        </pre>
-      </div>
-    </section>
-    <section id="quicstreamwriteparameters*">
-      <h3><dfn>QuicStreamWriteParameters</dfn> Dictionary</h3>
-      <p>The <code>QuicStreamWriteParameters</code> dictionary includes information
-      relating to the data to be written with <code><a>QuicWritableStream</a>.write</code>.</p>
-      <div>
-        <pre class="idl">dictionary QuicStreamWriteParameters {
-             Uint8Array data;
-             boolean finished = false;
-        };
-        </pre>
-        <section>
-          <h2>Dictionary <a class="idlType">QuicStreamWriteParameters</a> Members</h2>
-          <dl data-link-for="QuicStreamWriteParameters" data-dfn-for="QuicStreamWriteParameters" class=
-          "dictionary-members">
-            <dt><dfn><code>data</code></dfn> of type <span class=
-            "idlMemberType"><a>Uint8Array</a></span>.</dt>
-            <dd>
-              <p>The data to be written.</p>
-            </dd>
-            <dt><dfn><code>finished</code></dfn> of type <span class=
-            "idlMemberType">boolean</span>.</dt>
-            <dd>
-              <p>Set to <code>true</code> if this is the last data to be written.
-              This will result in a STREAM frame with the FIN bit set.</p>
-            </dd>
-          </dl>
-        </section>
-      </div>
-    </section>
-    <section id="quicstreamresult*">
-      <h3><dfn>QuicStreamReadResult</dfn> Dictionary</h3>
-      <p>The <code>QuicStreamReadResult</code> dictionary includes information
-      relating to the result returned from <code>readInto</code>.</p>
-      <div>
-        <pre class="idl">dictionary QuicStreamReadResult {
-             unsigned long amount;
-             boolean finished = false;
-        };
-        </pre>
-        <section>
-          <h2>Dictionary <a class="idlType">QuicStreamReadResult</a> Members</h2>
-          <dl data-link-for="QuicStreamReadResult" data-dfn-for="QuicStreamReadResult" class=
-          "dictionary-members">
-            <dt><dfn><code>amount</code></dfn> of type <span class=
-            "idlMemberType"><a>unsigned long</a></span>.</dt>
-            <dd>
-              <p>The amount of data read in bytes.</p>
-            </dd>
-            <dt><dfn><code>finished</code></dfn> of type <span class=
-            "idlMemberType">boolean</span>.</dt>
-            <dd>
-              <p>Set to <code>true</code> if the <code><a>QuicReadableStream</a></code> has
-              <a>finished reading</a>.</p>
-            </dd>
-          </dl>
-        </section>
-      </div>
-    </section>
-    <section id="quicstreamabortinfo*">
-      <h3><dfn>QuicStreamAbortInfo</dfn> Dictionary</h3>
-      <p>The <code>QuicStreamAbortInfo</code> dictionary includes information
-      relating to the error code for aborting a QUIC stream. This could be used either
-      in a RST_STREAM frame or STOP_SENDING frame.</p>
-      <div>
-        <pre class="idl">dictionary QuicStreamAbortInfo {
-             unsigned short errorCode = 0;
-        };
-        </pre>
-        <section>
-          <h2>Dictionary <a class="idlType">QuicStreamAbortInfo</a> Members</h2>
-          <dl data-link-for="QuicStreamAbortInfo" data-dfn-for="QuicStreamAbortInfo" class=
-          "dictionary-members">
-            <dt><dfn><code>errorCode</code></dfn> of type <span class=
-            "idlMemberType"><a>unsigned short</a></span>.</dt>
-            <dd>
-              <p>The error code used in the RST_STREAM or STOP_SENDING frame.
-              The default value of 0 means "STOPPING."</p>
-            </dd>
-          </dl>
-        </section>
-      </div>
-    </section>
+      <section id="StreamAbortInfo*">
+        <h3><dfn>StreamAbortInfo</dfn> Dictionary</h3>
+        <p>The <code>StreamAbortInfo</code> dictionary includes information
+        relating to the error code for aborting an incoming or outgoing stream. 
+        (For QUIC, in either a RST_STREAM frame or a STOP_SENDING frame).</p>
+        <div>
+          <pre class="idl">dictionary StreamAbortInfo {
+                unsigned short errorCode = 0;
+          };
+          </pre>
+          <section>
+            <h2>Dictionary <a class="idlType">StreamAbortInfo</a> Members</h2>
+            <dl data-link-for="StreamAbortInfo" data-dfn-for="StreamAbortInfo" class=
+            "dictionary-members">
+              <dt><dfn><code>errorCode</code></dfn> of type <span class=
+              "idlMemberType"><a>unsigned short</a></span>.</dt>
+              <dd>
+                <p>The error code.  The default value of 0 means "STOPPING."</p>
+              </dd>
+            </dl>
+          </section>
+        </div>
+      </section>
+    </div>
   </section>
+
+  <section id="incoming-stream*">
+    <h2>Interface Mixin <dfn>IncomingStream</dfn></h2>
+    <p>
+        An OutgoingStream is a stream that can be read fromn, 
+        as either a <code>ReceiveStream </code>or a <code>BidirectionalStream</code>
+    </p>    
+    <div>
+      <pre class="idl">
+[ Exposed=Window ]
+interface mixin IncomingStream {
+    readonly attribute boolean readable;
+    readonly attribute unsigned long readableAmount;
+    readonly attribute Promise&lt;StreamAbortInfo&gt; readingAborted;
+    StreamReadResult readInto (Uint8Array data);
+    void abortReading (StreamAbortInfo abortInfo);
+    Promise&lt;void&gt;   waitForReadable(unsigned long amount);
+};</pre>
+      <section>
+        <h3>Overview</h3>
+        <p>The <code><a>IncomingStream</a></code> will initialize with
+        the following:</p>
+        <ol>
+          <li>Let <var>stream</var> be the <code><a>IncomingStream</a></code>.</li>
+          <li>Let <var>stream</var> have a <dfn>[[\Readable]]</dfn> internal
+          slot initialized to <code>true</code>.</li>
+          <li>Let <var>stream</var> have a <dfn>[[\ReadableAmount]]</dfn> internal
+          slot initialized to zero.</li>
+        </ol>
+      </section>
+      <section>
+        <h3>Attributes</h3>
+        <dl data-link-for="IncomingStream" data-dfn-for="IncomingStream" class=
+        "attributes">
+          <dt><code>readable</code> of type <span class="idlAttrType"><a>boolean</a></span>,
+          readonly</dt>
+          <dd>
+            <p>The <dfn id="dom-incomingstream-readableamount"><code>readable</code></dfn>
+            attribute represents whether data can be read from the <code><a>IncomingStream</a></code>.
+            On getting, it <em class="rfc2119" title="MUST">MUST</em> return the value of the
+            <code><a>IncomingStream</a></code>'s <a>[[\Readable]]</a> slot.
+          </dd>
+          <dt><code>readableAmount</code> of type <span class="idlAttrType"><a>unsigned
+          long</a></span>, readonly</dt>
+          <dd>
+            <p>The <dfn id="dom-incomingstream-readableamount"><code>readableAmount</code></dfn>
+            attribute represents the number of bytes buffered for access by
+            <code>readInto</code> but that, as of the last time the event loop
+            started executing a task, had not yet been read. This does not include
+            framing overhead incurred by the protocol, or buffers associated with
+            the network hardware. On getting, it <em class="rfc2119" title="MUST">MUST</em>
+            return the value of the <code><a>IncomingStream</a></code>'s
+            <a>[[\ReadableAmount]]</a> internal slot.</p>
+          </dd>
+          <dt><code>readingAborted</code> of type <span class="idlAttriType"><a>StreamAbortInfo</a>
+          readonly</dt>
+          <dd>
+            <p>The <dfn id="dom-incomingstream-readingAborted"><code>readingAborted</code></dfn>
+            attribute represents a promise that <a>resolves</a> when the
+            a message is received inidicating the remote side aborted the stream.
+            For QUIC, this is a RST_STREAM frame.
+            When the <var>stream</var> receives this message, the <a>user agent</a>
+            <em class="rfc2119" title="MUST">MUST</em> run the following:
+            <ol>
+              <li>Let <var>stream</var> be the <code><a>IncomingStream</a></code>
+              object for which the abort message was received.</li>
+              <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to <code>false</code>.</li>
+              <li>Clear the <var>stream</var>'s read buffer.</li>
+              <li>Let <var>transport</var> be the <code><a>DataTransport</a></code>,
+              which the <var>stream</var> was created from.
+              <li>Remove the <var>stream</var> from the <var>transport</var>'s
+              <a>[[\IncomingStreams]]</a> internal slot.</li>
+              <li><a>resolve</a> the promise with the resulting
+              <code><a>StreamAbortInfo</a></code> with <code>errorCode</code>
+              set to the value of the errror code from the abot message.</li>
+            </ol>
+          </dd>
+        </dl>
+      </section>
+      <section>
+        <h3>Methods</h3>
+        <dl data-link-for="IncomingStream" data-dfn-for="IncomingStream" class=
+        "methods">
+          <dt><dfn><code>readInto</code></dfn></dt>
+          <dd>
+            <p>Reads from the <code><a>IncomingStream</a></code> into the buffer specified
+            by the first argument and returns <code><a>StreamReadResult</a></code>.
+            When the <code>readInto</code> method is called, the user agent
+            <em class="rfc2119" title="MUST">MUST</em> run the following steps:</p>
+            <ol>
+              <li>Let <var>stream</var> be the <code><a>IncomingStream</a></code> object
+              on which <code>readInto</code> is invoked.</li>
+              <li>If <var>stream</var>'s <a>[[\Readable]]</a> slot is <code>false</code>,
+              <a>throw</a> an <code>InvalidStateError</code>, then abort these steps.</li>
+              <li>Let <var>data</var> be the first argument.</li>
+              <li>Let <var>result</var> be the <code><a>StreamReadResult</a></code>
+              to be returned.</li>
+              <li>If <var>stream</var> has <a>finished reading</a>, return
+              <var>result</var> with <code>amount</code> set to 0 and <code>finished</code> set to
+              <code>true</code> and abort these steps.</li>
+              <li>Transfer data from the read buffer into <var>data</var>.</li>
+              <li>Decrease the value of <var>stream</var>'s <a>[[\ReadableAmount]]</a>
+              slot by the length of <var>data</var> in bytes.</li>
+              <li>Set <var>result</var>'s <code>amount</code> to the size of
+              <var>data</var> in bytes.</li>
+              <li>If the <var>data</var> includes up to the indication of the end of the stream
+                (for QUIC, the FIN bit), then run the following steps:</li>
+              <ol>
+                <li>Set <var>result</var>'s <code>finished</code> to <code>true</code>.</li>
+                <li>Set the <var>stream</var>'s <a>[[\Readable]]</a> slot to
+                <code>false</code>.</li>
+                <li>Let <var>transport</var> be the <code><a>DataTransport</a></code>,
+                which the <var>stream</var> was created from.
+                <li>Remove the <var>stream</var> from the <var>transport</var>'s
+                <a>[[\IncomingStreams]]</a> internal slot.</li>
+              </ol>
+              <li>Else, set <var>result</var>'s <code>finished</code> to false.</li>
+              <li>Return <var>result</var>.
+            </ol>
+            <table class="parameters">
+              <tbody>
+                <tr>
+                  <th>Parameter</th>
+                  <th>Type</th>
+                  <th>Nullable</th>
+                  <th>Optional</th>
+                  <th>Description</th>
+                </tr>
+                <tr>
+                  <td class="prmName">data</td>
+                  <td class="prmType"><code>Uint8Array</code></td>
+                  <td class="prmNullFalse"><span role="img" aria-label=
+                  "False">&#10008;</span></td>
+                  <td class="prmOptFalse"><span role="img" aria-label=
+                  "False">&#10008;</span></td>
+                  <td class="prmDesc"></td>
+                </tr>
+              </tbody>
+            </table>
+            <div>
+              <em>Return type:</em> <code><a>StreamReadResult</a></code>
+            </div>
+          </dd>
+          <dt><dfn><code>abortReading</code></dfn></dt>
+          <dd>
+            <p>A hard shutdown of the <code><a>IncomingStream</a></code>. It may be called
+            regardless of whether the <code><a>IncomingStream</a></code> object
+            was created by the local or remote peer. When the <code>abortReading()</code>
+            method is called, the user agent <em class="rfc2119" title="MUST">MUST</em>
+            run the following steps:</p>
+            <ol>
+              <li>Let <var>stream</var> be the <code><a>IncomingStream</a></code> object
+              which is about to abort reading.</li>
+              <li>If <var>stream</var>'s <a>[[\Readable]]</a> slot is <code>false</code>,
+              <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>
+              <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to <code>false</code>.</li>
+              <li>Clear the <var>stream</var>'s read buffer.</li>
+              <li>Let <var>transport</var> be the <code><a>DataTransport</a></code>,
+              which the <var>stream</var> was created from.
+              <li>Remove the <var>stream</var> from the <var>transport</var>'s
+              <a>[[\IncomingStreams]]</a> internal slot.</li>
+              <li>Let <var>abortInfo</var> be the first argument.</li>
+              <li>Start the closing procedure by sending a message to the remote side indicating
+                that the stream has been aborted (for QUIC, this is a STOP_SENDING frame) with its error
+                code set to the value of <var>abortInfo</var>.errorCode.</li>
+            </ol>
+            <table class="parameters">
+              <tbody>
+                <tr>
+                  <th>Parameter</th>
+                  <th>Type</th>
+                  <th>Nullable</th>
+                  <th>Optional</th>
+                  <th>Description</th>
+                </tr>
+                <tr>
+                  <td class="prmName">abortInfo</td>
+                  <td class="prmType"><code>StreamAbortInfo</code></td>
+                  <td class="prmNullFalse"><span role="img" aria-label=
+                  "False">&#10008;</span></td>
+                  <td class="prmOptFalse"><span role="img" aria-label=
+                  "False">&#10008;</span></td>
+                  <td class="prmDesc"></td>
+                </tr>
+              </tbody>
+            </table>
+            <div>
+              <em>Return type:</em> <code>void</code>
+            </div>
+          </dd>
+          <dt><dfn><code>waitForReadable</code></dfn></dt>
+          <dd>
+            <p><code>waitForReadable</code> waits for data to become available, or
+            for the <code><a>IncomingStream</a></code> to be finished reading.  It
+            <a>resolves</a> the promise when the data queued in the read buffer
+            increases above the amount provided as an argument or when a 
+            message is received with an end indication (for QUIC, a STREAM frame
+            with the FIN bit set). If <code>waitForReadable</code>
+            is called multiple times, multiple promises could be resolved.
+            The Promise will be <a>rejected</a> with a newly created
+            <code>InvalidStateError</code> if the <var>stream</var>'s
+            <a>[[\Readable]]</a> slot transitions from true to false and the promise
+            isn't <a>settled</a>. When the <code>waitForReadable</code> method is
+            called, the <a>user agent</a> <em class="rfc2119" title="MUST">MUST</em>
+            run the following steps:</p>
+            <ol>
+              <li>Let <var>stream</var> be the <code><a>IncomingStream</a></code>
+              on which <code>waitForReadable</code> is invoked.</li>
+              <li>Let <var>p</var> be a new promise.</li>
+              <li>If <var>stream</var>'s <a>[[\Readable]]</a> slot is
+              <code>false</code>, <a>reject</a> <var>p</var> with a
+              newly created <code>InvalidStateError</code> and abort
+              these steps.</li>
+              <li>Let <var>amount</var> be the first argument.</li>
+              <li><a>Resolve</a> <var>p</var> with <code>undefined</code> when
+              any of the following conditions are met:
+                <ol>
+                  <li>The <a>[[\ReadableAmount]]</a> increases from
+                  below the value of <var>amount</var> to greater than or equal
+                  to it.</li>
+                  <li><var>stream</var> receives a STREAM frame with the
+                  FIN bit set and <a>[[\ReadableAmount]]</a> is less than
+                  <var>amount</var>.</li>
+                </ol>
+              </li>
+            </ol>
+            <table class="parameters">
+              <tbody>
+                <tr>
+                  <th>Parameter</th>
+                  <th>Type</th>
+                  <th>Nullable</th>
+                  <th>Optional</th>
+                  <th>Description</th>
+                </tr>
+                <tr>
+                  <td class="prmName">amount</td>
+                  <td class="prmType"><code>unsigned long</code></td>
+                  <td class="prmNullFalse"><span role="img" aria-label=
+                  "False">&#10008;</span></td>
+                  <td class="prmOptFalse"><span role="img" aria-label=
+                  "False">&#10008;</span></td>
+                  <td class="prmDesc"></td>
+                </tr>
+              </tbody>
+            </table>
+            <div>
+              <em>Return type:</em> <code>Promise&lt;void&gt;</code>
+            </div>
+          </dd>
+        </dl>
+      </section>
+      <section id="quicstreamresult*">
+        <h3><dfn>StreamReadResult</dfn> Dictionary</h3>
+        <p>The <code>StreamReadResult</code> dictionary includes information
+        relating to the result returned from <code>readInto</code>.</p>
+        <div>
+          <pre class="idl">dictionary StreamReadResult {
+                unsigned long amount;
+                boolean finished = false;
+          };
+          </pre>
+          <section>
+            <h2>Dictionary <a class="idlType">StreamReadResult</a> Members</h2>
+            <dl data-link-for="StreamReadResult" data-dfn-for="StreamReadResult" class=
+            "dictionary-members">
+              <dt><dfn><code>amount</code></dfn> of type <span class=
+              "idlMemberType"><a>unsigned long</a></span>.</dt>
+              <dd>
+                <p>The amount of data read in bytes.</p>
+              </dd>
+              <dt><dfn><code>finished</code></dfn> of type <span class=
+              "idlMemberType">boolean</span>.</dt>
+              <dd>
+                <p>Set to <code>true</code> if the <code><a>IncomingStream</a></code> has
+                <a>finished reading</a>.</p>
+              </dd>
+            </dl>
+          </section>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <section id="data-transport-stream*">
+    <h2>Interface <dfn>DataTransportStream</dfn></h2>
+    <p>A collection of common attributes and methods of all streams.</p>
+    <div>
+      <pre class="idl">
+      [ Exposed=Window ]
+      interface DataTransportStream {
+          readonly attribute unsigned long long streamId;
+          readonly attribute DataTransport transport;
+      };
+      </pre>
+      <section>
+        <h2>Attributes</h2>
+        <dl data-link-for="QuicStream" data-dfn-for="QuicStream" class=
+        "attributes">
+          <dt><dfn><code>streamId</code></dfn> of type <span class=
+          "idlAttrType"><a>unsigned long long</a></span>, readonly</dt>
+          <dd>
+            <p>The readonly attribute referring to the ID of the
+            <code><a>TransportStream</a></code> object.</p>
+          </dd>
+          <dt><dfn><code>transport</code></dfn> of type <span class=
+          "idlAttrType"><a>DataTransport</a></span>, readonly</dt>
+          <dd>
+            <p>The readonly attribute referring to the related <code><a>DataTransport</a></code> object.</p>
+          </dd>
+        </dl>
+      </section>
+    </div>
+  </section>
+
+  <section id="bidirectional-stream*">
+    <h2>Interface <dfn>BidirectionalStream</dfn></h2>
+    <div>
+      <pre class="idl">
+      [ Exposed=Window ]
+      interface BidirectionalStream : DataTransportStream {
+      };
+      BidirectionalStream includes OutgoingStream;
+      BidirectionalStream includes IncomingStream;
+      </pre>
+    </div>
+  </section>
+
+  <section id="send-stream*">
+    <h2>Interface <dfn>SendStream</dfn></h2>
+    <div>
+      <pre class="idl">
+      [ Exposed=Window ]
+      interface SendStream : DataTransportStream {
+      };
+      SendStream includes OutgoingStream;
+      </pre>
+    </div>
+  </section>
+
+  <section id="receive-stream*">
+    <h3>Interface <dfn>ReceiveStream</dfn></h3>
+    <div>
+      <pre class="idl">
+      [ Exposed=Window ]
+      interface ReceiveStream : DataTransportStream {
+      };
+      ReceiveStream includes IncomingStream;
+      </pre>
+    </div>
+  </section>
+
   <section id="privacy-security">
     <h2>Privacy and Security Considerations</h2>
     <p>This section is non-normative; it specifies no new behaviour, but
@@ -1793,9 +1893,10 @@ interface QuicTransport : QuicTransportBase {
       TLS 1.3 [[TLS13]] in order to encrypt communications, it provides confidentiality.</p>
     </section>
   </section>
+
   <section class="informative">
     <h2>Event summary</h2>
-    <p>The following events fire on <code><a>QuicTransportBase</a></code> objects:</p>
+    <p>The following events fire on transport objects:</p>
     <table style="border-width:0; width:60%" border="1">
       <tbody>
         <tr>
@@ -1808,42 +1909,43 @@ interface QuicTransport : QuicTransportBase {
         <tr>
           <td><code>error</code></td>
           <td><code><a>ErrorEvent</a></code></td>
-          <td>The <code><a>QuicTransportBase</a></code> object has encountered an error.</td>
+          <td>The <code><a>DataTransport</a></code> object has encountered an error.</td>
         </tr>
         <tr>
           <td><code>statechange</code></td>
           <td><code><a>Event</a></code></td>
-          <td>The <code><a>QuicTransportState</a></code> changed.</td>
+          <td>The <code><a>DataTransportState</a></code> changed.</td>
         </tr>
         <tr>
           <td><dfn><code>receivestream</code></dfn></td>
           <td><code><a>ReceiveStreamEvent</a></code></td>
-          <td>A new <code><a>QuicReceiveStream</a></code> is dispatched to the
-          script in response to the remote peer creating a send only QUIC stream and
+          <td>A new <code><a>ReceiveStream</a></code> is dispatched to the
+          script in response to the remote peer creating a send-only stream and
           sending data on it. Prior to <code><a>receivestream</a></code>
-          firing, the <code><a>QuicReceiveStream</a></code> is added to
-          <code><a>QuicTransportBase</a></code>'s <a>[[\QuicTransportReadableStreams]]</a>
+          firing, the <code><a>ReceiveStream</a></code> is added to
+          <code><a>DataTransport</a></code>'s <a>[[\IncomingStreams]]</a>
           internal slot.</td>
         </tr>
         <tr>
           <td><dfn><code>bidirectionalstream</code></dfn></td>
           <td><code><a>BidirectionalStreamEvent</a></code></td>
-          <td>A new <code><a>QuicBidirectionalStream</a></code> is dispatched to the
-          script in response to the remote peer creating a bidirectional QUIC stream and
+          <td>A new <code><a>BidirectionalStream</a></code> is dispatched to the
+          script in response to the remote peer creating a bidirectional stream and
           sending data on it. Prior to <code><a>bidirectionalstream</a></code>
-          firing, the <code><a>QuicBidirectionalStream</a></code> is added to the
-          <code><a>QuicTransportBase</a></code>'s <a>[[\QuicTransportReadableStreams]]</a>
-          and <a>[[\QuicTransportWritableStreams]]</a> internal slots.</td>
+          firing, the <code><a>BidirectionalStream</a></code> is added to the
+          <code><a>DataTransport</a></code>'s <a>[[\IncomingStreams]]</a>
+          and <a>[[\OutgoingStreams]]</a> internal slots.</td>
         </tr>
         <tr>
           <td><dfn><code>datagramsreceived</code></dfn></td>
           <td><code><a>DatagramsReceivedEvent</a></code></td>
-          <td>The <code><a>QuicTransportBase</a></code> object has received some data
+          <td>The <code><a>DatagramTransport</a></code> object has received some data
             as a result of the remote side calling <code>sendDatagram</code></td>
         </tr>
       </tbody>
     </table>
   </section>
+
   <section id="examples*">
     <h2>Examples</h2>
     <section class="informative" id="unreliableexamples*">
@@ -1851,53 +1953,53 @@ interface QuicTransport : QuicTransportBase {
       <p>Unreliable delivery can be achieved by creating many streams with retransmissions disabled,
       each transporting a single small message.</p>
       <pre class="example highlight">
-      let quic = getQuicTransport();
-      let messages = getMessages();
-      for (msg in messages) {
-        quic.createSendStream({disableRetransmissions: true}).write({data: msg, finished: true});
-      }
-      </pre>
-  </section>
-  <section class="informative" id="datagramexample1*">
-    <h3>Sending a buffer of QUIC datagrams</h3>
-    <p>Sending a buffer of QUIC datagrams can be achieved by using the
-    <code>sendDatagram</code> and <code>readyToSendDatagram</code> methods. In
-    the following example datagrams are only sent if the
-    <code>QuicTransport</code> is ready to send, however the sending is not
-    blocked on the ACK promise returned from <code>sendDatagram</code> (these are
-    ignored in this example).</p>
-    <pre class="example highlight">
-    const quic = getQuicTransport();
-    const datagrams = getDatagramsToSend();
-    datagrams.forEach((datagram) => {
-      await quic.readyToSendDatagram();
-      quic.sendDatagram(datagram);
-    });
-    </pre>
-  </section>
-  <section class="informative" id="datagramexample2*">
-    <h3>Sending QUIC datagrams at a fixed rate</h3>
-    <p>Sending QUIC datagrams at a fixed rate regardless if the transport is ready to
-    send can be achieved by simply using <code>sendDatagram</code> and not using
-    the <code>readyToSendDatagram</code> method. More complex scenarios can utilize
-    the <code>readyToSendDatagram</code> method.</p>
-    <pre class="example highlight">
-    // Sends datagrams every 100 ms.
-    const quic = getQuicTransport();
-    setInterval(() => {
-      quic.sendDatagram(createDatagram());
-    }, 100);
-    </pre>
-  </section>
-  <section class="informative" id="datagramexample3*">
-      <h3>Receiving QUIC datagrams</h3>
-      <p>Receiving QUIC datagrams can be achieved by simply listening to the
+let transport = getTransport();
+let messages = getMessages();
+for (msg in messages) {
+  transport.createSendStream({disableRetransmissions: true}).write({data: msg, finished: true});
+}</pre>
+    </section>
+
+    <section class="informative" id="datagramexample1*">
+      <h3>Sending a buffer of datagrams</h3>
+      <p>Sending a buffer of datagrams can be achieved by using the
+      <code>sendDatagram</code> and <code>readyToSendDatagram</code> methods. In
+      the following example datagrams are only sent if the
+      <code>DatagramTransport</code> is ready to send, however the sending is not
+      blocked on the ACK promise returned from <code>sendDatagram</code> (these are
+      ignored in this example).</p>
+      <pre class="example highlight">
+const transport = getTransport();
+const datagrams = getDatagramsToSend();
+datagrams.forEach((datagram) => {
+  await transport.readyToSendDatagram();
+  transport.sendDatagram(datagram);
+});</pre>
+    </section>
+
+    <section class="informative" id="datagramexample2*">
+      <h3>Sending datagrams at a fixed rate</h3>
+      <p>Sending datagrams at a fixed rate regardless if the transport is ready to
+      send can be achieved by simply using <code>sendDatagram</code> and not using
+      the <code>readyToSendDatagram</code> method. More complex scenarios can utilize
+      the <code>readyToSendDatagram</code> method.</p>
+      <pre class="example highlight">
+// Sends datagrams every 100 ms.
+const transport = getTransport();
+setInterval(() => {
+  transport.sendDatagram(createDatagram());
+}, 100);</pre>
+    </section>
+
+    <section class="informative" id="datagramexample3*">
+      <h3>Receiving datagrams</h3>
+      <p>Receiving datagrams can be achieved by simply listening to the
       <code>datagramsreceived</code>, remembering to check for null values
       indicating the event handler is not processing the events quickly enough.
       </p>
       <pre class="example highlight">
-      const quic = getQuicTransport();
-      const datagrams = await quic.receiveDatagrams();
+      const transport = getTransport();
+      const datagrams = await transport.receiveDatagrams();
       for (let data of datagrams) {
         if (data == null) {
           // Log that datagrams were lost. Look into making the event handler faster
@@ -1908,12 +2010,14 @@ interface QuicTransport : QuicTransportBase {
       };
       </pre>
     </section>
-</section>
- <section id="change-log*">
+  </section>
+
+  <section id="change-log*">
     <h2>Change Log</h2>
     <p>This section will be removed before publication.</p>
- </section>
- <section class="appendix">
+  </section>
+
+  <section class="appendix">
     <h2>Acknowledgements</h2>
     <p>The editors wish to thank the Working Group chairs and Team Contact,
     Harald Alvestrand, Stefan H&aring;kansson, Bernard Aboba and Dominique
@@ -1922,6 +2026,6 @@ interface QuicTransport : QuicTransportBase {
     <p>The <code><a>QuicTransport</a></code> and <code><a>QuicStream</a></code> objects
     were initially described in the <a href="https://www.w3.org/community/ortc/">W3C ORTC CG</a>,
     and have been adapted for use in this specification.</p>
- </section>
+  </section>
 </body>
 </html>

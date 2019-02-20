@@ -449,8 +449,8 @@ interface QuicTransportBase {
             <dd>
               <p>If datagrams have been received since the last call to receiveDatagrams(),
 		 return a new promise resolved with all of the received datagrams. </p>
-              <p>If not, return a new promise that will resolve when the next datagram is received, 
-		 resolved with the the datagram received. </p>
+              <p>If not, return a new promise that will resolve when more datagrams are received, 
+		 resolved with all datagrams received. </p>
               <p>If too many datagrams are queued between calls to receiveDatagrams(), 
                  the implementation may drop datagrams and replace them with a null value
                  in the sequence of datagrams returned in the next call to receiveDatagrams(). 

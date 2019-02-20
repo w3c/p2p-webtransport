@@ -1709,12 +1709,6 @@ interface QuicTransport : QuicTransportBase {
           <code><a>QuicTransportBase</a></code>'s <a>[[\QuicTransportReadableStreams]]</a>
           and <a>[[\QuicTransportWritableStreams]]</a> internal slots.</td>
         </tr>
-        <tr>
-          <td><dfn><code>datagramsreceived</code></dfn></td>
-          <td><code><a>DatagramsReceivedEvent</a></code></td>
-          <td>The <code><a>QuicTransportBase</a></code> object has received some data
-            as a result of the remote side calling <code>sendDatagram</code></td>
-        </tr>
       </tbody>
     </table>
   </section>
@@ -1765,9 +1759,9 @@ interface QuicTransport : QuicTransportBase {
   </section>
   <section class="informative" id="datagramexample3*">
       <h3>Receiving QUIC datagrams</h3>
-      <p>Receiving QUIC datagrams can be achieved by simply listening to the
-      <code>datagramsreceived</code>, remembering to check for null values
-      indicating the event handler is not processing the events quickly enough.
+      <p>Receiving QUIC datagrams can be achieved by using the
+      <code>receiveDatagrams</code> method, remembering to check for null values
+      indicating that packets are not being processed quickly enough.
       </p>
       <pre class="example highlight">
       const quic = getQuicTransport();

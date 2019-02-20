@@ -92,7 +92,7 @@
       All stream data is encrypted and congestion-controlled.
     </p>
     <pre class="idl">
-interface UnidirectionalStreamsTransport {
+interface mixin UnidirectionalStreamsTransport {
   Promise&lt;SendStream&gt; createSendStream (optional SendStreamParameters parameters);
   attribute EventHandler    onreceivestream;
 };</pre>
@@ -519,7 +519,7 @@ dictionary BidirectionalStreamEventInit : EventInit {
       Datagrams are encrypted and congestion controlled.
       </p>
       <pre class="idl">
-interface DatagramTransport {
+interface mixin DatagramTransport {
     readonly attribute unsigned short         maxDatagramSize;
     Promise&lt;void&gt                        readyToSendDatagram ();
     Promise&lt;boolean&gt                     sendDatagram (Uint8Array data);
@@ -840,7 +840,7 @@ interface DatagramsReceivedEvent : Event {
       such as state, state changes, and the ability to stop the transport.
     </p>
     <pre class="idl">
-interface DataTransport {
+interface mixin DataTransport {
   readonly attribute TransportState state;
   void                                  stop (DataTransportStopInfo stopInfo);
            attribute EventHandler       onstatechange;

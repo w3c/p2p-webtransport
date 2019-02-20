@@ -717,7 +717,7 @@ interface BidirectionalStreamEvent : Event {
       <h3>Interface Definition</h3>
       <div>
         <pre class="idl">
-        [ Constructor (DOMString url), Exposed=Window]
+        [ Constructor (DOMString host, unsigned short port), Exposed=Window]
 interface QuicTransport : QuicTransportBase {
 };</pre>
         <section>
@@ -726,14 +726,10 @@ interface QuicTransport : QuicTransportBase {
           the user agent <em class="rfc2119" title="MUST">MUST</em> run the
           following steps:
           <ol>
-            <li>Let <var>url</var> be the first argument.</li>
-            <li>Let <var>parsedUrl</var> be the result of appyling the 
-              <a href="https://url.spec.whatwg.org/#concept-url-parser">URL parser</a> to <var>url<var>.
+            <li>
+                If <var>port</var> is 0,
+                <a>throw</a> an <code>NotSupportedError</code> and abort these steps.
             </li>
-            <li>If <var>parsedUrl</var> is a failure, then throw a "SyntaxError" DOMException.</li>
-            <li>If <var>parsedUrl</var>'s scheme is not "quic", then throw a "SyntaxError" DOMException.</li>
-            <li>If <var>parsedUrl</var>'s username, password, path, query, or fragment is non-null,
-              then throw a "SyntaxError" DOMException.</li>
             <li>
               Let <var>quictransport</var> be a newly constructed
               <code><a>QuicTransport</a></code> object.
@@ -753,7 +749,7 @@ interface QuicTransport : QuicTransportBase {
             <li>Run these steps in parallel:
               <ol>
                 <li>Establish a QUIC connection to the address identified by the
-                  <var>parsedUrl</var>'s host and port.  
+                  given host and port.  
                   During connection establishment, use of this API must be indicated 
                   by selecting the ALPN [[!ALPN]] token "wq" in the crypto handshake 
                   and including a QUIC transport parameter with ID web_client(0x333C)

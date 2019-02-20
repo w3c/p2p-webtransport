@@ -447,70 +447,17 @@ interface QuicTransportBase {
             </dd>
             <dt><dfn><code>receiveDatagrams</code></dfn></dt>
             <dd>
-              <p>Deque and return all QUIC datagrams that have been received.</p>
-              <p>When <code>receiveDatagrams</code> is called, the user agent
-                <em class="rfc2119" title="MUST">MUST</em> run the following
-                steps:</p>
-              <ol>
-                <li>
-                    <p>If <code>[[\QuicTransportReceiveDatagramsPromise]]</code> is not null, 
-                    return a new promise rejected with an <code>InvalidStateError</code>
-                    and abort these steps.</p>
-                </li>
-                <li>
-                  <p>Deque all datagrams from <code>[[\QuicTransportReceivedDatagrams]]</code>.
-                  Let <var>dequedDatagrams</var> be the dequed datagrams.</p>
-                </li>
-                <li>
-                  <p>If <var>dequedDatagrams</var> has at least one datagram,
-                  return a new promise resolved with <var>dequedDatagrams</var>
-                  and abort these steps.</p>
-                </li>
-                <li>
-                    <p>Set <code>[[\QuicTransportReceiveDatagramsPromise]]</code> to a
-                    new promise.</p>
-                </li>
-                <li>
-                  <p>Return <var>[[\QuicTransportReceiveDatagramsPromise]].</p>
-                </li>
-              <ol>
-              <p>When a datagram is received, the user agent
-                 <em class="rfc2119" title="MUST">MUST</em> run the following
-                 steps:</p>
-              <ol>
-                <li>
-                  <p>Let <code>receivedDatagram</code> be the received datagram.</p>
-                </li>
-                <li>
-                  If <code>[[\QuicTransportReceivedDatagrams]]</code> is too
-                  large (determining how large is too large is implementation
-                  specific), queue <code>null</code> onto
-                  [[\QuicTransportReceivedDatagrams]] and abort these steps.  
-                  If [[\QuicTransportReceivedDatagrams]] has multiple 
-                  <code>null</code> values at the end of the queue, they may be 
-                  coalesced into one <code>null</code> value.
-                </li>
-                <li>
-                  <p>Queue <code>receivedDatagram</code> onto
-                  <code>[[\QuicTransportReceivedDatagrams]]</code>.</p>
-                </li>
-                <li>
-                  <p>If <code>[[\QuicTransportReceiveDatagramsPromise]]</code> is null, 
-                  abort these steps.</p>
-                </li>
-                <li>
-                  <p>Deque all datagrams from <code>[[\QuicTransportReceivedDatagrams]]</code>.
-                    Let <var>dequedDatagrams</var> be the dequed datagrams.</p>
-                  </li>
-                <li>
-                  <p>Resolve <code>[[\QuicTransportReceiveDatagramsPromise]]</code> 
-                  with <var>dequedDatagrams</var>.
-                </li>
-                <li>
-                    <p>Set <code>[[\QuicTransportReceiveDatagramsPromise]]</code> 
-                    to <var>null</var>.
-                </li>
-              </ol>
+              <p>If datagrams have been received since the last call to receiveDatagrams(),
+		 return a new promise resolved with all of the received datagrams. </p>
+              <p>If not, return a new promise that will resolve when the next datagram is received, 
+		 resolved with the the datagram received. </p>
+              <p>If too many datagrams are queued between calls to receiveDatagrams(), 
+                 the implementation may drop datagrams and replace them with a null value
+                 in the sequence of datagrams returned in the next call to receiveDatagrams(). 
+		 One null value may represent many dropped datagrams.<p>
+              <p>receiveDatagrams() may only be called once a time. 
+		 If a promised returned from a previous call is still unresolved, 
+		 the user agent MUST return a new promise rejected with an InvalidStateError. </p>
               <div>
                 <em>Return type:</em> <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;</code>
               </div>

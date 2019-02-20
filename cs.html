@@ -455,7 +455,7 @@ interface QuicTransportBase {
                  the implementation may drop datagrams and replace them with a null value
                  in the sequence of datagrams returned in the next call to receiveDatagrams(). 
 		 One null value may represent many dropped datagrams.<p>
-              <p>receiveDatagrams() may only be called once a time. 
+              <p>receiveDatagrams() may only be called once at a time. 
 		 If a promised returned from a previous call is still unresolved, 
 		 the user agent MUST return a new promise rejected with an InvalidStateError. </p>
               <div>

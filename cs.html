@@ -666,70 +666,17 @@ interface mixin DatagramTransport {
         </dd>
         <dt><dfn><code>receiveDatagrams</code></dfn></dt>
         <dd>
-          <p>Deque and return all datagrams that have been received.</p>
-          <p>When <code>receiveDatagrams</code> is called, the user agent
-            <em class="rfc2119" title="MUST">MUST</em> run the following
-            steps:</p>
-          <ol>
-            <li>
-                <p>If <code>[[\ReceiveDatagramsPromise]]</code> is not null, 
-                return a new promise rejected with an <code>InvalidStateError</code>
-                and abort these steps.</p>
-            </li>
-            <li>
-              <p>Deque all datagrams from <code>[[\ReceivedDatagrams]]</code>.
-              Let <var>dequedDatagrams</var> be the dequed datagrams.</p>
-            </li>
-            <li>
-              <p>If <var>dequedDatagrams</var> has at least one datagram,
-              return a new promise resolved with <var>dequedDatagrams</var>
-              and abort these steps.</p>
-            </li>
-            <li>
-                <p>Set <code>[[\ReceiveDatagramsPromise]]</code> to a
-                new promise.</p>
-            </li>
-            <li>
-              <p>Return <var>[[\ReceiveDatagramsPromise]].</p>
-            </li>
-          <ol>
-          <p>When a datagram is received, the user agent
-            <em class="rfc2119" title="MUST">MUST</em> run the following
-            steps:</p>
-          <ol>
-            <li>
-              <p>Let <code>receivedDatagram</code> be the received datagram.</p>
-            </li>
-            <li>
-              If <code>[[\ReceivedDatagrams]]</code> is too
-              large (determining how large is too large is implementation
-              specific), queue <code>null</code> onto
-              [[\ReceivedDatagrams]] and abort these steps.  
-              If [[\DatagramransportReceivedDatagrams]] has multiple 
-              <code>null</code> values at the end of the queue, they may be 
-              coalesced into one <code>null</code> value.
-            </li>
-            <li>
-              <p>Queue <code>receivedDatagram</code> onto
-              <code>[[\ReceivedDatagrams]]</code>.</p>
-            </li>
-            <li>
-              <p>If <code>[[\ReceiveDatagramsPromise]]</code> is null, 
-              abort these steps.</p>
-            </li>
-            <li>
-              <p>Deque all datagrams from <code>[[\ReceivedDatagrams]]</code>.
-                Let <var>dequedDatagrams</var> be the dequed datagrams.</p>
-              </li>
-            <li>
-              <p>Resolve <code>[[\ReceiveDatagramsPromise]]</code> 
-              with <var>dequedDatagrams</var>.
-            </li>
-            <li>
-                <p>Set <code>[[\ReceiveDatagramsPromise]]</code> 
-                to <var>null</var>.
-            </li>
-          </ol>
+          <p>If datagrams have been received since the last call to receiveDatagrams(),
+		 return a new promise resolved with all of the received datagrams. </p>
+          <p>If not, return a new promise that will resolve when more datagrams are received, 
+		 resolved with all datagrams received. </p>
+          <p>If too many datagrams are queued between calls to receiveDatagrams(), 
+             the implementation may drop datagrams and replace them with a null value
+             in the sequence of datagrams returned in the next call to receiveDatagrams(). 
+		         One null value may represent many dropped datagrams.<p>
+          <p>receiveDatagrams() may only be called once at a time. 
+		         If a promised returned from a previous call is still unresolved, 
+            the user agent MUST return a new promise rejected with an InvalidStateError. </p>   
           <div>
             <em>Return type:</em> <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;</code>
           </div>
@@ -1121,7 +1068,7 @@ QuicTransportBase includes DataTransport;</pre>
 
   <section id="quic-transport*">
     <h2><dfn>QuicTransport</dfn> Interface</h2>
-    <p>The <code>QuicTransport</code> is a subclass of
+    <p>The <code>QuicTransportBase</code> is a subclass of
     <code>QuicTransportBase</code> focused on client/server use cases.</p>
     <section id="quictransport-interface-definition*">
       <h3>Interface Definition</h3>
@@ -1973,6 +1920,12 @@ interface mixin IncomingStream {
           <td><dfn><code>datagramsreceived</code></dfn></td>
           <td><code><a>DatagramsReceivedEvent</a></code></td>
           <td>The <code><a>DatagramTransport</a></code> object has received some data
+            as a result of the remote side calling <code>sendDatagram</code></td>
+        </tr>
+        <tr>
+          <td><dfn><code>datagramsreceived</code></dfn></td>
+          <td><code><a>DatagramsReceivedEvent</a></code></td>
+          <td>The <code><a>QuicTransportBase</a></code> object has received some data
             as a result of the remote side calling <code>sendDatagram</code></td>
         </tr>
       </tbody>

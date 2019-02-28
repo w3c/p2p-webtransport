@@ -1,5 +1,3 @@
-// TODO:
-// - Add support for datagram acking (improve return value of send())
 // - Make sure MessageEvent.type is correct
 // - Make sure onerror is being fired correctly
 // - Fill in onmessage .origin, lastEventId, source, and ports?
@@ -10,7 +8,7 @@
 class QuicWebSocketBase {
   constructor(hostname, port) {
     this._hostname = hostname;
-    this._port = port
+    this._port = port;
     this._readyState = 0;
     this._binaryType = "uint8array";
     this.onopen = null;
@@ -22,12 +20,12 @@ class QuicWebSocketBase {
     this._error = null;
     this._quic.onerror = (error) => {
       this._handleQuicError(error);
-    }
+    };
     this._quic.onstatechange = () => {
       this._handleQuicStateChange();
-    }
+    };
   }
-  
+
   get url() {
     return "";  // Doesn't make sense if constructor takes hostname + port.
   }
@@ -39,7 +37,7 @@ class QuicWebSocketBase {
   get extensions() {
     return "";
   }
-  
+
   get protocol() {
     return "";
   }
@@ -63,7 +61,7 @@ class QuicWebSocketBase {
     });
   }
 
-  _handleQuicMessageRecevied(data) {
+  _handleQuicMessageReceived(data) {
     if (!this.onmessage) {
       return;
     }
@@ -98,11 +96,11 @@ class QuicWebSocketBase {
 
     // Closed or failed
     this._readyState = 3;
-    if (!this.onclosed) {
+    if (!this.onclose) {
       return;
     }
     if (this._quic.state == "failed") {
-      this.onclosed(new CloseEvent({
+      this.onclose(new CloseEvent({
         wasClean: false
       }));
       return;
@@ -110,27 +108,27 @@ class QuicWebSocketBase {
 
     // Closed
     if (!this._error) {
-      this.onclosed(new CloseEvent({
+      this.onclose(new CloseEvent({
         wasClean: true
       }));
       return;
     }
 
     // Close w/ error
-    this.onclosed(new CloseEvent({
+    this.onclose(new CloseEvent({
       wasClean: false,
       reason: this._error.message
     }));
-  };
+  }
 }
 
 class QuicUnreliableDatagramWebSocket extends QuicWebSocketBase {
   constructor(hostname, port) {
     super(hostname, port);
 
-    this._quic.ondatagramreceived = event => {
-      this._handleQuicMessageRecevied(event.data);
-    }
+    this._quic.receiveDatagrams().then((datagrams) => {
+      this._handleReceivedDatagrams(datagrams);
+    });
   }
 
   get bufferedAmount() {
@@ -147,6 +145,15 @@ class QuicUnreliableDatagramWebSocket extends QuicWebSocketBase {
     }
     this._quic.sendDatagram(data);
   }
+
+  _handleReceivedDatagrams(datagrams) {
+    for (let datagram of datagrams) {
+      this._handleQuicMessageReceived(datagram);
+    }
+    this._quic.receiveDatagrams().then((datagrams) => {
+      this._handleReceivedDatagrams(datagrams);
+    });
+  }
 }
 
 class QuicUnreliableStreamWebSocket extends QuicWebSocketBase {
@@ -156,7 +163,7 @@ class QuicUnreliableStreamWebSocket extends QuicWebSocketBase {
     this._recvStreams = new Set();
     this._quic.onreceivestream = event => {
       this._readStreamAsOneMessage(event.stream);
-    }
+    };
   }
 
   get bufferedAmount() {
@@ -184,26 +191,43 @@ class QuicUnreliableStreamWebSocket extends QuicWebSocketBase {
   async _readStreamAsOneMessage(stream) {
     this._recvStreams.add(stream);
 
-    let buffer = new Uint8Array(1000);
+    let buffer = new Uint8Array();
     let bufferedSize = 0;
-    let finished = true;
+    let finished = false;
+    // We keep appending to an array. If we wanted to be efficient
+    // we could wait for the finish to arrive and write everything at
+    // once in order to reduce copies.
     while (stream.readable) {
       await stream.waitForReadable(1);
-      let bufferLengthNeeded = bufferedSize + stream.readableAmount;
-      if (bufferLengthNeeded > buffer.length) {
-        oldBuffer = buffer;
-        buffer = new Uint8Array(bufferLengthNeeded * 2);
-        buffer.set(oldBuffer);
-      }
-      let read = stream.readInto(buffer);
-      bufferedSize += read.amount;
+      let readBuffer = new Uint8Array(stream.readableAmount);
+      let read = stream.readInto(readBuffer);
+      let concatBuffer = new Uint8Array(buffer.length + readBuffer.length);
+      concatBuffer.set(buffer);
+      concatBuffer.set(readBuffer, buffer.length);
+      buffer = concatBuffer;
       finished = read.finished;
     }
     if (finished) {
-      this._handleQuicMessageRecevied(buffer.subarray(0, bufferedSize));
+      this._handleQuicMessageReceived(buffer);
     }
 
     this._recvStreams.delete(stream);
+  }
+}
+
+// We create our own CloseEvent because the built in CloseEvent has
+// read only properties.
+class CloseEvent extends Event {
+  constructor(params) {
+    super();
+    this.reason = "";
+    if (params.reason) {
+      this.reason = params.reason;
+    }
+    this.wasClean = false;
+    if (params.wasClean === true) {
+      this.wasClean = true;
+    }
   }
 }
 
@@ -227,7 +251,7 @@ async function readBlobAsArrayBuffer(blob) {
   const reader = new FileReader();
   const loadend = new Promise((resolve, reject) => {
     reader.onloadend = resolve;
-  })
+  });
   reader.readAsArrayBuffer(blob);
   await loadend;
   return reader.result;
@@ -252,7 +276,7 @@ function fromUint8Array(array, binaryType) {
   if (binaryType == "string") {
     try {
       return utf8decode(array);
-    } catch {
+    } catch(e) {
       return "";
     }
   }
@@ -269,7 +293,7 @@ function copyToArrayBuffer(values) {
 }
 
 function utf8encode(str) {
-  return Uint8Array.from(Array.from(unescape(encodeURIComponent(str))).map(c => c.codePointAt(0)))
+  return Uint8Array.from(Array.from(unescape(encodeURIComponent(str))).map(c => c.codePointAt(0)));
 }
 
 function utf8decode(bytes) {

@@ -3,8 +3,8 @@ async function testWebSocket(ws) {
   ws.onopen = () => {
     console.log("onopen");
   };
-  ws.onclosed = (evt) => {
-    console.log("onclosed: ");
+  ws.onclose = (evt) => {
+    console.log("onclose: ");
     console.log(evt);
   };
   ws.onerror = (evt) => {
@@ -13,7 +13,7 @@ async function testWebSocket(ws) {
   ws.onmessage = (evt) => {
     console.log("Received message: ");
     console.log(evt.data);
-  }
+  };
 
   console.log("ws.readyState: " + ws.readyState);
   console.log("ws.binaryType: " + ws.binaryType);
@@ -49,8 +49,8 @@ function sleep (time) {
 }
 
 async function test() {
-  await testWebSocket(new QuicUnreliableDatagramWebSocket("datagram.us", 12345))
-  await testWebSocket(new QuicUnreliableStreamWebSocket("stream.us", 54321))
+  await testWebSocket(new QuicUnreliableDatagramWebSocket("datagram.us", 12345));
+  await testWebSocket(new QuicUnreliableStreamWebSocket("stream.us", 54321));
 }
 
-test()
+test();

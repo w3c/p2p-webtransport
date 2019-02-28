@@ -1,8 +1,9 @@
-// TODO: 
-// - Add support for acking datagrams
-// - Add support for readyToSendDatagram
-// - Test stream buffering and aborting code :)
+// TODO:
 // - add QuicTransport onbidirectionalstream, createBidrectionalStream()
+//
+// A QuicTransport that is connected to itself, meaning that datagrams sent
+// are received on the same transport, and QuicSendStreams created are connected
+// to a QuicReceiveStrem on the same transport.
 class QuicTransport {
   constructor(hostname, port) {
     this._hostname = hostname;
@@ -10,11 +11,15 @@ class QuicTransport {
     this._state = new State("new");
     this._onError = new Event();
     this._onReceiveStream = new Event();
-    this._onDatagramReceived = new Event();
+
+    this._maxReceivedDatagramAmount = 1000; // Make something up.
+    this._resolveReceivedDatagrams = null;
+    this._unresolvedDatagramPromise = false;
+    this._receivedDatagrams = [];
 
     // See https://tools.ietf.org/html/draft-ietf-quic-transport-17#section-2.1
     // Including 2 bit suffix, client send streams get 2, 6, 10, ...
-    this._lastSendStreamId = 10;  
+    this._lastSendStreamId = 10;
     this._stopInfo = null;
 
     // Do later to allow watching state change
@@ -60,18 +65,72 @@ class QuicTransport {
 
     const sendStreamId = this.allocateSendStreamId();
     // See https://tools.ietf.org/html/draft-ietf-quic-transport-17#section-2.1
-    const recvStreamId = sendStreamId + 1
+    const recvStreamId = sendStreamId + 1;
     const maxBufferedAmount = 5000;  // Just make something up
     const recvStream = new QuicReceiveStream(this, recvStreamId, maxBufferedAmount);
     const sendStream = new QuicSendStream(this, sendStreamId, params, recvStream, maxBufferedAmount);
     return sendStream;
   }
 
+  readyToSendDatagram() {
+    if (this._closedOrFailed) {
+      throw new InvalidStateError();
+    }
+    return new Promise((resolve, reject) => {
+      // Let's pretend that congestion control never blocks the transport ;).
+      resolve();
+    });
+  }
+
   sendDatagram(data) {
     if (this._closedOrFailed) {
       throw new InvalidStateError();
     }
-    this._onDatagramReceived.fire(new DatagramReceivedEvent(data));
+    // Drop datagrams once the max is hit.
+    if (this._receivedDatagrams.length == this._maxReceivedDatagramAmount) {
+      return new Promise((resolve, reject) => {
+        resolve(false);
+      });
+    }
+
+    this._receivedDatagrams.push(data);
+    // Resolve a receivedDatagrams() promise if one has been returned.
+    if (this._unresolvedDatagramPromise) {
+      this._resolveReceivedDatagrams(this._receivedDatagrams.slice());
+      this._receivedDatagrams = [];
+      this._resolveReceivedDatagrams = null;
+      this._unresolvedDatagramPromise = false;
+    }
+
+    // Return a promise resolved with true, because we know that the datagram
+    // has been "acked".
+    return new Promise((resolve, reject) => {
+      resolve(true);
+    });
+  }
+
+  receiveDatagrams() {
+    if (this._unresolvedDatagramPromise) {
+      // Can't return a promise if previous one is unresolved.
+      throw new InvalidStateError();
+    }
+
+    if (this._receivedDatagrams.length > 0) {
+      // Already received datagrams, go ahead and resolve the
+      // promise immediately.
+      return new Promise((resolve, reject) => {
+        resolve(this._receivedDatagrams.slice());
+        this._receivedDatagrams = [];
+      });
+    }
+    this._unresolvedDatagramPromise = true;
+    return new Promise((resolve, reject) => {
+      this._resolveReceivedDatagrams = resolve;
+    });
+  }
+
+  get _datagramBufferedAmount() {
+    return this._receivedDatagrams.length;
   }
 
   set onstatechange(handler) {
@@ -79,15 +138,15 @@ class QuicTransport {
   }
 
   set onerror(handler) {
-    this._onError.handler = handler
+    this._onError.handler = handler;
   }
 
   set onreceivestream(handler) {
-    this._onReceiveStream.handler = handler
+    this._onReceiveStream.handler = handler;
   }
 
   set ondatagramreceived(handler) {
-    this._onDatagramReceived.handler = handler
+    this._onDatagramReceived.handler = handler;
   }
 }
 
@@ -101,20 +160,30 @@ class QuicStream {
   }
 }
 
-class QuicReceiveStream {
+class QuicReceiveStream extends QuicStream {
   constructor(transport, streamId, maxBufferedAmount) {
+    super();
     this._transport = transport;
-    this._streamId = streamId
+    this._streamId = streamId;
 
     // Data received but not read (buffered)
-    this._received = new CircularBuffer(maxBufferedAmount);
+    this._receiveBuffer = new CircularBuffer(maxBufferedAmount);
     this._receivedFinBit = false;
-    this._readableAmount = new State();
+    this._readableAmount = new State(0);
     // Whether or not the fin bit has been read out or not
     this._readFinBit = false;
 
-    this._readingAbortedFromSendStream = new OneTimeEvent();
-    this._readingAbortedFromReceiveStream = new OneTimeEvent();
+    // Allows the send stream to abort the reading.
+    this._abortReadingFromSendStream = null;
+    this._readingAbortedFromSendStream = new Promise((resolve, reject) => {
+      this._abortReadingFromSendStream = resolve;
+    });
+    // Allows send stream to access Promise for when reading is aborted from
+    // this receive stream.
+    this._abortReadingFromReceiveStream = null;
+    this._readingAbortedFromReceiveStream = new Promise((resolve, reject) => {
+      this._abortReadingFromReceiveStream = resolve;
+    });
   }
 
   get readable() {
@@ -126,23 +195,23 @@ class QuicReceiveStream {
   }
 
   get readingAborted() {
-    return this._readingAbortedFromSendStream.wait();
+    return this._readingAbortedFromSendStream;
   }
 
   readInto(array) {
-    const amount = this._received.dequeInto(array);
-    if (this._receivedFinBit) {
+    const amount = this._receiveBuffer.dequeInto(array);
+    if (this._receivedFinBit && this._receiveBuffer.usedSize == 0) {
       this._readFinBit = true;
     }
-    this._readableAmount.change(this._received.usedSize);
+    this._readableAmount.change(this._receiveBuffer.usedSize);
     return {
       amount: amount,
-      finished: this._receivedFinBit
-    }
+      finished: this._readFinBit
+    };
   }
 
   abortReading(info) {
-    this._readingAbortedFromReceiveStream.set(info);
+    this._abortReadingFromReceiveStream();
   }
 
   async waitForReadable(wantedAmount) {
@@ -153,33 +222,36 @@ class QuicReceiveStream {
     this._readableAmount.onchange = handler;
   }
 
+  // Used by QuicSendStream.
   _receive(array, finBit) {
-    let amount = this._received.queue(array);
-    if (finBit && amount == array.length) {
+    if (array.length > this._receiveBuffer.unusedSize) {
+      console.error("QuicSendStream sent more data than can be buffered.");
+    }
+
+    let x = this._receiveBuffer.queue(array);
+    if (finBit) {
       this._receivedFinBit = finBit;
     }
-    this._readableAmount.change(this._received.usedSize);
-    return amount;
+    this._readableAmount.change(this._receiveBuffer.usedSize);
   }
 }
 
-class QuicSendStream {
+// TODO: Implement params.disableRetransmissions.
+class QuicSendStream extends QuicStream {
   constructor(transport, streamId, params, recvStream, maxBufferedAmount) {
+    super();
     this._transport = transport;
-    this._streamId = streamId
+    this._streamId = streamId;
     this._params = params;
     this._recvStream = recvStream;
 
-    this._unreceived = new CircularBuffer(maxBufferedAmount);  
-    this._writeBufferedAmount = new State();
+    this._writeBuffer = new CircularBuffer(maxBufferedAmount);
+    this._writeBufferedAmount = new State(0);
     this._wroteFinBit = false;
-    this._receivedFinBit = false;
-
-    this._writingAborted = new OneTimeEvent();
 
     this._recvStream._onreadableamountchanged = (readableAmount) => {
-      this._dequeUnreceived(this._recvStream.readableAmount);
-    }
+      this._dequeUnreceived();
+    };
     this._recvStreamFired = false;
   }
 
@@ -192,7 +264,7 @@ class QuicSendStream {
   }
 
   get writingAborted() {
-    this._recvStream._readingAbortedFromReceiveStream.wait();
+    return this._recvStream._readingAbortedFromReceiveStream;
   }
 
   write(params) {
@@ -202,16 +274,29 @@ class QuicSendStream {
     if (params.finished && params.data.length == 0) {
       throw new NotSupportedError();
     }
+    if (params.data.length > this._writeBuffer.unusedSize) {
+      // We can't write more than available in the buffer.
+      throw new NotSupportedError();
+    }
     if (params.finished) {
       this._wroteFinBit = true;
     }
 
-    let receivedAmount = this._recvStream._receive(params.data, params.finished);
-    let unreceived = params.data.subarray(receivedAmount);
-    if (unreceived.length > 0) {
-      this._queueUnreceived(unreceived);
-    } else if (params.finished) {
-      this._receivedFinBit = true;
+    if (this.writeBufferedAmount > 0) {
+      // Backpressure is being applied from receive side, so append to
+      // already buffered data.
+      this._queueUnreceived(params.data);
+    } else {
+      let sendAmount = Math.min(this._recvStream._receiveBuffer.unusedSize,
+                                params.data.length);
+      let sendData = params.data.slice(0, sendAmount);
+      // Send the FIN bit to receive side if it has been written by write()
+      // and we have dequeued everything in the write buffer.
+      this._recvStream._receive(sendData, this._wroteFinBit);
+      if (sendAmount < params.data.length) {
+        // Queue data that couldn't be sent.
+        this._queueUnreceived(params.data.slice(sendAmount));
+      }
     }
 
     if (!this._recvStreamFired) {
@@ -221,52 +306,38 @@ class QuicSendStream {
   }
 
   abortWriting(info) {
-    this.recvStream._readingAbortedFromSendStream.set(info);
+    this._recvStream._abortReadingFromSendStream();
   }
 
   async waitForWriteBufferedAmountBelow(threshold) {
     await this._writeBufferedAmount.until(writableAmount => writableAmount < threshold);
   }
 
+
   _queueUnreceived(unreceived) {
-    let queuedAmount = this._unreceived.queue(unreceived);
-    if (queuedAmount) {
-      this._writeBufferedAmount.change(this._unreceived.usedSize);
-    }
+    let queuedAmount = this._writeBuffer.queue(unreceived);
     if (queuedAmount < unreceived.length) {
+      console.error("Could not buffer all write() data.");
       this.abortWriting(500);
+    }
+    if (queuedAmount) {
+      this._writeBufferedAmount.change(this._writeBuffer.usedSize);
     }
   }
 
-  _dequeUnreceived(readableAmount) {
-    let dequeAmount  = Math.min(readableAmount, this._unreceived.usedSize);
+  _dequeUnreceived() {
+    let dequeAmount  = Math.min(this._recvStream._receiveBuffer.unusedSize,
+                                this._writeBuffer.usedSize);
     if (dequeAmount == 0) {
       return;
     }
-    let recvData = new Uint8Array(dequeAmount);
-    this._unreceived.dequeInto(recvData);
-    let recvFinBit = this._wroteFinBit && (this._unreceived.usedSize == 0);
-    this._recvStream._receive(recvData, recvFinBit);
-    this._writeBufferedAmount.change(this._unreceived.usedSize);
-  };
-}
-
-class OneTimeEvent {
-  constructor(state) {
-    this._set = false;
-    this._state = new State(null);
-  }
-
-  async wait() {
-    if (this._set) {
-      return this._state.current;
-    }
-    return await this._next;
-  }
-
-  set(value) {
-    this._state.set(value);
-    this._set = true;
+    let sendData = new Uint8Array(dequeAmount);
+    this._writeBuffer.dequeInto(sendData);
+    // Send the FIN bit to receive side if it has been written by write()
+    // and we have dequeued everything in the write buffer.
+    let sendFin = this._wroteFinBit && this._writeBuffer.usedSize == 0;
+    this._recvStream._receive(sendData, sendFin);
+    this._writeBufferedAmount.change(this._writeBuffer.usedSize);
   }
 }
 
@@ -280,19 +351,14 @@ class State {
     return this._state;
   }
 
-  // async
-  get next() {
-    return this._changed.next;
-  }
-
   async until(pred) {
     while(!pred(this.current)) {
-      await this.next;
+      await this._changed.nextStatePromise;
     }
   }
 
   set onchange(handler) {
-    this._changed.handler = handler
+    this._changed.handler = handler;
   }
 
   change(state) {
@@ -304,13 +370,14 @@ class State {
 class Event {
   constructor() {
     this._handler = null;
-    this._resolves = [];
+    this._resolveNextState = null;
+    this._nextStatePromise = new Promise((resolve, reject) => {
+      this._resolveNextState = resolve;
+    });
   }
 
-  get next() {
-    return new Promise((resolve, reject) => {
-      this._resolves.push(resolve);
-    });
+  get nextStatePromise() {
+    return this._nextStatePromise;
   }
 
   set handler(handler) {
@@ -321,9 +388,10 @@ class Event {
     if (this._handler) {
       this._handler(payload);
     }
-    for (const resolve of this._resolves) {
-      resolve(payload);
-    }
+    this._resolveNextState();
+    this._nextStatePromise = new Promise((resolve, reject) => {
+      this._resolveNextState = resolve;
+    });
   }
 }
 
@@ -352,6 +420,7 @@ class CircularBuffer {
     this._array = new Uint8Array(maxSize);
     this._start = 0;
     this._end = 0;
+    this._usedSize = 0;
   }
 
   get maxSize() {
@@ -359,15 +428,11 @@ class CircularBuffer {
   }
 
   get usedSize() {
-    let used = this._end - this._start;
-    if (used < 0) {
-      used += this.maxSize;
-    }
-    return used;
+    return this._usedSize;
   }
 
   get unusedSize() {
-    return this.maxSize - this.usedSize;
+    return this.maxSize - this._usedSize;
   }
 
   queue(array) {
@@ -378,6 +443,7 @@ class CircularBuffer {
       this._array[this._end] = array[i];
       this._end = (this._end + 1) % this.maxSize;
     }
+    this._usedSize += amount;
     return amount;
   }
 
@@ -389,6 +455,7 @@ class CircularBuffer {
       array[i] = this._array[this._start];
       this._start = (this._start + 1) % this.maxSize;
     }
+    this._usedSize -= amount;
     return amount;
   }
 }

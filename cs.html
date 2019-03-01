@@ -217,7 +217,11 @@ interface mixin UnidirectionalStreamsTransport {
             <dd>
               <p>disableRetransmissions, with a default of <code>false</code>.  If
               true, the stream will be sent without retransmissions.  If false, the
-              stream will be sent with retransmissions.</p>
+              stream will be sent with retransmissions.
+              If the WebTransport is unable to send without retransmissions, it may ignore this value.
+              <!-- TODO: Provide some API surface to indidcate
+                   that the transport doesn't support disabling retransmissions -->
+	      </p>
             </dd>
           </dl>
         </section>

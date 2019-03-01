@@ -85,7 +85,7 @@
   <section id="unidirectional-streams-transport*">
     <h2><dfn>UnidirectionalStreamsTransport</dfn> Mixin</h2>
     <p>
-      A <code>UnidirectionalStreamsTransport</code> can send an receive unidirectional streams.
+      A <code>UnidirectionalStreamsTransport</code> can send and receive unidirectional streams.
       Data within a stream is delivered in order, but data between streams may be delivered out of order.
       Data is generally sent reliably, but retransmissions may be disabled
       or the stream may aborted to produce a form of unreliability.
@@ -133,6 +133,8 @@ interface mixin UnidirectionalStreamsTransport {
               newly created <code>InvalidStateError</code> and abort these steps.</p>
             </li>
             <li>
+	      <!-- TODO If/when we support 0-RTT, allow resoling the
+	      stream before we are connected. -->
               <p>If <code><var>transport</var>'s state</code> is <code>"connected"</code>,
               immediately return a new <a>resolved</a> promise with a newly created
               <code><a>SendStream</a></code> object,

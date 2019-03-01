@@ -685,101 +685,6 @@ interface mixin DatagramTransport {
         </dd>
       </dl>
     </section>
-    <section>
-      <h3><dfn>DatagramsReceivedEvent</dfn></h3>
-      <p>The <code><a>datagramsreceived</a></code> event uses the
-      <code><a>DatagramsReceivedEvent</a></code> interface.</p>
-      <div>
-        <pre class="idl">
-        [ Constructor (DOMString type, DatagramsReceivedEventInit eventInitDict), Exposed=Window]
-interface DatagramsReceivedEvent : Event {
-    readonly        attribute sequence<Uint8Array?> datagrams;
-};</pre>
-        <section>
-          <h2>Constructors</h2>
-          <dl data-link-for="DatagramsReceivedEvent" data-dfn-for="DatagramsReceivedEvent"
-          class="constructors">
-            <dt><code>DatagramsReceivedEvent</code></dt>
-            <dd>
-              <table class="parameters">
-                <tbody>
-                  <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Nullable</th>
-                    <th>Optional</th>
-                    <th>Description</th>
-                  </tr>
-                  <tr>
-                    <td class="prmName">type</td>
-                    <td class="prmType"><code>DOMString</code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                  <tr>
-                    <td class="prmName">eventInitDict</td>
-                    <td class="prmType"><code><a>DatagramsReceivedEventInit</a></code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                </tbody>
-              </table>
-            </dd>
-          </dl>
-        </section>
-        <section>
-          <h2>Attributes</h2>
-          <dl data-link-for="DatagramsReceivedEvent" data-dfn-for="DatagramsReceivedEvent"
-          class="attributes">
-            <dt><code>data</code> of type <span class=
-            "idlAttrType"><a>sequence&ltUint8Array?&gt</a></span>, readonly</dt>
-            <dd>
-              <p>The payloads of the datagrams received, with possible null
-              values. </p>
-              <p>A null value indicates that the user agent dropped 1 or more
-              datagrams after receiving and acking them because the event
-              handler was not able to handle incoming datagrams quickly enough
-              and the user agent has decided that dropping them is
-              better than buffering them.  How much to buffer before dropping is
-              left to the implementation of the user agent to decide, but
-              implementations should seek to minimize buffering and assume that
-              event handlers will be able to handle dropped datagrams.</p>
-              <p> The event provides a sequence of datagrams (rather than a
-              single datagram) to support a high throughput of datagrams. To
-              reduce the number of events necessary to process the datagrams,
-              implementations should provide all the datagrams received since
-              the last event was fired and handled. But implementations should
-              also seek to minimize buffering and not delay firing the events in
-              order to fire fewer events. </p>
-            </dd>
-          </dl>
-        </section>
-      </div>
-      <div>
-          <p>The <dfn><code>DatagramsReceivedEventInit</code></dfn> dictionary includes
-          information to construct a DatagramsReceivedEvent .</p>
-        <pre class="idl">dictionary DatagramsReceivedEventInit : EventInit {
-            sequence<Uint8Array?> datagrams;;
-};</pre>
-        <section>
-          <h2>Dictionary DatagramsReceivedEventInit Members</h2>
-          <dl data-link-for="DatagramsReceivedEventInit" data-dfn-for=
-          "DatagramsReceivedEventInit" class="dictionary-members">
-            <dt><dfn><code>data</code></dfn> of type <span class=
-            "idlMemberType"><a>sequence&ltUint8Array?&gt</a></span></dt>
-            <dd>
-                <p>The payloads of the datagrams received.</p>
-            <dd>
-          </dl>
-        </section>
-      </div>
-    </section>
   </section>
 
   <section id="data-transport*">
@@ -1917,18 +1822,6 @@ interface mixin IncomingStream {
           <code><a>DataTransport</a></code>'s <a>[[\IncomingStreams]]</a>
           and <a>[[\OutgoingStreams]]</a> internal slots.</td>
         </tr>
-        <tr>
-          <td><dfn><code>datagramsreceived</code></dfn></td>
-          <td><code><a>DatagramsReceivedEvent</a></code></td>
-          <td>The <code><a>DatagramTransport</a></code> object has received some data
-            as a result of the remote side calling <code>sendDatagram</code></td>
-        </tr>
-        <tr>
-          <td><dfn><code>datagramsreceived</code></dfn></td>
-          <td><code><a>DatagramsReceivedEvent</a></code></td>
-          <td>The <code><a>QuicTransportBase</a></code> object has received some data
-            as a result of the remote side calling <code>sendDatagram</code></td>
-        </tr>
       </tbody>
     </table>
   </section>
@@ -1980,9 +1873,8 @@ setInterval(() => {
 
     <section class="informative" id="datagramexample3*">
       <h3>Receiving datagrams</h3>
-      <p>Receiving datagrams can be achieved by simply listening to the
-      <code>datagramsreceived</code>, remembering to check for null values
-      indicating the event handler is not processing the events quickly enough.
+      <p>Receiving datagrams can be achieved by calling
+      <code>receiveDatagrams()</code> and remembering to check for null values.
       </p>
       <pre class="example highlight">
       const transport = getTransport();

@@ -1096,7 +1096,7 @@ interface QuicTransport : QuicTransportBase {
                   </tr>
                   <tr>
                     <td class="prmName">port</td>
-                    <td class="prmType"><code><a>unsigned shor</a></code></td>
+                    <td class="prmType"><code><a>unsigned short</a></code></td>
                     <td class="prmNullFalse"><span role="img" aria-label=
                     "False">&#10008;</span></td>
                     <td class="prmOptFalse"><span role="img" aria-label=
@@ -1145,7 +1145,7 @@ interface mixin OutgoingStream {
         <h3>Attributes</h3>
         <dl data-link-for="OutgoingStream" data-dfn-for="OutgoingStream" class=
         "attributes">
-          <dt><code>writable</code> of type <span class="idlAttriType"><a>boolean</a>
+          <dt><code>writable</code> of type <span class="idlAttrType"><a>boolean</a></span>
           readonly</dt>
           <dd>
             <p>The <dfn id="dom-outgoingstream-writable"><code>writable</code></dfn>
@@ -1199,7 +1199,8 @@ interface mixin OutgoingStream {
         "methods">
           <dt><dfn><code>write</code></dfn></dt>
           <dd>
-            <p>Writes data to the stream. When the remote <code><a>WebTransport</a></code>
+            <p>Buffer the given data to be written to the network when possible.
+	    When the remote <code><a>WebTransport</a></code>
             receives data for this stream for the first time, it will trigger the
             creation of the corresponding remote <code>IncomingStream</code>.
             When the <code>write</code> method is

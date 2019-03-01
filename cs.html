@@ -193,7 +193,7 @@ interface mixin UnidirectionalStreamsTransport {
             <p>Continue the following steps in the background.</p>
           </li>
           <li>
-            <p>Create <var>stream</var>'s associated underlying data
+            <p>Create <var>stream</var>'s associated underlying
             transport.</p>
           </li>
         </ol>
@@ -422,7 +422,7 @@ interface BidirectionalStreamsTransport {
             <p>Continue the following steps in the background.</p>
           </li>
           <li>
-            <p>Create <var>stream</var>'s associated underlying data
+            <p>Create <var>stream</var>'s associated underlying
             transport.</p>
           </li>
         </ol>
@@ -688,21 +688,21 @@ interface mixin DatagramTransport {
   </section>
 
   <section id="data-transport*">
-    <h2><dfn>DataTransport</dfn> Mixin</h2>
+    <h2><dfn>WebTransport</dfn> Mixin</h2>
     <p>
-      The <code>DataTransport</code> includes the methods common to all data transports,
+      The <code>WebTransport</code> includes the methods common to all transports,
       such as state, state changes, and the ability to stop the transport.
     </p>
     <pre class="idl">
-interface mixin DataTransport {
+interface mixin WebTransport {
   readonly attribute TransportState state;
-  void                                  stop (DataTransportStopInfo stopInfo);
+  void                                  stop (WebTransportStopInfo stopInfo);
            attribute EventHandler       onstatechange;
            attribute EventHandler       onerror;
 };</pre>
     <section>
       <h2>Attributes</h2>
-      <dl data-link-for="DataTransport" data-dfn-for="DataTransport" class=
+      <dl data-link-for="WebTransport" data-dfn-for="WebTransport" class=
       "attributes">
         <dt><dfn><code>state</code></dfn> of type <span class=
         "idlAttrType"><a>TransportState</a></span>, readonly</dt>
@@ -736,19 +736,19 @@ interface mixin DataTransport {
     </section>
     <section>
       <h2>Methods</h2>
-      <dl data-link-for="DataTransport" data-dfn-for="DataTransport" class=
+      <dl data-link-for="WebTransport" data-dfn-for="WebTransport" class=
       "methods">
-        <!-- TODO: Should this be moved out of DataTransport?
-             It might different for each type of data transport. -->
+        <!-- TODO: Should this be moved out of WebTransport?
+             It might different for each type of transport. -->
         <dt><dfn><code>stop</code></dfn></dt>
         <dd>
-          <p>Stops and closes the <code><a>DataTransport</a></code> object.
+          <p>Stops and closes the <code><a>WebTransport</a></code> object.
           <!-- TODO: move reference to QUIC under QuicTransportBase. -->
           For QUIC, this triggers an <dfn>Immediate Close</dfn> as described in [[QUIC-TRANSPORT]] section 10.3.
           <p>When <code>stop</code> is called, the user agent <em class="rfc2119" title="MUST">MUST</em>
           run the following steps:</p>
           <ol>
-            <li>Let <var>transport</var> be the <code><a>DataTransport</a></code>
+            <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>
             on which <code>stop</code> is invoked.</li>
             <li>If <var>transport</var>'s <a>[[\TransportState]]</a> is <code>"closed"</code>
             then abort these steps.</li>
@@ -777,7 +777,7 @@ interface mixin DataTransport {
               </tr>
               <tr>
                 <td class="prmName">stopInfo</td>
-                <td class="prmType"><code>DataTransportStopInfo</code></td>
+                <td class="prmType"><code>WebTransportStopInfo</code></td>
                 <td class="prmNullFalse"><span role="img" aria-label=
                 "False">&#10008;</span></td>
                 <td class="prmOptFalse"><span role="img" aria-label=
@@ -789,35 +789,35 @@ interface mixin DataTransport {
         </dd>
       </dl>
     </section>
-    <section id="DataTransportState*">
-      <h3><dfn>DataTransportState</dfn> Enum</h3>
-      <p><code>DataTransportState</code> indicates the state of the
+    <section id="WebTransportState*">
+      <h3><dfn>WebTransportState</dfn> Enum</h3>
+      <p><code>WebTransportState</code> indicates the state of the
       transport.</p>
       <div>
         <pre class="idl">
-enum DataTransportState {
+enum WebTransportState {
     "new",
     "connecting",
     "connected",
     "closed",
     "failed"
 };</pre>
-        <table data-link-for="DataTransportState" data-dfn-for="DataTransportState"
+        <table data-link-for="WebTransportState" data-dfn-for="WebTransportState"
         class="simple">
           <tbody>
             <tr>
               <th colspan="2">Enumeration description</th>
             </tr>
             <tr>
-              <td><dfn><code id="idl-def-DataTransportState.new">new</code></dfn></td>
+              <td><dfn><code id="idl-def-WebTransportState.new">new</code></dfn></td>
               <td>
-                <p>The <code><a>DataTransport</a></code> object has been created and
+                <p>The <code><a>WebTransport</a></code> object has been created and
                 has not started negotiating yet.</p>
               </td>
             </tr>
             <tr>
               <td><dfn><code id=
-              "idl-def-DataTransportState.connecting">connecting</code></dfn></td>
+              "idl-def-WebTransportState.connecting">connecting</code></dfn></td>
               <td>
                 <p>The transport is in the process of negotiating a secure connection.
                 Once a secure connection is negotiated, incoming data can flow through.</p>
@@ -825,7 +825,7 @@ enum DataTransportState {
             </tr>
             <tr>
               <td><dfn><code id=
-              "idl-def-DataTransportState.connected">connected</code></dfn></td>
+              "idl-def-WebTransportState.connected">connected</code></dfn></td>
               <td>
                 <p>The transport has completed negotiation of a secure connection.
                 Outgoing data and media can now flow through.</p>
@@ -833,16 +833,16 @@ enum DataTransportState {
             </tr>
             <tr>
               <td><dfn><code id=
-              "idl-def-DataTransportState.closed">closed</code></dfn></td>
+              "idl-def-WebTransportState.closed">closed</code></dfn></td>
               <td>
                 <p>The transport has been closed intentionally via a call to
                 <code>stop()</code> or receipt of a closing message from the remote side.
-                When the <code><a>DataTransport</a></code>'s
+                When the <code><a>WebTransport</a></code>'s
                 internal <a>[[\TransportState]]</a> slot transitions to
                 <code>closed</code> the user agent <em class="rfc2119" title="MUST">MUST</em>
                 run the following steps:</p>
                 <ol>
-                  <li>Let <var>transport</var> be the <code><a>DataTransportBase</a></code>.
+                  <li>Let <var>transport</var> be the <code><a>WebTransportBase</a></code>.
                   <li>For each <code><a>IncomingStream</a></code> in <var>transport</var>'s
                   <a>[[\IncomingStreams]]</a> internal slot run the
                   following:</li>
@@ -870,7 +870,7 @@ enum DataTransportState {
             </tr>
             <tr>
               <td><dfn><code id=
-              "idl-def-DataTransportState.failed">failed</code></dfn></td>
+              "idl-def-WebTransportState.failed">failed</code></dfn></td>
               <td>
                 <p>The transport has been closed as the result of an error (such as
                 receipt of an error alert). When the <code><a>DatraTransport/a></code>'s
@@ -908,20 +908,20 @@ enum DataTransportState {
       </div>
     </section>
     <section id="datatransportstopinfo*">
-      <h3><dfn>DataTransportStopInfo</dfn> Dictionary</h3>
-      <p>The <code>DataTransportStopInfo</code> dictionary includes information
-      relating to the error code for stopping a <code><a>DataTransport</a></code>.
+      <h3><dfn>WebTransportStopInfo</dfn> Dictionary</h3>
+      <p>The <code>WebTransportStopInfo</code> dictionary includes information
+      relating to the error code for stopping a <code><a>WebTransport</a></code>.
       For QUIC, this information is used to set the error code and reason for an CONNECTION_CLOSE
       frame.</p>
       <div>
         <pre class="idl">
-dictionary DataTransportStopInfo {
+dictionary WebTransportStopInfo {
     unsigned short errorCode = 0;
     DOMString reason = "";
 };</pre>
         <section>
-          <h2>Dictionary <a class="idlType">DataTransportStopInfo</a> Members</h2>
-          <dl data-link-for="DataTransportStopInfo" data-dfn-for="DataTransportStopInfo" class=
+          <h2>Dictionary <a class="idlType">WebTransportStopInfo</a> Members</h2>
+          <dl data-link-for="WebTransportStopInfo" data-dfn-for="WebTransportStopInfo" class=
           "dictionary-members">
             <dt><dfn><code>errorCode</code></dfn> of type <span class=
             "idlMemberType"><a>unsigned short</a></span>, defaulting to
@@ -932,7 +932,7 @@ dictionary DataTransportStopInfo {
             <dt><dfn><code>reason</code></dfn> of type <span class=
             "idlMemberType"><a>DOMString</a></span>, defaulting to <code>""</code></dt>
             <dd>
-              <p>The reason for stopping the <code><a>DataTransport</a></code></p>
+              <p>The reason for stopping the <code><a>WebTransport</a></code></p>
             </dd>
           </dl>
         </section>
@@ -968,7 +968,7 @@ interface QuicTransportBase {
 QuicTransportBase includes UnidirectionalStreamsTransport;
 QuicTransportBase includes BidirectionalStreamsTransport;
 QuicTransportBase includes DatagramTransport;
-QuicTransportBase includes DataTransport;</pre>
+QuicTransportBase includes WebTransport;</pre>
       </div>
     </section>
   </section>
@@ -1182,7 +1182,7 @@ interface mixin OutgoingStream {
               <li>Let <var>stream</var> be the <code><a>OutgoingStream</a></code> object.
               <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to <code>false</code>.</li>
               <li>Clear the <var>stream</var>'s write buffer.</li>
-              <li>Let <var>transport</var> be the <code><a>DataTransport</a></code>,
+              <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>,
               which the <var>stream</var> was created from.
               <li>Remove the <var>stream</var> from the <var>transport</var>'s
               <a>[[\OutgoingStreams]]</a> internal slot.</li>
@@ -1199,7 +1199,7 @@ interface mixin OutgoingStream {
         "methods">
           <dt><dfn><code>write</code></dfn></dt>
           <dd>
-            <p>Writes data to the stream. When the remote <code><a>DataTransport</a></code>
+            <p>Writes data to the stream. When the remote <code><a>WebTransport</a></code>
             receives data for this stream for the first time, it will trigger the
             creation of the corresponding remote <code>IncomingStream</code>.
             When the <code>write</code> method is
@@ -1218,7 +1218,7 @@ interface mixin OutgoingStream {
               <a>[[\WriteBufferedAmount]]</a> slot by the length of
               <var>data</var>.data in bytes.</li>
               <li>Queue <var>data</var>.data for transmission on <var>stream</var>'s
-              underlying data transport.</li>
+              underlying transport.</li>
               <li>if <var>data</var>.finish is set to <code>true</code>, run the
               following:</li>
               <ol>
@@ -1226,7 +1226,7 @@ interface mixin OutgoingStream {
                   for QUIC, this is a STREAM frame with the FIN bit set.)</li>
                 <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to
                 <code>false</code>.</li>
-                <li>Let <var>transport</var> be the <code><a>DataTransport</a></code>,
+                <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>,
                 which the <var>stream</var> was created from.</li>
                 <li>Remove the <var>stream</var> from the <var>transport</var>'s
                 <a>[[\OutgoingStreams]]</a> internal slot.</li>
@@ -1234,7 +1234,7 @@ interface mixin OutgoingStream {
               <div class="note">The actual transmission of data occurs in
               parallel. If sending data leads to a transport-level error, the
               application will be notified asynchronously through the
-              <code><a>DataTransport</a></code>'s <code><a>onerror</a></code>
+              <code><a>WebTransport</a></code>'s <code><a>onerror</a></code>
               EventHandler.</div>
             </ol>
             <table class="parameters">
@@ -1275,7 +1275,7 @@ interface mixin OutgoingStream {
               <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>
               <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to <code>false</code>.</li>
               <li>Clear the <var>stream</var>'s write buffer.</li>
-              <li>Let <var>transport</var> be the <code><a>DataTransport</a></code>,
+              <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>,
               which the <var>stream</var> was created from.</li>
               <li>Remove the <var>stream</var> from the <var>transport</var>'s
               <a>[[\OutgoingStreams]]</a> internal slot.</li>
@@ -1480,7 +1480,7 @@ interface mixin IncomingStream {
               object for which the abort message was received.</li>
               <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to <code>false</code>.</li>
               <li>Clear the <var>stream</var>'s read buffer.</li>
-              <li>Let <var>transport</var> be the <code><a>DataTransport</a></code>,
+              <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>,
               which the <var>stream</var> was created from.
               <li>Remove the <var>stream</var> from the <var>transport</var>'s
               <a>[[\IncomingStreams]]</a> internal slot.</li>
@@ -1523,7 +1523,7 @@ interface mixin IncomingStream {
                 <li>Set <var>result</var>'s <code>finished</code> to <code>true</code>.</li>
                 <li>Set the <var>stream</var>'s <a>[[\Readable]]</a> slot to
                 <code>false</code>.</li>
-                <li>Let <var>transport</var> be the <code><a>DataTransport</a></code>,
+                <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>,
                 which the <var>stream</var> was created from.
                 <li>Remove the <var>stream</var> from the <var>transport</var>'s
                 <a>[[\IncomingStreams]]</a> internal slot.</li>
@@ -1569,7 +1569,7 @@ interface mixin IncomingStream {
               <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>
               <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to <code>false</code>.</li>
               <li>Clear the <var>stream</var>'s read buffer.</li>
-              <li>Let <var>transport</var> be the <code><a>DataTransport</a></code>,
+              <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>,
               which the <var>stream</var> was created from.
               <li>Remove the <var>stream</var> from the <var>transport</var>'s
               <a>[[\IncomingStreams]]</a> internal slot.</li>
@@ -1697,14 +1697,14 @@ interface mixin IncomingStream {
   </section>
 
   <section id="data-transport-stream*">
-    <h2>Interface <dfn>DataTransportStream</dfn></h2>
+    <h2>Interface <dfn>WebTransportStream</dfn></h2>
     <p>A collection of common attributes and methods of all streams.</p>
     <div>
       <pre class="idl">
       [ Exposed=Window ]
-      interface DataTransportStream {
+      interface WebTransportStream {
           readonly attribute unsigned long long streamId;
-          readonly attribute DataTransport transport;
+          readonly attribute WebTransport transport;
       };
       </pre>
       <section>
@@ -1718,9 +1718,9 @@ interface mixin IncomingStream {
             <code><a>TransportStream</a></code> object.</p>
           </dd>
           <dt><dfn><code>transport</code></dfn> of type <span class=
-          "idlAttrType"><a>DataTransport</a></span>, readonly</dt>
+          "idlAttrType"><a>WebTransport</a></span>, readonly</dt>
           <dd>
-            <p>The readonly attribute referring to the related <code><a>DataTransport</a></code> object.</p>
+            <p>The readonly attribute referring to the related <code><a>WebTransport</a></code> object.</p>
           </dd>
         </dl>
       </section>
@@ -1732,7 +1732,7 @@ interface mixin IncomingStream {
     <div>
       <pre class="idl">
       [ Exposed=Window ]
-      interface BidirectionalStream : DataTransportStream {
+      interface BidirectionalStream : WebTransportStream {
       };
       BidirectionalStream includes OutgoingStream;
       BidirectionalStream includes IncomingStream;
@@ -1745,7 +1745,7 @@ interface mixin IncomingStream {
     <div>
       <pre class="idl">
       [ Exposed=Window ]
-      interface SendStream : DataTransportStream {
+      interface SendStream : WebTransportStream {
       };
       SendStream includes OutgoingStream;
       </pre>
@@ -1757,7 +1757,7 @@ interface mixin IncomingStream {
     <div>
       <pre class="idl">
       [ Exposed=Window ]
-      interface ReceiveStream : DataTransportStream {
+      interface ReceiveStream : WebTransportStream {
       };
       ReceiveStream includes IncomingStream;
       </pre>
@@ -1795,12 +1795,12 @@ interface mixin IncomingStream {
         <tr>
           <td><code>error</code></td>
           <td><code><a>ErrorEvent</a></code></td>
-          <td>The <code><a>DataTransport</a></code> object has encountered an error.</td>
+          <td>The <code><a>WebTransport</a></code> object has encountered an error.</td>
         </tr>
         <tr>
           <td><code>statechange</code></td>
           <td><code><a>Event</a></code></td>
-          <td>The <code><a>DataTransportState</a></code> changed.</td>
+          <td>The <code><a>WebTransportState</a></code> changed.</td>
         </tr>
         <tr>
           <td><dfn><code>receivestream</code></dfn></td>
@@ -1809,7 +1809,7 @@ interface mixin IncomingStream {
           script in response to the remote peer creating a send-only stream and
           sending data on it. Prior to <code><a>receivestream</a></code>
           firing, the <code><a>ReceiveStream</a></code> is added to
-          <code><a>DataTransport</a></code>'s <a>[[\IncomingStreams]]</a>
+          <code><a>WebTransport</a></code>'s <a>[[\IncomingStreams]]</a>
           internal slot.</td>
         </tr>
         <tr>
@@ -1819,7 +1819,7 @@ interface mixin IncomingStream {
           script in response to the remote peer creating a bidirectional stream and
           sending data on it. Prior to <code><a>bidirectionalstream</a></code>
           firing, the <code><a>BidirectionalStream</a></code> is added to the
-          <code><a>DataTransport</a></code>'s <a>[[\IncomingStreams]]</a>
+          <code><a>WebTransport</a></code>'s <a>[[\IncomingStreams]]</a>
           and <a>[[\OutgoingStreams]]</a> internal slots.</td>
         </tr>
       </tbody>

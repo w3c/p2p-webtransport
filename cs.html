@@ -10,18 +10,18 @@
 <body>
   <section id="abstract">
     <p>This document defines a set of ECMAScript APIs in WebIDL to allow data to be sent
-    and received between a browser and server implementing pluggable 
+    and received between a browser and server implementing pluggable
     protocols underneath with common APIs on top.  APIs specific to QUIC are also provided
     protocol. This specification is being developed in conjunction with a protocol
     specification developed by the IETF QUIC Working Group.</p>
   </section>
-  
+
   <section id="sotd">
   </section>
 
   <section class="informative" id="intro">
     <h2>Introduction</h2>
-    <p>This specification uses pluggable protocols, with 
+    <p>This specification uses pluggable protocols, with
     QUIC [[!QUIC-TRANSPORT]] as one such protocol, to send data
     to and receive data from servers.  It can be used like WebSockets
     but with support for multiple streams, unidirectional streams,
@@ -83,11 +83,11 @@
   </section>
 
   <section id="unidirectional-streams-transport*">
-    <h2><dfn>UnidirectionalStreamsTransport</dfn> Mixin</h2>    
+    <h2><dfn>UnidirectionalStreamsTransport</dfn> Mixin</h2>
     <p>
       A <code>UnidirectionalStreamsTransport</code> can send an receive unidirectional streams.
       Data within a stream is delivered in order, but data between streams may be delivered out of order.
-      Data is generally sent reliably, but retransmissions may be disabled 
+      Data is generally sent reliably, but retransmissions may be disabled
       or the stream may aborted to produce a form of unreliability.
       All stream data is encrypted and congestion-controlled.
     </p>
@@ -307,11 +307,11 @@ dictionary ReceiveStreamEventInit : EventInit {
   </section>
 
   <section id="bidirectional-streams-transport*">
-    <h2><dfn>BidirectionalStreamsTransport</dfn> Mixin</h2>    
+    <h2><dfn>BidirectionalStreamsTransport</dfn> Mixin</h2>
     <p>
       A <code>BidirectionalStreamsTransport</code> can send and receive bidirectional streams.
       Data within a stream is delivered in order, but data between streams may be delivered out of order.
-      Data is generally sent reliably, but retransmissions may be disabled 
+      Data is generally sent reliably, but retransmissions may be disabled
       or the stream may aborted to produce a form of unreliability.
       All stream data is encrypted and congestion-controlled.
     </p>
@@ -512,7 +512,7 @@ dictionary BidirectionalStreamEventInit : EventInit {
   </section>
 
   <section id="datagram-transport*">
-    <h2><dfn>DatagramTransport</dfn> Mixin</h2>    
+    <h2><dfn>DatagramTransport</dfn> Mixin</h2>
     <p>
       A <code>DatagramTransport</code> can send and receive datagrams.
       Datagrams are sent out of order, unreliably, and have a limited maximum size.
@@ -667,16 +667,16 @@ interface mixin DatagramTransport {
         <dt><dfn><code>receiveDatagrams</code></dfn></dt>
         <dd>
           <p>If datagrams have been received since the last call to receiveDatagrams(),
-		 return a new promise resolved with all of the received datagrams. </p>
-          <p>If not, return a new promise that will resolve when more datagrams are received, 
-		 resolved with all datagrams received. </p>
-          <p>If too many datagrams are queued between calls to receiveDatagrams(), 
+             return a new promise resolved with all of the received datagrams. </p>
+          <p>If not, return a new promise that will resolve when more datagrams are received,
+              resolved with all datagrams received. </p>
+          <p>If too many datagrams are queued between calls to receiveDatagrams(),
              the implementation may drop datagrams and replace them with a null value
-             in the sequence of datagrams returned in the next call to receiveDatagrams(). 
-		         One null value may represent many dropped datagrams.<p>
-          <p>receiveDatagrams() may only be called once at a time. 
-		         If a promised returned from a previous call is still unresolved, 
-            the user agent MUST return a new promise rejected with an InvalidStateError. </p>   
+             in the sequence of datagrams returned in the next call to receiveDatagrams().
+             One null value may represent many dropped datagrams.<p>
+          <p>receiveDatagrams() may only be called once at a time.
+             If a promised returned from a previous call is still unresolved,
+             the user agent MUST return a new promise rejected with an InvalidStateError. </p>
           <div>
             <em>Return type:</em> <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;</code>
           </div>
@@ -781,7 +781,7 @@ interface DatagramsReceivedEvent : Event {
   </section>
 
   <section id="data-transport*">
-    <h2><dfn>DataTransport</dfn> Mixin</h2>   
+    <h2><dfn>DataTransport</dfn> Mixin</h2>
     <p>
       The <code>DataTransport</code> includes the methods common to all data transports,
       such as state, state changes, and the ability to stop the transport.
@@ -831,7 +831,7 @@ interface mixin DataTransport {
       <h2>Methods</h2>
       <dl data-link-for="DataTransport" data-dfn-for="DataTransport" class=
       "methods">
-        <!-- TODO: Should this be moved out of DataTransport?  
+        <!-- TODO: Should this be moved out of DataTransport?
              It might different for each type of data transport. -->
         <dt><dfn><code>stop</code></dfn></dt>
         <dd>
@@ -1025,7 +1025,7 @@ dictionary DataTransportStopInfo {
             <dt><dfn><code>reason</code></dfn> of type <span class=
             "idlMemberType"><a>DOMString</a></span>, defaulting to <code>""</code></dt>
             <dd>
-              <p>The reason for stopping the <code><a>DataTransport/a></code></p>
+              <p>The reason for stopping the <code><a>DataTransport</a></code></p>
             </dd>
           </dl>
         </section>
@@ -1045,7 +1045,7 @@ dictionary DataTransportStopInfo {
       <p>A <code><a>QuicTransportBase</a></code> is a
       <code>UnidirectionalStreamsTransport</code>, a
       <code>BidirectionalStreamsTransport</code>, and a
-      <code>DatagramTransport</code>.  
+      <code>DatagramTransport</code>.
       SendStreams and ReceiveStreams are implemented with unidirectional QUIC streams as defined in [[!QUIC-TRANSPORT]].
       BidirectionalStreams are implemented with bidirectional QUIC streams as defined in [[!QUIC-TRANSPORT]].
       Datagrams are implemented with QUIC datagrams as defined in [[QUIC-DATAGRAM]].
@@ -1112,15 +1112,14 @@ interface QuicTransport : QuicTransportBase {
             </li>
             <li>Run these steps in parallel:
               <ol>
-                
                 <!-- TODO: Figure out a way to convey the origin in an encrypted manner
                            and then use a non-empty value like so:
                 Let <var>serializedOrigin<var> be the empty string ,<code>""</code>.
-                Let <var>serializedOrigin<var> be <var>quictransport<var>'s 
+                Let <var>serializedOrigin<var> be <var>quictransport<var>'s
                 <a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">relevant settings object</a>'s
                 <a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-origin">origin</a>,
                 <a href="https://html.spec.whatwg.org/multipage/origin.html#ascii-serialisation-of-an-origin">serialized</a>.
-                The user agent MUST include a QUIC transport parameter with ID of web_origin(0x3330) 
+                The user agent MUST include a QUIC transport parameter with ID of web_origin(0x3330)
                 and value of <var>serializedOrigin</var>.
                 -->
                 <li>Establish a QUIC connection to the address identified by the
@@ -1209,7 +1208,7 @@ interface QuicTransport : QuicTransportBase {
   <section id="outgoing-stream*">
     <h2>Interface Mixin <dfn>OutgoingStream</dfn></h2>
     <p>
-      An OutgoingStream is a stream that can be written to, 
+      An OutgoingStream is a stream that can be written to,
       as either a <code>SendStream </code>or a <code>BidirectionalStream</code>
     </p>
     <div>
@@ -1295,7 +1294,7 @@ interface mixin OutgoingStream {
           <dd>
             <p>Writes data to the stream. When the remote <code><a>DataTransport</a></code>
             receives data for this stream for the first time, it will trigger the
-            creation of the corresponding remote <code>IncomingStream</code>. 
+            creation of the corresponding remote <code>IncomingStream</code>.
             When the <code>write</code> method is
             called, the <a>user agent</a> <em class="rfc2119" title="MUST">MUST</em>
             run the following steps:</p>
@@ -1510,9 +1509,9 @@ dictionary StreamWriteParameters {
   <section id="incoming-stream*">
     <h2>Interface Mixin <dfn>IncomingStream</dfn></h2>
     <p>
-        An OutgoingStream is a stream that can be read fromn, 
+        An OutgoingStream is a stream that can be read from,
         as either a <code>ReceiveStream </code>or a <code>BidirectionalStream</code>
-    </p>    
+    </p>
     <div>
       <pre class="idl">
 [ Exposed=Window ]
@@ -1701,7 +1700,7 @@ interface mixin IncomingStream {
             <p><code>waitForReadable</code> waits for data to become available, or
             for the <code><a>IncomingStream</a></code> to be finished reading.  It
             <a>resolves</a> the promise when the data queued in the read buffer
-            increases above the amount provided as an argument or when a 
+            increases above the amount provided as an argument or when a
             message is received with an end indication (for QUIC, a STREAM frame
             with the FIN bit set). If <code>waitForReadable</code>
             is called multiple times, multiple promises could be resolved.

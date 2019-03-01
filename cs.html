@@ -691,12 +691,12 @@ interface mixin DatagramTransport {
     <h2><dfn>WebTransport</dfn> Mixin</h2>
     <p>
       The <code>WebTransport</code> includes the methods common to all transports,
-      such as state, state changes, and the ability to stop the transport.
+      such as state, state changes, and the ability to close the transport.
     </p>
     <pre class="idl">
 interface mixin WebTransport {
   readonly attribute TransportState state;
-  void                                  stop (WebTransportStopInfo stopInfo);
+  void                                  close (WebTransportCloseInfo closeInfo);
            attribute EventHandler       onstatechange;
            attribute EventHandler       onerror;
 };</pre>
@@ -718,7 +718,7 @@ interface mixin WebTransport {
           <p>This event handler, of event handler event type
           <code><a>statechange</a></code>, <em class="rfc2119" title="MUST">MUST</em>
           be fired any time the <a>[[\TransportState]]</a> slot changes, unless
-          the state changes due to calling <a><code>stop</code></a>.</p>
+          the state changes due to calling <a><code>close</code></a>.</p>
         </dd>
 
         <dt><dfn><code>onerror</code></dfn> of type <span class=
@@ -740,25 +740,25 @@ interface mixin WebTransport {
       "methods">
         <!-- TODO: Should this be moved out of WebTransport?
              It might different for each type of transport. -->
-        <dt><dfn><code>stop</code></dfn></dt>
+        <dt><dfn><code>close</code></dfn></dt>
         <dd>
-          <p>Stops and closes the <code><a>WebTransport</a></code> object.
+          <p>Closes the <code><a>WebTransport</a></code> object.
           <!-- TODO: move reference to QUIC under QuicTransportBase. -->
           For QUIC, this triggers an <dfn>Immediate Close</dfn> as described in [[QUIC-TRANSPORT]] section 10.3.
-          <p>When <code>stop</code> is called, the user agent <em class="rfc2119" title="MUST">MUST</em>
+          <p>When <code>close</code> is called, the user agent <em class="rfc2119" title="MUST">MUST</em>
           run the following steps:</p>
           <ol>
             <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>
-            on which <code>stop</code> is invoked.</li>
+            on which <code>close</code> is invoked.</li>
             <li>If <var>transport</var>'s <a>[[\TransportState]]</a> is <code>"closed"</code>
             then abort these steps.</li>
             <li>Set <var>transport</var>'s <a>[[\TransportState]]</a> to
             <code>"closed"</code>.</li>
-            <li>Let <code>stopInfo</code> be the first argument.</li>
+            <li>Let <code>closeInfo</code> be the first argument.</li>
             <!-- TODO: move reference to QUIC under QuicTransportBase. -->
             <li>For QUIC, start the <a>Immediate Close</a> procedure by sending an CONNECTION_CLOSE frame
-            with its error code value set to the value of <var>stopInfo</var>.errorCode
-            and its reason value set to the value of <var>stopInfo</var>.reason.</li>
+            with its error code value set to the value of <var>closeInfo</var>.errorCode
+            and its reason value set to the value of <var>closeInfo</var>.reason.</li>
           </ol>
           <div>
             <em>No parameters.</em>
@@ -776,8 +776,8 @@ interface mixin WebTransport {
                 <th>Description</th>
               </tr>
               <tr>
-                <td class="prmName">stopInfo</td>
-                <td class="prmType"><code>WebTransportStopInfo</code></td>
+                <td class="prmName">closeInfo</td>
+                <td class="prmType"><code>WebTransportCloseInfo</code></td>
                 <td class="prmNullFalse"><span role="img" aria-label=
                 "False">&#10008;</span></td>
                 <td class="prmOptFalse"><span role="img" aria-label=
@@ -836,13 +836,13 @@ enum WebTransportState {
               "idl-def-WebTransportState.closed">closed</code></dfn></td>
               <td>
                 <p>The transport has been closed intentionally via a call to
-                <code>stop()</code> or receipt of a closing message from the remote side.
+                <code>close()</code> or receipt of a closing message from the remote side.
                 When the <code><a>WebTransport</a></code>'s
                 internal <a>[[\TransportState]]</a> slot transitions to
                 <code>closed</code> the user agent <em class="rfc2119" title="MUST">MUST</em>
                 run the following steps:</p>
                 <ol>
-                  <li>Let <var>transport</var> be the <code><a>WebTransportBase</a></code>.
+                  <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>.
                   <li>For each <code><a>IncomingStream</a></code> in <var>transport</var>'s
                   <a>[[\IncomingStreams]]</a> internal slot run the
                   following:</li>
@@ -907,21 +907,21 @@ enum WebTransportState {
         </table>
       </div>
     </section>
-    <section id="datatransportstopinfo*">
-      <h3><dfn>WebTransportStopInfo</dfn> Dictionary</h3>
-      <p>The <code>WebTransportStopInfo</code> dictionary includes information
-      relating to the error code for stopping a <code><a>WebTransport</a></code>.
+    <section id="datatransportcloseinfo*">
+      <h3><dfn>WebTransportCloseInfo</dfn> Dictionary</h3>
+      <p>The <code>WebTransportCloseInfo</code> dictionary includes information
+      relating to the error code for closing a <code><a>WebTransport</a></code>.
       For QUIC, this information is used to set the error code and reason for an CONNECTION_CLOSE
       frame.</p>
       <div>
         <pre class="idl">
-dictionary WebTransportStopInfo {
+dictionary WebTransportCloseInfo {
     unsigned short errorCode = 0;
     DOMString reason = "";
 };</pre>
         <section>
-          <h2>Dictionary <a class="idlType">WebTransportStopInfo</a> Members</h2>
-          <dl data-link-for="WebTransportStopInfo" data-dfn-for="WebTransportStopInfo" class=
+          <h2>Dictionary <a class="idlType">WebTransportCloseInfo</a> Members</h2>
+          <dl data-link-for="WebTransportCloseInfo" data-dfn-for="WebTransportCloseInfo" class=
           "dictionary-members">
             <dt><dfn><code>errorCode</code></dfn> of type <span class=
             "idlMemberType"><a>unsigned short</a></span>, defaulting to
@@ -932,7 +932,7 @@ dictionary WebTransportStopInfo {
             <dt><dfn><code>reason</code></dfn> of type <span class=
             "idlMemberType"><a>DOMString</a></span>, defaulting to <code>""</code></dt>
             <dd>
-              <p>The reason for stopping the <code><a>WebTransport</a></code></p>
+              <p>The reason for closing the <code><a>WebTransport</a></code></p>
             </dd>
           </dl>
         </section>
@@ -1404,7 +1404,7 @@ dictionary StreamWriteParameters {
               <dt><dfn><code>errorCode</code></dfn> of type <span class=
               "idlMemberType"><a>unsigned short</a></span>.</dt>
               <dd>
-                <p>The error code.  The default value of 0 means "STOPPING."</p>
+                <p>The error code.  The default value of 0 means "CLOSING."</p>
               </dd>
             </dl>
           </section>

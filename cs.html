@@ -246,18 +246,28 @@ interface QuicTransportBase {
                 </li>
                 <ol>
                   <li>
-                    <p>When <code><var>transport</var>'s state</code> transitions to
-                    <code>"connected"</code> and <var>p</var> has not been <a>settled</a>,
-                    <a>resolve</a> <var>p</var> with a newly created
-                    <code><a>QuicBidirectionalStream</a></code> object, and
+                    <p><a>Resolve</a> <var>p</var> with a newly created
+                    <code><a>QuicBidirectionalStream</a></code> object,
                     <a>add the QuicBidirectionalStream</a> to the <var>transport</var>
-                    and abort these steps.</p>
+                    when all of the following conditions are met:</p>
+                    <ol>
+                      <li>The <code><var>transport</var>'s state</code> has transitioned to
+                      <code>"connected"</code></li>
+                      <li> Stream creation flow control is not being violated by exceeding
+                      the max stream limit set by the remote endpoint, as specified in
+                      [[QUIC-TRANSPORT]].</li>
+                      <li><var>p</var> has not been <a>settled</a></li>
+                    </ol>
+                    </p>
                   </li>
                   <li>
-                    <p>When <code><var>transport</var>'s state</code> transitions to
-                    <code>"closed"</code> or <code>"failed"</code> and <var>p</var> has not been
-                    <a>settled</a>, <a>reject</a> <var>p</var> with a newly created
-                    <code>InvalidStateError</code>.</p>
+                    <p><a>Reject</a> <var>p</var> with a newly created
+                    <code>InvalidStateError</code> when all of the following conditions are met:
+                    <ol>
+                      <li>The <code><var>transport</var>'s state</code> transitions to
+                      <code>"closed"</code> or <code>"failed"</code></li>
+                      <li><var>p</var> has not been <a>settled</a></li>
+                    </ol>
                   </li>
                 </ol>
               </ol>
@@ -300,18 +310,28 @@ interface QuicTransportBase {
                 </li>
                 <ol>
                   <li>
-                    <p>When <code><var>transport</var>'s state</code> transitions to
-                    <code>"connected"</code> and <var>p</var> has not been <a>settled</a>,
-                    <a>resolve</a> <var>p</var> with a newly created
-                    <code><a>QuicSendStream</a></code> object, and
+                    <p><a>Resolve</a> <var>p</var> with a newly created
+                    <code><a>QuicSendStream</a></code> object,
                     <a>add the QuicSendStream</a> to the <var>transport</var>
-                    and abort these steps.</p>
+                    when all of the following conditions are met:</p>
+                    <ol>
+                      <li>The <code><var>transport</var>'s state</code> has transitioned to
+                      <code>"connected"</code></li>
+                      <li> Stream creation flow control is not being violated by exceeding
+                      the max stream limit set by the remote endpoint, as specified in
+                      [[QUIC-TRANSPORT]].</li>
+                      <li><var>p</var> has not been <a>settled</a></li>
+                    </ol>
+                    </p>
                   </li>
                   <li>
-                    <p>When <code><var>transport</var>'s state</code> transitions to
-                    <code>"closed"</code> or <code>"failed"</code> and <var>p</var> has not been
-                    <a>settled</a>, <a>reject</a> <var>p</var> with a newly created
-                    <code>InvalidStateError</code>.</p>
+                    <p><a>Reject</a> <var>p</var> with a newly created
+                    <code>InvalidStateError</code> when all of the following conditions are met:
+                    <ol>
+                      <li>The <code><var>transport</var>'s state</code> transitions to
+                      <code>"closed"</code> or <code>"failed"</code></li>
+                      <li><var>p</var> has not been <a>settled</a></li>
+                    </ol>
                   </li>
                 </ol>
               </ol>

@@ -877,7 +877,7 @@ enum WebTransportState {
               "idl-def-WebTransportState.failed">failed</code></dfn></td>
               <td>
                 <p>The transport has been closed as the result of an error (such as
-                receipt of an error alert). When the <code><a>DataTransport</a></code>'s
+                receipt of an error alert). When the <code><a>WebTransport</a></code>'s
                 internal <a>[[\WebTransportState]]</a> slot transitions to
                 <code>failed</code> the user agent <em class="rfc2119" title="MUST">MUST</em>
                 run the following steps:</p>
@@ -911,7 +911,7 @@ enum WebTransportState {
         </table>
       </div>
     </section>
-    <section id="datatransportcloseinfo*">
+    <section id="webtransportcloseinfo*">
       <h3><dfn>WebTransportCloseInfo</dfn> Dictionary</h3>
       <p>The <code>WebTransportCloseInfo</code> dictionary includes information
       relating to the error code for closing a <code><a>WebTransport</a></code>.

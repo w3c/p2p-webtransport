@@ -877,7 +877,7 @@ enum WebTransportState {
               "idl-def-WebTransportState.failed">failed</code></dfn></td>
               <td>
                 <p>The transport has been closed as the result of an error (such as
-                receipt of an error alert). When the <code><a>DatraTransport/a></code>'s
+                receipt of an error alert). When the <code><a>DataTransport</a></code>'s
                 internal <a>[[\TransportState]]</a> slot transitions to
                 <code>failed</code> the user agent <em class="rfc2119" title="MUST">MUST</em>
                 run the following steps:</p>
@@ -1041,12 +1041,12 @@ interface QuicTransport : QuicTransportBase {
                   and empty value.
                   <!-- TODO: register "wq" with IANA. --> 
                 </li>
-                <li>If the connection fails, set <var>quictransport</var>'s <a>[[\QuicTransportState]]</a>
+                <li>If the connection fails, set <var>quictransport</var>'s <a>[[\WebTransportState]]</a>
                     internal slot to <code>"failed"</code> and abort these steps.
                 </li>
                 <li>Let <var>joinedAcceptedOrigins</var> be the QUIC transport parameter provided
                     by the server with ID web_accepted_origins(0x333A).  If the transport parameter is
-                    absent, set <var>quictransport</var>'s <a>[[\QuicTransportState]]</a>
+                    absent, set <var>quictransport</var>'s <a>[[\WebTransportState]]</a>
                     internal slot to <code>"failed"</code> and abort these steps.
                     <!-- TODO: register 0x333A with IANA -->
                 </li>
@@ -1063,11 +1063,11 @@ interface QuicTransport : QuicTransportBase {
                 </li>
                 <li>If <var>serializedOrigin</var> is a member of <var>serializedAcceptedOrigins</var> 
                     or <var>joinedAcceptedOrigins</var> is equal to <code>"*"</code>, 
-                    set <var>quictransport</var>'s <a>[[\QuicTransportState]]</a>
+                    set <var>quictransport</var>'s <a>[[\WebTransportState]]</a>
                     internal slot to <code>"connected"</code> and abort these steps.
                 </li>
                 <li>
-                    Set <var>quictransport</var>'s <a>[[\QuicTransportState]]</a>
+                    Set <var>quictransport</var>'s <a>[[\WebTransportState]]</a>
                     internal slot to <code>"failed"</code>.
                 </li>
               </ol>
@@ -1714,7 +1714,7 @@ interface mixin IncomingStream {
       </pre>
       <section>
         <h2>Attributes</h2>
-        <dl data-link-for="QuicStream" data-dfn-for="QuicStream" class=
+        <dl data-link-for="WebTransportStream" data-dfn-for="WebTransportStream" class=
         "attributes">
           <dt><dfn><code>streamId</code></dfn> of type <span class=
           "idlAttrType"><a>unsigned long long</a></span>, readonly</dt>
@@ -1907,7 +1907,7 @@ setInterval(() => {
     Harald Alvestrand, Stefan H&aring;kansson, Bernard Aboba and Dominique
     Haza&euml;l-Massieux, for their support. Contributions to this
     specification were provided by Robin Raymond.</p>
-    <p>The <code><a>QuicTransport</a></code> and <code><a>QuicStream</a></code> objects
+    <p>The <code><a>QuicTransport</a></code> and <code>QuicStream</code> objects
     were initially described in the <a href="https://www.w3.org/community/ortc/">W3C ORTC CG</a>,
     and have been adapted for use in this specification.</p>
   </section>

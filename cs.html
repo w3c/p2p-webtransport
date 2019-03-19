@@ -699,7 +699,7 @@ interface mixin DatagramTransport {
     </p>
     <pre class="idl">
 interface mixin WebTransport {
-  readonly attribute TransportState state;
+  readonly attribute WebTransportState state;
   void                                  close (WebTransportCloseInfo closeInfo);
            attribute EventHandler       onstatechange;
            attribute EventHandler       onerror;
@@ -709,11 +709,11 @@ interface mixin WebTransport {
       <dl data-link-for="WebTransport" data-dfn-for="WebTransport" class=
       "attributes">
         <dt><dfn><code>state</code></dfn> of type <span class=
-        "idlAttrType"><a>TransportState</a></span>, readonly</dt>
+        "idlAttrType"><a>WebTransportState</a></span>, readonly</dt>
         <dd>
           <p>The current state of the transport. On getting, it
           <em class="rfc2119" title="MUST">MUST</em> return the value
-          of the <a>[[\TransportState]]</a> internal slot.</p>
+          of the <a>[[\WebTransportState]]</a> internal slot.</p>
         </dd>
 
         <dt><dfn><code>onstatechange</code></dfn> of type <span class=
@@ -721,7 +721,7 @@ interface mixin WebTransport {
         <dd>
           <p>This event handler, of event handler event type
           <code><a>statechange</a></code>, <em class="rfc2119" title="MUST">MUST</em>
-          be fired any time the <a>[[\TransportState]]</a> slot changes, unless
+          be fired any time the <a>[[\WebTransportState]]</a> slot changes, unless
           the state changes due to calling <a><code>close</code></a>.</p>
         </dd>
 
@@ -754,9 +754,9 @@ interface mixin WebTransport {
           <ol>
             <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>
             on which <code>close</code> is invoked.</li>
-            <li>If <var>transport</var>'s <a>[[\TransportState]]</a> is <code>"closed"</code>
+            <li>If <var>transport</var>'s <a>[[\WebTransportState]]</a> is <code>"closed"</code>
             then abort these steps.</li>
-            <li>Set <var>transport</var>'s <a>[[\TransportState]]</a> to
+            <li>Set <var>transport</var>'s <a>[[\WebTransportState]]</a> to
             <code>"closed"</code>.</li>
             <li>Let <code>closeInfo</code> be the first argument.</li>
             <!-- TODO: move reference to QUIC under QuicTransportBase. -->
@@ -842,7 +842,7 @@ enum WebTransportState {
                 <p>The transport has been closed intentionally via a call to
                 <code>close()</code> or receipt of a closing message from the remote side.
                 When the <code><a>WebTransport</a></code>'s
-                internal <a>[[\TransportState]]</a> slot transitions to
+                internal <a>[[\WebTransportState]]</a> slot transitions to
                 <code>closed</code> the user agent <em class="rfc2119" title="MUST">MUST</em>
                 run the following steps:</p>
                 <ol>
@@ -878,7 +878,7 @@ enum WebTransportState {
               <td>
                 <p>The transport has been closed as the result of an error (such as
                 receipt of an error alert). When the <code><a>DataTransport</a></code>'s
-                internal <a>[[\TransportState]]</a> slot transitions to
+                internal <a>[[\WebTransportState]]</a> slot transitions to
                 <code>failed</code> the user agent <em class="rfc2119" title="MUST">MUST</em>
                 run the following steps:</p>
                 <ol>
@@ -1011,7 +1011,7 @@ interface QuicTransport : QuicTransportBase {
             objects, initialized to empty.
             </li>
             <li>
-              Let <var>quictransport</var> have a <dfn>[[\TransportState]]</dfn>
+              Let <var>quictransport</var> have a <dfn>[[\WebTransportState]]</dfn>
               internal slot, initialized to <code>"connecting"</code>.
             </li>
             <li>Let <var>quictransport</var> have a <dfn>[[\ReceivedDatagrams]]</dfn>

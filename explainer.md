@@ -47,8 +47,11 @@ encrypted and congestion-controlled communication.
 - Sending game state with minimal latency to server in many small, unreliable,
   out-of-order messages at a regular interval
 
-- Receiving state pushed from server (such as notifications)
-  
+- Receiving messages pushed from server (such as notifications)
+
+- Requesting over HTTP and receiving media pushed out-of-order and unreliably
+  over the same network connection
+
 ## Proposed solutions
 
 1. A set of of generic transport mixins that can be provided by any transport,
@@ -58,7 +61,6 @@ encrypted and congestion-controlled communication.
 
 3. A specific transport based on HTTP3 that allows a subset of the transport
    mixins able to be pooled with HTTP traffic (sharing a congestion control context).
-
 
 ## Example of sending game state to server using QUIC datagrams
 
@@ -95,7 +97,7 @@ setInterval(() => {
 }, 100);
 ```
 
-## Example of consuming media pushed from server using unidirectional receive streams
+## Example of receiving media pushed from server using unidirectional receive streams
 
 ```javascript
 const host = 'example.com';
@@ -148,7 +150,7 @@ async function readStreamBytes(stream, count) {
 }
 ```
 
-## Example of showing notifications pushed from the server, with responses
+## Example of receiving notifications pushed from the server, with responses
 
 ```javascript
 const host = 'example.com';
@@ -196,6 +198,21 @@ async function readStreamUntilFin(stream) {
 }
 ```
 
+## Example of requesting over HTTP and receiving media pushed out-of-order and unreliably over the same network connection
+
+```javascript
+const transport = PooledHttpTransport.getDatagramTransport();
+if (transport) {
+  await fetch('http://example.com/babyshark');
+  const datagrams = await transport.receiveDatagrams();
+  for (let data of datagrams) {
+    if (data) {
+      // Process the data
+    }
+  };
+}
+```
+
 ## Detailed design discussion
 
 Any WebTransport can provide any of the following capabilities (mixins):
@@ -220,7 +237,12 @@ overhead than streams.
 
 A QuicTransport is a WebTransport that maps directly to QUIC streams and
 datagrams, which makes it easy to connect to servers that speak QUIC with
-minimum overhead.
+minimum overhead.  It supports all of these capabilities.
+
+A PooledHttpTransport is a WebTransport that provides different subset of these
+capabilities depending on the underlying HTTP protocol (HTTP3 providing the
+widest support).  It has the advantages that HTTP and non-HTTP traffic can share
+the same network port and congestion control context.
 
 ## Alternative designs considered
 

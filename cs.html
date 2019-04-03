@@ -148,22 +148,43 @@ interface mixin UnidirectionalStreamsTransport {
               <p>Return <var>p</var> and continue the following steps in
               the background.</p>
             </li>
-            <ol>
-              <li>
-                <p>When <code><var>transport</var>'s state</code> transitions to
-                <code>"connected"</code> and <var>p</var> has not been <a>settled</a>,
-                <a>resolve</a> <var>p</var> with a newly created
-                <code><a>SendStream</a></code> object, and
+            <li>
+              <p>
+                <a>Resolve</a> <var>p</var> with a newly created
+                <code><a>SendStream</a></code> object and
                 <a>add the SendStream</a> to the <var>transport</var>
-                and abort these steps.</p>
-              </li>
-              <li>
-                <p>When <code><var>transport</var>'s state</code> transitions to
-                <code>"closed"</code> or <code>"failed"</code> and <var>p</var> has not been
-                <a>settled</a>, <a>reject</a> <var>p</var> with a newly created
-                <code>InvalidStateError</code>.</p>
-              </li>
-            </ol>
+                when all of the following conditions are met:</p>
+                <ol>
+                  <li>
+                    <p>The <code><var>transport</var>'s state</code> has transitioned to
+                    <code>"connected"</code></p>
+                  </li>
+                  <li> 
+                    <p>Stream creation flow control is not being violated by exceeding
+                    the max stream limit set by the remote endpoint, as specified in
+                    [[QUIC-TRANSPORT]].</p>
+                  </li>
+                  <li>
+                    <p><var>p</var> has not been <a>settled</a></p>
+                  </li>
+                </ol>
+              </p>
+            </li>
+            <li>
+              <p>
+                <a>Reject</a> <var>p</var> with a newly created
+                <code>InvalidStateError</code> when all of the following conditions are met:
+                <ol>
+                  <li>
+                    <p>The <code><var>transport</var>'s state</code> transitions to
+                      <code>"closed"</code> or <code>"failed"</code></p>
+                  </li>
+                  <li>
+                    <p><var>p</var> has not been <a>settled</a></p>
+                  </li>
+                </ol>
+              </p>
+            </li>
           </ol>
           <div>
             <em>No parameters.</em>
@@ -376,22 +397,43 @@ interface BidirectionalStreamsTransport {
               <p>Return <var>p</var> and continue the following steps in
               the background.</p>
             </li>
-            <ol>
-              <li>
-                <p>When <code><var>transport</var>'s state</code> transitions to
-                <code>"connected"</code> and <var>p</var> has not been <a>settled</a>,
-                <a>resolve</a> <var>p</var> with a newly created
-                <code><a>BidirectionalStream</a></code> object, and
-                <a>add the BidirectionalStream</a> to the <var>transport</var>
-                and abort these steps.</p>
+            <li>
+                <p>
+                  <a>Resolve</a> <var>p</var> with a newly created
+                  <code><a>BidirectionalStream</a></code> object and
+                  <a>add the BidirectionalStream</a> to the <var>transport</var>
+                  when all of the following conditions are met:</p>
+                  <ol>
+                    <li>
+                      <p>The <code><var>transport</var>'s state</code> has transitioned to
+                      <code>"connected"</code></p>
+                    </li>
+                    <li> 
+                      <p>Stream creation flow control is not being violated by exceeding
+                      the max stream limit set by the remote endpoint, as specified in
+                      [[QUIC-TRANSPORT]].</p>
+                    </li>
+                    <li>
+                      <p><var>p</var> has not been <a>settled</a></p>
+                    </li>
+                  </ol>
+                </p>
               </li>
               <li>
-                <p>When <code><var>transport</var>'s state</code> transitions to
-                <code>"closed"</code> or <code>"failed"</code> and <var>p</var> has not been
-                <a>settled</a>, <a>reject</a> <var>p</var> with a newly created
-                <code>InvalidStateError</code>.</p>
+                <p>
+                  <a>Reject</a> <var>p</var> with a newly created
+                  <code>InvalidStateError</code> when all of the following conditions are met:
+                  <ol>
+                    <li>
+                      <p>The <code><var>transport</var>'s state</code> transitions to
+                        <code>"closed"</code> or <code>"failed"</code></p>
+                    </li>
+                    <li>
+                      <p><var>p</var> has not been <a>settled</a></p>
+                    </li>
+                  </ol>
+                </p>
               </li>
-            </ol>
           </ol>
           <div>
             <em>No parameters.</em>
@@ -1879,7 +1921,8 @@ setInterval(() => {
     <section class="informative" id="datagramexample3*">
       <h3>Receiving datagrams</h3>
       <p>Receiving datagrams can be achieved by calling
-      <code>receiveDatagrams()</code> and remembering to check for null values.
+      <code>receiveDatagrams()</code>  method, remembering to check for null values
+      indicating that packets are not being processed quickly enough.
       </p>
       <pre class="example highlight">
       const transport = getTransport();

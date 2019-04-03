@@ -231,7 +231,21 @@ interface RTCQuicTransport : QuicTransportBase {
             <dt><dfn><code>transport</code></dfn> of type <span class=
             "idlAttrType"><a>RTCIceTransport</a></span>, readonly</dt>
             <dd>
-              <p>The associated <code><a>RTCIceTransport</a></code> instance.</p>
+              <p>The associated <code><a>RTCIceTransport</a></code> instance.
+              When the <code><a>RTCIceTransport</a></code>'s <code>state</code> attribute
+              changes values, the user agent <em class="rfc2119" title="MUST">MUST</em>
+              run the following steps:</p>
+              <ol>
+                 <li>Let <var>transport</var> be the associated
+                   <code><a>RTCIceTransport</a></code> instance.
+                 </li>
+                 <li>If <var>transport</var> is not in the <code>"closed"</code> state,
+                 abort these steps.
+                 </li>
+                 <li>Let <var>quicTransport</var> be the <code><a>RTCQuicTransport</a></code>.</li>
+                 <li>Set <var>quicTransport</var>'s <a>[[\QuicTransportState]]</a> to
+                 <code>"closed"</code>.</li>
+              </ol>
             </dd>
           </dl>
         </section>

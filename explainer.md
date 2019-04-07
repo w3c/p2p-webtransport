@@ -9,7 +9,7 @@ many messages as quickly as possibly, possibly out of order, and possibly
 unreliably from client to server or server to client.  The web platform is
 missing the capability to do this easily.
 
-Native applications can use raw UDP socekts, but those are not available on the
+Native applications can use raw UDP sockets, but those are not available on the
 web because they lack encryption and congestion control.
 
 Historically, web applications that needed bidirectional data stream between a

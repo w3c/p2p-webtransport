@@ -9,19 +9,20 @@ many messages as quickly as possibly, possibly out of order, and possibly
 unreliably from client to server or server to client.  The web platform is
 missing the capability to do this easily.
 
-Native applications can use raw UDP socekts, but those are not available on the
-web because they lack encryption and congestion control.
+Native applications can use raw UDP sockets, but those are not available on the
+web because they lack encryption, congestion control, and a mechanism for
+consent to send (to prevent DDoS attacks).
 
 Historically, web applications that needed bidirectional data stream between a
 client and a server could rely on WebSockets [RFC6455], a message-based
 protocol compatible with Web security model.  However, since the abstraction it
-provides is a single ordered stream of messages, it suffers from head-of-line
+provides is a single, reliable, ordered stream of messages, it suffers from head-of-line
 blocking (HOLB), meaning that all messages must be sent and received in order
 even if they are independent and some of them are no longer needed.  This makes
 it a poor fit for latency sensitive applications which rely on partial
 reliability and stream independence for performance.
 
-We think there is a room for a simple, client-server, unoredered/unreliable API
+We think there is a room for a simple, client-server, unordered/unreliable API
 with minimal latency.  The WebTransport protocol provides this with a single
 transport object that closely matches the functionality provided by the QUIC
 protocol.
@@ -54,12 +55,12 @@ encrypted and congestion-controlled communication.
 
 ## Proposed solutions
 
-1. A set of of generic transport mixins that can be provided by any transport,
+1. A set of generic transport mixins that can be provided by any transport,
    but match closely with QUIC's capabilities.
 
 2. A specific transport based on QUIC that implements all of the transport mixins.
 
-3. A specific transport based on HTTP3 that allows a subset of the transport
+3. A specific transport based on HTTP/3 that allows a subset of the transport
    mixins able to be pooled with HTTP traffic (sharing a congestion control context).
 
 ## Example of sending game state to server using QUIC datagrams
@@ -223,8 +224,7 @@ to the sender when either the receiver can't read quickly enough or when
 constrained by network capacity/congestions.  Useful for sending messages that
 do not expect a response.  In-order, reliable messaging can be achieved by
 sending many messages in a single stream. Out-of-order messaging can be achieved
-by sending one message per stream. unreliable messaging can be achieved by
-disabling retransmissions for a particular stream.
+by sending one message per stream.
 
 : Bidirectional streams
 :: Like unidirectional streams, but in two directions.  Useful for sending
@@ -240,7 +240,7 @@ datagrams, which makes it easy to connect to servers that speak QUIC with
 minimum overhead.  It supports all of these capabilities.
 
 A PooledHttpTransport is a WebTransport that provides different subset of these
-capabilities depending on the underlying HTTP protocol (HTTP3 providing the
+capabilities depending on the underlying HTTP protocol (HTTP/3 providing the
 widest support).  It has the advantages that HTTP and non-HTTP traffic can share
 the same network port and congestion control context.
 
@@ -270,4 +270,4 @@ the fact that semantically each WebSocket is a completely independent entity:
   into the system, and prevents optimizations which rely on the streams being on
   the same connection (for instance, it might be possible for the client to
   request different retransmission priorities for different streams, but that
-  would be impossible unless they are all on the same connection.
+  would be impossible unless they are all on the same connection).

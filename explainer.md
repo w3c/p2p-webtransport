@@ -24,9 +24,10 @@ reliability and stream independence for performance.
 
 We think there is a room for a simple, client-server, unordered/unreliable API
 with minimal latency.  The WebTransport protocol provides this with a single
-transport object that closely matches the functionality provided by the QUIC
-protocol and provides a framework that abstracts away the specific underlying
-protocol used.
+transport object that abstracts away the specific underlying protocol with
+a flexibile set of possible capabilities including reliable
+unidirectional and bidirectional streams, and unreliable datagrams 
+(much like the capabilities of QUIC). 
 
 ## Goals
 
@@ -67,7 +68,7 @@ encrypted and congestion-controlled communication.
 3. A specific transport based on HTTP/3 that allows a subset of the transport
    mixins able to be pooled with HTTP traffic (sharing a congestion control context).
 
-## Example of sending game state to server using QUIC datagrams
+## Example of sending unreliable game state to server using QUIC datagrams
 
 ```javascript
 const host = 'example.com';
@@ -86,7 +87,7 @@ setInterval(() => {
 }, 100);
 ```
 
-## Example of sending game state to server using QUIC unidirectional send streams
+## Example of sending reliable game state to server using QUIC unidirectional send streams
 
 ```javascript
 const host = 'example.com';
@@ -97,8 +98,7 @@ setInterval(() => {
   // App-specific encoded game state
   const gameState = getGameState();
   const encodeGameState = encodeGameState(gameState);
-  const stream = await quic.createSendStream({disableRetransmissions
-  true});
+  const stream = await quic.createSendStream();
   stream.write({data: encodedGameState, finished: true});
 }, 100);
 ```
@@ -234,8 +234,8 @@ Any WebTransport can provide any of the following capabilities (mixins):
 - Bidirectional streams are like unidirectional streams, but in two directions.  
   They are useful for sending messages that expect a response.
 
-- Datagrams are small, out-of-order, unreliable messages.  They areuseful for 
-  sending small, out-of-order, unreliable messages with less API complexity
+- Datagrams are small, out-of-order, unreliable messages.  They are useful for 
+  sending messages with less API complexity
   and less network overhead than streams.
 
 A QuicTransport is a WebTransport that maps directly to QUIC streams and
@@ -249,12 +249,12 @@ the same network port and congestion control context.
 
 ## Alternative designs considered
 
-- [WebRTC Data Channel](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel)
+### [WebRTC Data Channel](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel)
 can be used, but require that the server endpoint implement several protocols
 uncommonly found on servers (ICE, DTLS, and SCTP) and that the client
 application use a complex API designed for a very different use case.
 
-- Layering WebSockets over HTTP/3
+### Layering WebSockets over HTTP/3
 [I-D.ietf-quic-http] in a manner similar to how they are currently layered over
 HTTP/2 [RFC8441].  That would avoid head-of-line blocking and provide an
 ability to cancel a stream by closing the corresponding WebSocket object.

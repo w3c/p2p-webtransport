@@ -147,6 +147,8 @@ async function readStreamBytes(stream, count) {
   while (bufferedAmount < count) {
     await stream.waitForReadable(1);
     if (!stream.readable) {
+      // If waitForReadable resolved but the stream is not readable,
+      // Then the stream must have been closed.
       return null;
     }
     const read = stream.readInto(new Uint8Array(buffer, bufferedAmount));
@@ -187,10 +189,12 @@ async function readStreamUntilFin(stream) {
     await stream.waitForReadable(1);
     const buffer = new Uint8Array(stream.readableAmount);
     const read = stream.readInto(readBuffer);
+    buffers.push(buffer);
     bufferedSize += read.amount;
     finished = read.finished;
   }
   if (!finished) {
+    // Stream was aborted
     return null;
   }
 
@@ -207,16 +211,23 @@ async function readStreamUntilFin(stream) {
 ## Example of requesting over HTTP and receiving media pushed out-of-order and unreliably over the same network connection
 
 ```javascript
-const transport = PooledHttpTransport.getDatagramTransport();
-if (transport) {
-  await fetch('http://example.com/babyshark');
-  const datagrams = await transport.receiveDatagrams();
-  for (let data of datagrams) {
-    if (data) {
-      // Process the data
+const mime = 'video/webm; codecs="opus, vp09.00.10.08"';
+const mediaSource = new MediaSource();
+mediaSource.onsourceopen = (e) => {
+  const sourceBuffer = mediaSource.addSourceBuffer(mime);
+  
+  const transport = PooledHttpTransport.getDatagramTransport();
+  if (transport) {
+    await fetch('http://example.com/babyshark');
+    const datagrams = await transport.receiveDatagrams();
+    for (let data of datagrams) {
+      if (data) {
+        const chunk = ccontainerizeMedia(data);
+        sourceBuffer.appendBuffer(chunk);
+      }
     }
-  };
-}
+  }
+};
 ```
 
 ## Detailed design discussion

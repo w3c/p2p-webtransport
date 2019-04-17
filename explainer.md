@@ -25,7 +25,8 @@ reliability and stream independence for performance.
 We think there is a room for a simple, client-server, unordered/unreliable API
 with minimal latency.  The WebTransport protocol provides this with a single
 transport object that closely matches the functionality provided by the QUIC
-protocol.
+protocol and provides a framework that abstracts away the specific underlying
+protocol used.
 
 ## Goals
 
@@ -36,6 +37,9 @@ for unreliable and unordered communication.
 including both reliable and unreliable, ordered and unordered, client-server and
 p2p, data and media.
 
+- Ensure the same security properties as WebSockets (use of TLS, 
+  server-controlled origin policy)
+
 ## Non-goals
 
 This is not [UDP Socket API](https://www.w3.org/TR/raw-sockets/).  We must have
@@ -43,10 +47,10 @@ encrypted and congestion-controlled communication.
 
 ## Key use-cases
 
-- Receiving media pushed from server with minimal latency (out-of-order)
-
 - Sending game state with minimal latency to server in many small, unreliable,
   out-of-order messages at a regular interval
+
+- Receiving media pushed from server with minimal latency (out-of-order)
 
 - Receiving messages pushed from server (such as notifications)
 
@@ -93,7 +97,8 @@ setInterval(() => {
   // App-specific encoded game state
   const gameState = getGameState();
   const encodeGameState = encodeGameState(gameState);
-  const stream = await quic.createSendStream({disableRetransmissions: true});
+  const stream = await quic.createSendStream({disableRetransmissions
+  true});
   stream.write({data: encodedGameState, finished: true});
 }, 100);
 ```
@@ -218,22 +223,20 @@ if (transport) {
 
 Any WebTransport can provide any of the following capabilities (mixins):
 
-: Unidirectional streams
-:: Indefintely long streams of bytes in one direction with back pressure applied
-to the sender when either the receiver can't read quickly enough or when
-constrained by network capacity/congestions.  Useful for sending messages that
-do not expect a response.  In-order, reliable messaging can be achieved by
-sending many messages in a single stream. Out-of-order messaging can be achieved
-by sending one message per stream.
+- Unidirectional streams are indefintely long streams of bytes in one direction 
+  with back pressure applied
+  to the sender when either the receiver can't read quickly enough or when
+  constrained by network capacity/congestions.  Useful for sending messages that
+  do not expect a response.  In-order, reliable messaging can be achieved by
+  sending many messages in a single stream. Out-of-order messaging can be achieved
+  by sending one message per stream.
 
-: Bidirectional streams
-:: Like unidirectional streams, but in two directions.  Useful for sending
-messages that expect a response.
+- Bidirectional streams are like unidirectional streams, but in two directions.  
+  They are useful for sending messages that expect a response.
 
-: Datagrams
-:: Small, out-of-order, unreliable messages.  Useful for sending small
-out-of-order, unreliable messages with less API complexity and less network
-overhead than streams.
+- Datagrams are small, out-of-order, unreliable messages.  They areuseful for 
+  sending small, out-of-order, unreliable messages with less API complexity
+  and less network overhead than streams.
 
 A QuicTransport is a WebTransport that maps directly to QUIC streams and
 datagrams, which makes it easy to connect to servers that speak QUIC with

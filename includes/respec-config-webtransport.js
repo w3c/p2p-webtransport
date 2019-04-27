@@ -1,8 +1,8 @@
 var respecConfig = {
   specStatus: "CG-DRAFT",
   // if there a publicly available Editor's Draft, this is the link
-  edDraftURI: "https://w3c.github.io/webrtc-quic/cs.html",
-  shortName: "webrtc-quic-cs",     
+  edDraftURI: "https://w3c.github.io/webrtc-quic/webtransport2.html",
+  shortName: "webtransport",     
   editors: [
     { name: "Peter Thatcher", company: "Google", w3cid: "68236" },
     { name: "Bernard Aboba", company: "Microsoft Corporation", w3cid: "65611" },
@@ -56,7 +56,7 @@ var respecConfig = {
       "status": "11 March 2019. Internet draft (work in progress)",
       "publisher": "IETF"
     },
-    "RFC8446": {
+    "TLS13": {
       "title": "The Transport Layer Security (TLS) Protocol Version 1.3",
       "href": "https://tools.ietf.org/html/rfc8446",
       "authors": [

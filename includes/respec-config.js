@@ -51,14 +51,15 @@ var respecConfig = {
       "status": "03 October 2018 (work in progress)",
       "publisher": "W3C"
     },
-    "CS-QUIC": {
-      "title": "QUIC API for Client-Server Connections",
-      "href": "https://w3c.github.io/webrtc-quic/cs.html",
+    "WEBTRANSPORT": {
+      "title": "WebTransport",
+      "href": "https://w3c.github.io/webrtc-quic/webtransport2.html",
       "authors": [
         "Peter Thatcher",
-        "Bernard Aboba"
+        "Bernard Aboba",
+        "Robin Raymond"
       ],
-      "status": "05 December 2018 (work in progress)",
+      "status": "25 April 2019 (work in progress)",
       "publisher": "W3C"
     },
     "QUIC-DATAGRAM": {

@@ -12,7 +12,7 @@ progress changes and other inconsistencies, including an incomplete change log.
 
 * [Latest P2P API draft at github](https://w3c.github.io/webrtc-quic/)
 * [Latest WebTransport API draft at github](https://pthatcherg.github.io/web-transport/)
-* [Archived previous version of the WebTransport API draft at github](https://w3c.github.io/webtransport2.html)
+* [Archived previous version of the WebTransport API draft at github](https://w3c.github.io/webrtc-quic/webtransport2.html)
 * [Archived previous version of the Client/Server API draft at github](https://w3c.github.io/webrtc-quic/cs.html)
 * [Archived previous version of P2P API draft at github](https://w3c.github.io/webrtc-quic/index-old.html)
 

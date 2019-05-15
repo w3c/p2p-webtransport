@@ -57,7 +57,7 @@ var respecConfig = {
       "publisher": "IETF"
     },
     "WEB-TRANSPORT-QUIC": {
-      "title": "WebTransport over QUIC"
+      "title": "WebTransport over QUIC",
       "href": "https://tools.ietf.org/html/draft-vvv-webtransport-quic",
       "authors": [
         "V. Vasiliev"
@@ -66,7 +66,7 @@ var respecConfig = {
       "publisher": "IETF"
     },
     "WEB-TRANSPORT-HTTP3": {
-      "title": "WebTransport over HTTP/3"
+      "title": "WebTransport over HTTP/3",
       "href": "https://tools.ietf.org/html/draft-vvv-webtransport-http3",
       "authors": [
         "V. Vasiliev"

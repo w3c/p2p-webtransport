@@ -140,7 +140,7 @@ interface RTCQuicTransport : QuicTransportBase {
             state, <a>throw</a> an <code>InvalidStateError</code> and abort
             these steps.</li>
             <li>If <var>transport</var> has been used to construct another
-            <code><a>RTCQuicTransport</a></code> whose <a>[[\QuicTransportState]]</a> slot
+            <code><a>RTCQuicTransport</a></code> whose <a>[[\WebTransportState]]</a> slot
             is not <code>"closed"</code>, <a>throw</a> an <code>InvalidStateError</code>
             and abort these steps.</li>
             <li>
@@ -250,7 +250,7 @@ interface RTCQuicTransport : QuicTransportBase {
                  abort these steps.
                  </li>
                  <li>Let <var>quicTransport</var> be the <code><a>RTCQuicTransport</a></code>.</li>
-                 <li>Set <var>quicTransport</var>'s <a>[[\QuicTransportState]]</a> to
+                 <li>Set <var>quicTransport</var>'s <a>[[\WebTransportState]]</a> to
                  <code>"closed"</code>.</li>
               </ol>
             </dd>

@@ -80,9 +80,8 @@
       [[!ECMASCRIPT-6.0]].</p>
       <p>The <dfn><code>RTCIceTransport</code></dfn> and <dfn><code>RTCCertificate</code></dfn> interfaces
       and the <dfn><code>RTCDtlsFingerprint</code></dfn> dictionary are defined in [[!WEBRTC]] and [[!ORTC]].
-      The <dfn><code>QuicTransportBase</code></dfn> interface is defined in [[!WEBTRANSPORT]].
-      The <dfn><code>QuicWritableStream</code></dfn>
-      and <dfn><code>QuicReadableStream</code></dfn> interfaces are defined in ??.
+      The <dfn><code>QuicTransportBase</code></dfn>, <dfn><code>OutgoingStream</code></dfn> and
+      <dfn><code>IncomingStream</code></dfn> interfaces are defined in [[!WEBTRANSPORT]] Sections 8, 10 and 11.
       </p>
   </section>
   <section id="rtcquic-transport*">
@@ -158,17 +157,24 @@ interface RTCQuicTransport : QuicTransportBase {
               Let <var>quictransport</var> be a newly constructed
               <code><a>RTCQuicTransport</a></code> object.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportWritableStreams]]</dfn>
-            internal slot representing a sequence of <code><a>QuicWritableStream</a></code>
+            <li>Let <var>quictransport</var> have a <dfn>[[\OutgoingStreams]]</dfn>
+            internal slot representing a sequence of <code><a>OutgoingStream</a></code>
             objects, initialized to empty.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\QuicTransportReadableStreams]]</dfn>
-            internal slot representing a sequence of <code><a>QuicReadableStream</a></code>
+            <li>Let <var>quictransport</var> have a <dfn>[[\IncomingStreams]]</dfn>
+            internal slot representing a sequence of <code><a>IncomingStream</a></code>
             objects, initialized to empty.
             </li>
             <li>
-              Let <var>quictransport</var> have a <dfn>[[\QuicTransportState]]</dfn>
-              internal slot, initialized to <code>"new"</code>.
+              Let <var>quictransport</var> have a <dfn>[[\WebTransportState]]</dfn>
+              internal slot, initialized to <code>"connecting"</code>.
+            </li>
+            <li>Let <var>quictransport</var> have a <dfn>[[\ReceivedDatagrams]]</dfn>
+              internal slot representing a queue of <code>Uint8Array</code>, initialized to empty.
+            </li>
+            <li>Let <var>quictransport</var> have a <dfn>[[\ReceiveDatagramsPromise]]</dfn>
+              internal slot representing a <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;?</code>,
+              initialized to null.
             </li>
             <li>
               Let <var>quictransport</var> have a <dfn>[[\Certificates]]</dfn>

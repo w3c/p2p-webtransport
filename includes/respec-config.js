@@ -53,13 +53,13 @@ var respecConfig = {
     },
     "WEBTRANSPORT": {
       "title": "WebTransport",
-      "href": "https://w3c.github.io/webrtc-quic/webtransport2.html",
+      "href": "https://w3c.github.io/webrtc-quic/webtransport.html",
       "authors": [
         "Peter Thatcher",
         "Bernard Aboba",
         "Robin Raymond"
       ],
-      "status": "25 April 2019 (work in progress)",
+      "status": "15 May 2019 (work in progress)",
       "publisher": "W3C"
     },
     "QUIC-DATAGRAM": {
@@ -80,7 +80,7 @@ var respecConfig = {
         "J. Iyengar",
         "M. Thomson"
       ],
-      "status": "11 March 2019. Internet draft (work in progress)",
+      "status": "23 April 2019. Internet draft (work in progress)",
       "publisher": "IETF"
     },
     "QUIC-MULT": {
@@ -135,7 +135,7 @@ var respecConfig = {
         "C. Jennings",
         "E. Rescorla"
       ],
-      "status": "22 October 2018. Internet Draft (work in progress)",
+      "status": "27 February 2019. Internet Draft (work in progress)",
       "publisher": "IETF"
     },
     "RTCWEB-SECURITY": {
@@ -144,7 +144,7 @@ var respecConfig = {
       "authors": [
         "E. Rescorla"
       ],
-      "status": "22 January 2018. Internet Draft (work in progress)",
+      "status": "01 February 2019. Internet Draft (work in progress)",
       "publisher": "IETF"
     },
     "RTCWEB-SECURITY-ARCH": {
@@ -153,7 +153,7 @@ var respecConfig = {
       "authors": [
         "E. Rescorla"
       ],
-      "status": "17 November 2018. Internet Draft (work in progress)",
+      "status": "01 February 2019. Internet Draft (work in progress)",
       "publisher": "IETF"
     },
     "WEBRTC-STATS": {
@@ -163,7 +163,7 @@ var respecConfig = {
         "Harald Alvestrand",
         "Varun Singh"
       ],
-      "status": "04 April 2019 (work in progress)",
+      "status": "15 May 2019 (work in progress)",
       "publisher": "W3C"
     }
   }

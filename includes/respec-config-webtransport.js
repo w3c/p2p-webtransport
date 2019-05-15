@@ -1,7 +1,7 @@
 var respecConfig = {
   specStatus: "CG-DRAFT",
   // if there a publicly available Editor's Draft, this is the link
-  edDraftURI: "https://w3c.github.io/webrtc-quic/webtransport2.html",
+  edDraftURI: "https://w3c.github.io/webrtc-quic/webtransport.html",
   shortName: "webtransport",     
   editors: [
     { name: "Peter Thatcher", company: "Google", w3cid: "68236" },
@@ -53,7 +53,7 @@ var respecConfig = {
         "J. Iyengar",
         "M. Thomson"
       ],
-      "status": "11 March 2019. Internet draft (work in progress)",
+      "status": "23 April 2019. Internet draft (work in progress)",
       "publisher": "IETF"
     },
     "WEB-TRANSPORT-QUIC": {

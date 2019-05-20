@@ -53,13 +53,13 @@ var respecConfig = {
     },
     "WEBTRANSPORT": {
       "title": "WebTransport",
-      "href": "https://w3c.github.io/webrtc-quic/webtransport.html",
+      "href": "https://pthatcherg.github.io/web-transport/",
       "authors": [
         "Peter Thatcher",
         "Bernard Aboba",
         "Robin Raymond"
       ],
-      "status": "15 May 2019 (work in progress)",
+      "status": "16 May 2019 (work in progress)",
       "publisher": "W3C"
     },
     "QUIC-DATAGRAM": {
@@ -91,7 +91,7 @@ var respecConfig = {
         "P. Thatcher",
         "C. Perkins"
       ],
-      "status": "23 October 2018. Internet draft (work in progress)",
+      "status": "23 January 2019. Internet draft (work in progress)",
       "publisher": "IETF"
     },
     "RFC7675": {

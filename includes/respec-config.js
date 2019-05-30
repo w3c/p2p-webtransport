@@ -53,13 +53,13 @@ var respecConfig = {
     },
     "WEBTRANSPORT": {
       "title": "WebTransport",
-      "href": "https://pthatcherg.github.io/web-transport/",
+      "href": "https://github.com/WICG/web-transport",
       "authors": [
         "Peter Thatcher",
         "Bernard Aboba",
         "Robin Raymond"
       ],
-      "status": "16 May 2019 (work in progress)",
+      "status": "30 May 2019 (work in progress)",
       "publisher": "W3C"
     },
     "QUIC-DATAGRAM": {

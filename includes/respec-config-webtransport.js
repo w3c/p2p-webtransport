@@ -53,7 +53,16 @@ var respecConfig = {
         "J. Iyengar",
         "M. Thomson"
       ],
-      "status": "23 April 2019. Internet draft (work in progress)",
+      "status": "11 March 2019. Internet draft (work in progress)",
+      "publisher": "IETF"
+    },
+    "WEB-TRANSPORT-OVERVIEW": {
+      "title": "WebTransport Protocol Framework",
+      "href": "https://tools.ietf.org/html/draft-vvv-webtransport-overview",
+      "authors": [
+        "V. Vasiliev"
+      ],
+      "status": "03 May 2019. Internet draft (work in progress)",
       "publisher": "IETF"
     },
     "WEB-TRANSPORT-QUIC": {
@@ -80,7 +89,7 @@ var respecConfig = {
       "authors": [
         "E. Rescorla"
       ],
-      "status": "August 2018. RFC",
+      "status": "Internet Standards Track document",
       "publisher": "IETF"
     },
     "ALPN": {

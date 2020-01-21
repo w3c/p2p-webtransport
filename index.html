@@ -82,6 +82,7 @@
       and the <dfn><code>RTCDtlsFingerprint</code></dfn> dictionary are defined in [[!WEBRTC]] and [[!ORTC]].
       The <dfn><code>QuicTransportBase</code></dfn>, <dfn><code>OutgoingStream</code></dfn> and
       <dfn><code>IncomingStream</code></dfn> interfaces are defined in [[!WEBTRANSPORT]] Sections 8, 10 and 11.
+      The <dfn><code>WebTransportState</code></dfn> enum  is defined in [[!WEBTRANSPORT]] Section 7.3.
       </p>
   </section>
   <section id="rtcquic-transport*">
@@ -306,7 +307,7 @@ interface RTCQuicTransport : QuicTransportBase {
               certificate encoded in binary Distinguished Encoding Rules (DER) [[!X690]].
               <code><a>getRemoteCertificates()</a></code> returns an empty list prior to
               selection of the remote certificate, which is completed once
-              <code><a>RTCQuicTransportState</a></code> transitions to
+              <code><a>WebTransportState</a></code> transitions to
               <code>connected</code>.</p>
               <div>
                 <em>No parameters.</em>

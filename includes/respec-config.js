@@ -59,7 +59,7 @@ var respecConfig = {
         "Bernard Aboba",
         "Robin Raymond"
       ],
-      "status": "30 May 2019 (work in progress)",
+      "status": "19 December 2019 (work in progress)",
       "publisher": "W3C"
     },
     "QUIC-DATAGRAM": {
@@ -70,7 +70,7 @@ var respecConfig = {
         "E. Kinnear",
         "D. Schinazi"
       ],
-      "status": "06 February 2019. Internet draft (work in progress)",
+      "status": "04 November 2019. Internet draft (work in progress)",
       "publisher": "IETF"
     },
     "QUIC-TRANSPORT": {
@@ -80,7 +80,7 @@ var respecConfig = {
         "J. Iyengar",
         "M. Thomson"
       ],
-      "status": "23 April 2019. Internet draft (work in progress)",
+      "status": "04 November 2019. Internet draft (work in progress)",
       "publisher": "IETF"
     },
     "QUIC-MULT": {
@@ -163,7 +163,7 @@ var respecConfig = {
         "Harald Alvestrand",
         "Varun Singh"
       ],
-      "status": "15 May 2019 (work in progress)",
+      "status": "15 January 2020 (work in progress)",
       "publisher": "W3C"
     }
   }

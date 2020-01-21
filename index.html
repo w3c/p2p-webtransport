@@ -87,7 +87,7 @@
   <section id="rtcquic-transport*">
     <h2><dfn>RTCQuicTransport</dfn> Interface</h2>
     <p>The <code>RTCQuicTransport</code> is a specialization
-    of <code>QuicTransportBase</code> focused on peer-to-peer use
+    of <code><a>QuicTransport</a></code> focused on peer-to-peer use
     cases and includes information relating to use of a QUIC transport
     with an ICE transport.</p>
     <section id="rtcquictransport-operation*">
@@ -516,7 +516,7 @@ interface RTCQuicTransport : QuicTransport {
       <h2>Persistent information</h2>
       <p>Utilizing the <code>generateCertificate</code> API in [[!WEBRTC]], it is possible to
       generate and store certificates that can subsequently be reused in constructing
-      <code><a>QuicTransportBase</a></code> objects.  These persistent certificates
+      <code><a>RTCQuicTransport</a></code> objects.  These persistent certificates
       can therefore be used to identify a user.</p>
     </section>
   </section>

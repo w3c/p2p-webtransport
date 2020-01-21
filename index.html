@@ -121,8 +121,9 @@
       <h3>Interface Definition</h3>
       <div>
         <pre class="idl">
-        [ Constructor (RTCIceTransport transport, optional sequence&lt;RTCCertificate&gt; certificates), Exposed=Window]
+[Exposed=Window]
 interface RTCQuicTransport : QuicTransportBase {
+    constructor(RTCIceTransport transport, optional sequence&lt;RTCCertificate&gt; certificates);
     readonly        attribute RTCIceTransport          transport;
     RTCQuicParameters     getLocalParameters ();
     RTCQuicParameters?    getRemoteParameters ();
@@ -132,7 +133,7 @@ interface RTCQuicTransport : QuicTransportBase {
 };</pre>
         <section>
           <h2>Constructors</h2>
-          When the <code><a>RTCQuicTransport</a></code> constructor is invoked,
+          When <code><a>RTCQuicTransport</a>.constructor()</code> is invoked,
           the user agent <em class="rfc2119" title="MUST">MUST</em> run the
           following steps:
           <ol>

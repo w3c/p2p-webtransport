@@ -375,7 +375,7 @@ interface RTCQuicTransport : QuicTransportBase {
       <div>
         <pre class="idl">dictionary RTCQuicParameters {
              RTCQuicRole                  role = "auto";
-             sequence&lt;RTCDtlsFingerprint&gt; fingerprints;
+             required sequence&lt;RTCDtlsFingerprint&gt; fingerprints;
 };</pre>
         <section>
           <h2>Dictionary <a class="idlType">RTCQuicParameters</a> Members</h2>

@@ -80,8 +80,7 @@
       [[!ECMASCRIPT-6.0]].</p>
       <p>The <dfn><code>RTCIceTransport</code></dfn> and <dfn><code>RTCCertificate</code></dfn> interfaces
       and the <dfn><code>RTCDtlsFingerprint</code></dfn> dictionary are defined in [[!WEBRTC]] and [[!ORTC]].
-      The <dfn><code>QuicTransportBase</code></dfn>, <dfn><code>OutgoingStream</code></dfn> and
-      <dfn><code>IncomingStream</code></dfn> interfaces are defined in [[!WEBTRANSPORT]] Sections 8, 10 and 11.
+      The <dfn><code>QuicTransport</code></dfn> interface is defined in [[!WEBTRANSPORT]] Sections 8.1.
       The <dfn><code>WebTransportState</code></dfn> enum  is defined in [[!WEBTRANSPORT]] Section 7.3.
       </p>
   </section>
@@ -122,7 +121,7 @@
       <div>
         <pre class="idl">
 [Exposed=Window]
-interface RTCQuicTransport : QuicTransportBase {
+interface RTCQuicTransport : QuicTransport {
     constructor(RTCIceTransport transport, optional sequence&lt;RTCCertificate&gt; certificates);
     readonly        attribute RTCIceTransport          transport;
     RTCQuicParameters     getLocalParameters ();

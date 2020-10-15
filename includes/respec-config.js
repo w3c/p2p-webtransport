@@ -25,10 +25,6 @@ var respecConfig = {
           href: "https://lists.w3.org/Archives/Public/public-ortc/"
         },
         {
-          value: "Browse open issues",
-          href: "https://github.com/w3c/webrtc-quic/issues"
-        },
-        {
           value: "IETF QUIC Working Group",
           href: "https://tools.ietf.org/wg/quic/"
         }

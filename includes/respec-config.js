@@ -48,7 +48,7 @@ var respecConfig = {
         "Bernard Aboba",
         "Justin Uberti"
       ],
-      "status": "03 October 2018 (work in progress)",
+      "status": "20 January 2020 (work in progress)",
       "publisher": "W3C"
     },
     "WEBTRANSPORT": {
@@ -59,18 +59,18 @@ var respecConfig = {
         "Bernard Aboba",
         "Robin Raymond"
       ],
-      "status": "19 December 2019 (work in progress)",
+      "status": "24 September 2020 (work in progress)",
       "publisher": "W3C"
     },
     "QUIC-DATAGRAM": {
       "title": "An Unreliable Datagram Extension to QUIC",
-      "href": "https://tools.ietf.org/html/draft-pauly-quic-datagram",
+      "href": "https://tools.ietf.org/html/draft-ietf-quic-datagram",
       "authors": [
         "T. Pauly",
         "E. Kinnear",
         "D. Schinazi"
       ],
-      "status": "04 November 2019. Internet draft (work in progress)",
+      "status": "24 August 2020. Internet draft (work in progress)",
       "publisher": "IETF"
     },
     "QUIC-TRANSPORT": {
@@ -80,18 +80,18 @@ var respecConfig = {
         "J. Iyengar",
         "M. Thomson"
       ],
-      "status": "04 November 2019. Internet draft (work in progress)",
+      "status": "25 September 2020. Internet draft (work in progress)",
       "publisher": "IETF"
     },
     "QUIC-MULT": {
-      "title": "QUIC Multiplexing",
-      "href": "https://tools.ietf.org/html/draft-aboba-avtcore-quic-multiplexing",
+      "title": "Multiplexing Scheme Updates for QUIC",
+      "href": "https://tools.ietf.org/html/draft-aboba-avtcore-rfc7983bis",
       "authors": [
         "B. Aboba",
-        "P. Thatcher",
+        "G. Salgueiro",
         "C. Perkins"
       ],
-      "status": "23 January 2019. Internet draft (work in progress)",
+      "status": "05 March 2020. Internet draft (work in progress)",
       "publisher": "IETF"
     },
     "RFC7675": {
@@ -163,7 +163,7 @@ var respecConfig = {
         "Harald Alvestrand",
         "Varun Singh"
       ],
-      "status": "15 January 2020 (work in progress)",
+      "status": "06 October 2020 (work in progress)",
       "publisher": "W3C"
     }
   }

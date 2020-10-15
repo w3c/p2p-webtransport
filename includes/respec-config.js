@@ -10,11 +10,12 @@ var respecConfig = {
   ],
   authors: [
   ],
-  wg: "Object-RTC API Community Group",
-  wgURI: "https://www.w3.org/community/ortc/",
+  group: "ortc",
   wgPublicList: "public-ortc",
-  wgPatentURI:  "https://www.w3.org/2004/01/pp-impl/47318/status",
-  issueBase: "https://github.com/w3c/webrtc-quic/issues",
+  github: {
+    repoURL: "https://github.com/w3c/webrtc-quic/",
+    branch: "master"
+  },
   otherLinks: [
     {
       key: "Participate",

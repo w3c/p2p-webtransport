@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <link href="includes/style.css" rel="stylesheet">
   <title>QUIC API for Peer-to-peer Connections</title>
-  <script class="remove" src="https://www.w3.org/Tools/respec/respec-w3" type="text/javascript"></script>
+  <script class="remove" src="https://www.w3.org/Tools/respec/respec-w3-common" type="text/javascript"></script>
   <script src="includes/respec-config.js" class="remove"></script>
 </head>
 <body>
@@ -29,11 +29,10 @@
     by utilizing a QUIC stream per message, it is possible to implement
     support for message-based communications (such as <code>RTCDataChannel</code>)
     on top.</p>
-    <p class="note">The QUIC API presented in this specification
-    represents a preliminary proposal based on work-in-progress
-    within the IETF QUIC WG. Since the QUIC transport specification is
-    a work-in-progress, both the protocol and API are likely to
-    change significantly going forward.</p>
+    <p class="note">This specification extends the WebTransport API under development
+    within the W3C WebTransport WG. Since the WebTransport specification is
+    a work-in-progress, the API is likely to change significantly going
+    forward.</p>
   </section>
   <section id="conformance">
     <p>This specification defines conformance criteria that apply to a single
@@ -89,7 +88,7 @@
   <section id="rtcquic-transport*">
     <h2><dfn>RTCQuicTransport</dfn> Interface</h2>
     <p>The <code>RTCQuicTransport</code> is a specialization
-    of <code><a>QuicTransport</a></code> focused on peer-to-peer use
+    of <code><a>WebTransport</a></code> focused on peer-to-peer use
     cases and includes information relating to use of a QUIC transport
     with an ICE transport.</p>
     <section id="rtcquictransport-operation*">
@@ -123,14 +122,14 @@
       <div>
         <pre class="idl">
 [Exposed=Window]
-interface RTCQuicTransport : QuicTransport {
+interface RTCQuicTransport : WebTransport {
     constructor(RTCIceTransport transport, optional sequence&lt;RTCCertificate&gt; certificates);
     readonly        attribute RTCIceTransport          transport;
     RTCQuicParameters     getLocalParameters ();
     RTCQuicParameters?    getRemoteParameters ();
     sequence&lt;RTCCertificate&gt; getCertificates ();
     sequence&lt;ArrayBuffer&gt; getRemoteCertificates ();
-    void                  start (RTCQuicParameters remoteParameters);
+    undefined                  start (RTCQuicParameters remoteParameters);
 };</pre>
         <section>
           <h2>Constructors</h2>

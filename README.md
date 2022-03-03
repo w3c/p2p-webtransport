@@ -10,8 +10,8 @@ specification developed by the IETF WEBTRANS Working Group.
 The editors' draft is the tip-of-tree of this document, it may contain work in
 progress changes and other inconsistencies, including an incomplete change log.
 
-* [Latest P2P API draft at github](https://w3c.github.io/p2p-webtransport/)
-* [Original P2P API (without WHATWG Streams)](https://webrtc.internaut.com/ortc/#quic-transport*)
+* [Latest P2P WebTransport API draft at github](https://w3c.github.io/p2p-webtransport/)
+* [Original RTCQuicTransport API](https://webrtc.internaut.com/ortc/#quic-transport*)
 * [Latest WebTransport API draft at github](https://wicg.github.io/web-transport/)
 * [Archived previous version of the WebTransport API draft at github](https://w3c.github.io/p2p-webtransport/webtransport.html)
 * [Archived previous version of the Client/Server API draft at github](https://w3c.github.io/p2p-webtransport/cs.html)

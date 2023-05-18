@@ -48,7 +48,7 @@ var respecConfig = {
       "status": "20 January 2020 (work in progress)",
       "publisher": "W3C"
     },
-    "QUIC-DATAGRAM": {
+    "RFC9221": {
       "title": "An Unreliable Datagram Extension to QUIC",
       "href": "https://datatracker.ietf.org/doc/html/rfc9221",
       "authors": [
@@ -59,7 +59,7 @@ var respecConfig = {
       "status": "March 2022. RFC",
       "publisher": "IETF"
     },
-    "QUIC-TRANSPORT": {
+    "RFC9000": {
       "title": "QUIC: A UDP-Based Multiplexed and Secure Transport",
       "href": "https://datatracker.ietf.org/doc/html/rfc9000",
       "authors": [
@@ -69,7 +69,7 @@ var respecConfig = {
       "status": "May 2021. RFC",
       "publisher": "IETF"
     },
-    "QUIC-MULT": {
+    "RFC7983bis": {
       "title": "Multiplexing Scheme Updates for QUIC",
       "href": "https://datatracker.ietf.org/html/draft-ietf-avtcore-rfc7983bis",
       "authors": [
@@ -102,7 +102,7 @@ var respecConfig = {
       "status": "August 2018. RFC",
       "publisher": "IETF"
     },
-    "DATA-PROT": {
+    "RFC8832": {
       "title": "WebRTC Data Channel Establishment Protocol",
       "href": "https://datatracker.ietf.org/doc/html/rfc8832",
       "authors": [
@@ -124,7 +124,7 @@ var respecConfig = {
       "status": "26 July 2023. Internet Draft (work in progress)",
       "publisher": "IETF"
     },
-    "RTCWEB-SECURITY": {
+    "RFC8826": {
       "title": "Security Considerations for WebRTC",
       "href": "https://datatracker.ietf.org/doc/html/rfc8826",
       "authors": [
@@ -133,7 +133,7 @@ var respecConfig = {
       "status": "January 2021. RFC",
       "publisher": "IETF"
     },
-    "RTCWEB-SECURITY-ARCH": {
+    "RFC8827": {
       "title": "WebRTC Security Architecture",
       "href": "https://datatracker.ietf.org/doc/html/rfc8827",
       "authors": [

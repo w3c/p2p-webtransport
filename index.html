@@ -12,24 +12,24 @@
     <p>This document defines a set of ECMAScript APIs in WebIDL to allow data to be sent
     and received from another browser or device implementing the QUIC
     protocol. This specification is being developed in conjunction with a protocol
-    specification developed by the IETF QUIC Working Group.</p>
+    specification developed by the IETF AVTCORE Working Group.</p>
   </section>
   <section id="sotd">
   </section>
   <section class="informative" id="intro">
     <h2>Introduction</h2>
     <p>This specification extends the WebRTC [[WEBRTC]], ORTC [[ORTC]] and WebTransport [[WEBTRANSPORT]]
-    specifications to enable the use of QUIC [[QUIC-TRANSPORT]] to exchange arbitrary data with
+    specifications to enable the use of QUIC [[RFC9000]] to exchange arbitrary data with
     remote peers using NAT-traversal technologies such as ICE, STUN, and
     TURN. Since QUIC can be multiplexed on the same port as RTP, RTCP,
-    DTLS, STUN and TURN, this specification is compatible with all the
+    DTLS, STUN and TURN as defined in [!RFC7983bis], this specification is compatible with all the
     functionality defined in [[WEBRTC]] and [[ORTC]] including communication
     using audio/video media and SCTP data channels.</p>
-    <p>This specification defines an interface to QUIC streams as well as datagrams [[QUIC-DATAGRAM]]. 
+    <p>This specification defines an interface to QUIC streams as well as datagrams [[RFC9221]]. 
     By utilizing a QUIC stream per message, it is possible to implement
     support for message-based communications (such as <code>RTCDataChannel</code>)
     on top.</p>
-    <p class="note">This specification extends the WebTransport API under development
+    <p class="note">This specification extends the WebTransport API [[WEBTRANSPORT]] under development
     within the W3C WebTransport WG. Since the WebTransport specification is
     a work-in-progress, the API is likely to change significantly going
     forward.</p>
@@ -102,7 +102,7 @@
       referenced.</p>
       <p>The QUIC negotiation occurs between transport endpoints determined via ICE.
       Multiplexing of QUIC with STUN, TURN, DTLS, RTP and RTCP
-      is supported within [[QUIC-TRANSPORT]].</p>
+      is supported within [[RFC7983bis]].</p>
       <p>A newly constructed <code><a>RTCQuicTransport</a></code> <em class="rfc2119"
       title="MUST">MUST</em> listen and respond to incoming QUIC packets before
       <code>start()</code> is called. However, to complete the negotiation it is
@@ -476,7 +476,7 @@ interface RTCQuicTransport : WebTransport {
     instead summarizes information already present in other parts of the
     specification. The overall security considerations of the
     APIs and protocols used in WebRTC are described in
-    [[RTCWEB-SECURITY-ARCH]].</p>
+    [[RFC8827]].</p>
     <section>
       <h2>Impact on same origin policy</h2>
       <p>The QUIC API enables data to be communicated between
@@ -523,4 +523,3 @@ interface RTCQuicTransport : WebTransport {
   </section>
 </body>
 </html>
-

@@ -48,47 +48,36 @@ var respecConfig = {
       "status": "20 January 2020 (work in progress)",
       "publisher": "W3C"
     },
-    "WEBTRANSPORT": {
-      "title": "WebTransport",
-      "href": "https://w3c.github.io/webtransport/",
-      "authors": [
-        "Peter Thatcher",
-        "Bernard Aboba",
-        "Robin Raymond"
-      ],
-      "status": "24 September 2020 (work in progress)",
-      "publisher": "W3C"
-    },
     "QUIC-DATAGRAM": {
       "title": "An Unreliable Datagram Extension to QUIC",
-      "href": "https://tools.ietf.org/html/draft-ietf-quic-datagram",
+      "href": "https://datatracker.ietf.org/doc/html/rfc9221",
       "authors": [
         "T. Pauly",
         "E. Kinnear",
         "D. Schinazi"
       ],
-      "status": "24 August 2020. Internet draft (work in progress)",
+      "status": "March 2022. RFC",
       "publisher": "IETF"
     },
     "QUIC-TRANSPORT": {
       "title": "QUIC: A UDP-Based Multiplexed and Secure Transport",
-      "href": "https://tools.ietf.org/html/draft-ietf-quic-transport",
+      "href": "https://datatracker.ietf.org/doc/html/rfc9000",
       "authors": [
         "J. Iyengar",
         "M. Thomson"
       ],
-      "status": "25 September 2020. Internet draft (work in progress)",
+      "status": "May 2021. RFC",
       "publisher": "IETF"
     },
     "QUIC-MULT": {
       "title": "Multiplexing Scheme Updates for QUIC",
-      "href": "https://tools.ietf.org/html/draft-aboba-avtcore-rfc7983bis",
+      "href": "https://datatracker.ietf.org/html/draft-ietf-avtcore-rfc7983bis",
       "authors": [
         "B. Aboba",
         "G. Salgueiro",
         "C. Perkins"
       ],
-      "status": "05 March 2020. Internet draft (work in progress)",
+      "status": "26 March 2023. Internet draft (work in progress)",
       "publisher": "IETF"
     },
     "RFC7675": {
@@ -115,42 +104,42 @@ var respecConfig = {
     },
     "DATA-PROT": {
       "title": "WebRTC Data Channel Establishment Protocol",
-      "href": "https://tools.ietf.org/html/draft-ietf-rtcweb-data-protocol",
+      "href": "https://datatracker.ietf.org/doc/html/rfc8832",
       "authors": [
         "R. Jesup",
         "S. Loreto",
         "M. Tuexen"
       ],
-      "status": "04 January 2015. Internet Draft (work in progress)",
+      "status": "January 2021. RFC",
       "publisher": "IETF"
     },
     "JSEP": {
       "title": "Javascript Session Establishment Protocol",
-      "href": "https://tools.ietf.org/html/draft-ietf-rtcweb-jsep",
+      "href": "https://datatracker.ietf.org/doc/html/draft-uberti-rtcweb-rfc8829bis",
       "authors": [
         "J. Uberti",
         "C. Jennings",
         "E. Rescorla"
       ],
-      "status": "27 February 2019. Internet Draft (work in progress)",
+      "status": "26 July 2023. Internet Draft (work in progress)",
       "publisher": "IETF"
     },
     "RTCWEB-SECURITY": {
       "title": "Security Considerations for WebRTC",
-      "href": "https://tools.ietf.org/html/draft-ietf-rtcweb-security",
+      "href": "https://datatracker.ietf.org/doc/html/rfc8826",
       "authors": [
         "E. Rescorla"
       ],
-      "status": "01 February 2019. Internet Draft (work in progress)",
+      "status": "January 2021. RFC",
       "publisher": "IETF"
     },
     "RTCWEB-SECURITY-ARCH": {
       "title": "WebRTC Security Architecture",
-      "href": "https://tools.ietf.org/html/draft-ietf-rtcweb-security-arch",
+      "href": "https://datatracker.ietf.org/doc/html/rfc8827",
       "authors": [
         "E. Rescorla"
       ],
-      "status": "01 February 2019. Internet Draft (work in progress)",
+      "status": "January 2021. RFC",
       "publisher": "IETF"
     },
     "WEBRTC-STATS": {

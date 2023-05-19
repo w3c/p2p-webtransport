@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <link href="includes/style.css" rel="stylesheet">
   <title>QUIC API for Peer-to-peer Connections</title>
-  <script class="remove" src="https://www.w3.org/Tools/respec/respec-w3c" type="text/javascript"></script>
+  <script class="remove" src="https://www.w3.org/Tools/respec/respec-w3c"></script>
   <script src="includes/respec-config.js" class="remove"></script>
 </head>
 <body>
@@ -114,7 +114,7 @@
       <p>
         A <code><a>RTCQuicTransport</a></code> instance is constructed
         using an {{RTCIceTransport}} and an optional sequence of
-        <code><a>RTCCertificate</a></code> objects. A
+        {{RTCCertificate}} objects. A
         <code><a>RTCQuicTransport</a></code> object whose {{WebTransport/[[State]]}} internal
         slot is <code>"closed"</code> or <code>"failed"</code> can be
         garbage-collected when it is no longer referenced.
@@ -165,7 +165,7 @@ interface RTCQuicTransport : WebTransport {
               Let <var>transport</var> be the first argument.
             </li>
             <li>
-              If <var>transport</var>'s <code>state</code> attribute has the 
+              If <var>transport</var>'s {{RTCIceTransport/state}} attribute has the 
               value <code>"closed"</code> [= exception/throw =] an
               <code>InvalidStateError</code> and abort these steps.
             <li>
@@ -180,7 +180,7 @@ interface RTCQuicTransport : WebTransport {
             </li>
             <li>
               If <var>certificates</var> is non-null and is non-empty, check that the
-              <code>expires</code> attribute of each <code><a>RTCCertificate</a></code>
+              <code>expires</code> attribute of each {{RTCCertificate}}
               object is in the future. If a certificate has expired, [= exception/throw =]
               an <code>InvalidAccessError</code> and abort these steps.
             </li>
@@ -227,7 +227,7 @@ interface RTCQuicTransport : WebTransport {
                   </tr>
                   <tr>
                     <td class="prmName">transport</td>
-                    <td class="prmType"><code><a>RTCIceTransport</a></code></td>
+                    <td class="prmType">{{RTCIceTransport}}</td>
                     <td class="prmNullFalse"><span role="img" aria-label=
                     "False">&#10008;</span></td>
                     <td class="prmOptFalse"><span role="img" aria-label=
@@ -237,7 +237,7 @@ interface RTCQuicTransport : WebTransport {
                   <tr>
                     <td class="prmName">certificates</td>
                     <td class="prmType">
-                    <code>sequence</code>&lt;<code><a>RTCCertificate</a></code>&gt;</td>
+                    <code>sequence</code>&lt;{{RTCCertificate}}&gt;</td>
                     <td class="prmNullFalse"><span role="img" aria-label=
                     "False">&#10008;</span></td>
                     <td class="prmOptTrue"><span role="img" aria-label=
@@ -257,7 +257,7 @@ interface RTCQuicTransport : WebTransport {
             "idlAttrType">{{RTCIceTransport}}</span>, readonly</dt>
             <dd>
               <p>The associated {{RTCIceTransport}} instance.
-              When the {{RTCIceTransport}}'s <code>state</code>
+              When the {{RTCIceTransport}}'s {{RTCIceTransport/state}}
               attribute changes values, the user agent <em class="rfc2119" title="MUST">MUST</em>
               run the following steps:</p>
               <ol>
@@ -266,7 +266,7 @@ interface RTCQuicTransport : WebTransport {
                    {{RTCIceTransport}} instance.
                  </li>
                  <li>
-                   If <var>transport</var>'s <code>state</code> attribute is not
+                   If <var>transport</var>'s {{RTCIceTransport/state}} attribute is not
                    code>"closed"</code> state, abort these steps.
                  </li>
                  <li>
@@ -357,7 +357,7 @@ interface RTCQuicTransport : WebTransport {
                 Only a single QUIC transport can be multiplexed over an ICE transport.
                 Therefore if a <code><a>RTCQuicTransport</a></code> object
                 <var>quicTransportB</var> is constructed with an
-                <code><a>RTCIceTransport</a></code> object <var>iceTransport</var>
+                {{RTCIceTransport}} object <var>iceTransport</var>
                 previously used to construct another <code><a>RTCQuicTransport</a></code>
                 object <var>quicTransportA</var>, then if
                 <code>quicTransportB.start()</code> is called prior to having called
@@ -562,7 +562,7 @@ interface RTCQuicTransport : WebTransport {
     </section>
     <section>
       <h2>Persistent information</h2>
-      <p>Utilizing the <code>generateCertificate</code> API in [[!WEBRTC]], it is possible to
+      <p>Utilizing the {{generateCertificate}} API in [[!WEBRTC]], it is possible to
       generate and store certificates that can subsequently be reused in constructing
       <code><a>RTCQuicTransport</a></code> objects.  These persistent certificates
       can therefore be used to identify a user.</p>

@@ -60,39 +60,35 @@
   </section>
   <section>
     <h2>Terminology</h2>
-     <p>The <code><a href=
-      "http://dev.w3.org/html5/spec/webappapis.html#eventhandler">EventHandler</a></code>
-      interface, representing a callback used for event handlers, and the <a href=
-      "http://dev.w3.org/html5/spec/webappapis.html#errorevent"><code><dfn>ErrorEvent</dfn></code></a>
-      interface are defined in [[!HTML51]].</p>
-      <p>The concepts <dfn><a href=
-      "http://dev.w3.org/html5/spec/webappapis.html#queue-a-task">queue a task</a></dfn>,
-      <dfn><a href=
-      "http://dev.w3.org/html5/spec/webappapis.html#fire-a-simple-event">fires a simple
-      event</a></dfn> and <dfn><a href=
-      "http://dev.w3.org/html5/spec/webappapis.html#networking-task-source">networking
-      task source</a></dfn> are defined in [[!HTML51]].</p>
-      <p>The terms <dfn>event</dfn>, <dfn><a href=
-      "http://dev.w3.org/html5/spec/webappapis.html#event-handlers">event
-      handlers</a></dfn> and <dfn><a href=
-      "http://dev.w3.org/html5/spec/webappapis.html#event-handler-event-type">event
-      handler event types</a></dfn> are defined in [[!HTML51]].</p>
-     <p>When referring to exceptions, the terms <dfn><a
-      href="https://www.w3.org/TR/WebIDL-1/#dfn-throw">throw</a></dfn> and
-      <dfn data-dfn-for="exception"><a href=
-      "https://www.w3.org/TR/WebIDL-1/#dfn-create-exception">create</a></dfn> are
-      defined in [[!WEBIDL-1]].</p>
-      <p>The terms <dfn data-lt="fulfill|fulfillment">fulfilled</dfn>, <dfn
-      data-lt="reject|rejection|rejecting|rejected">rejected</dfn>,
-      <dfn data-lt="resolve|resolves">resolved</dfn>, <dfn>pending</dfn> and
-      <dfn data-lt="settled">settled</dfn> used in the context of Promises are defined in
-      [[!ECMASCRIPT-6.0]].</p>
-      <p>The <dfn><code>RTCIceTransport</code></dfn> and <dfn><code>RTCCertificate</code></dfn> interfaces
-      and the <dfn><code>RTCDtlsFingerprint</code></dfn> dictionary are defined in [[!WEBRTC]] and [[!ORTC]].
-      The <dfn><code>WebTransport</code></dfn> interface is defined in [[!WEBTRANSPORT]] Section 7.
-      The <dfn><code>WebTransportState</code></dfn> enum  is defined in [[!WEBTRANSPORT]] Section 7.5.
-      The <dfn><code>OutgoingStream</code></dfn> interface is defined in [[!WEBTRANSPORT]] Sections 8.
-      The <dfn><code>IncomingStream</code></dfn> interface is defined in [[!WEBTRANSPORT]] Sections 9.
+      <p>
+        The {{EventHandler}} interface, representing a callback used for event
+        handlers, is defined in [[!HTML]].
+      </p>
+      <p>
+        The concepts [= queue a task =] and [= networking task source =] are
+        defined in [[!HTML]].
+      </p>
+      <p>
+        The concept [= fire an event =] is defined in [[!DOM]].
+      </p>
+      <p>
+        The terms [= event =], [= event handlers =] and [= event handler event
+        types =] are defined in [[!HTML]].
+      </p>
+      <p>
+        {{Performance.timeOrigin}} and {{Performance.now()}} are defined in
+        [[!hr-time]].
+      </p>
+      <p>
+        The terms <dfn class=fixme data-cite="HTML/structured-data.html#serializable-objects">serializable objects</dfn>, [= serialization steps =], and [=
+        deserialization steps =] are defined in [[!HTML]].
+      </p>
+      <p>
+        The <dfn><code>RTCIceTransport</code></dfn> and <dfn><code>RTCCertificate</code></dfn> interfaces
+        and the <dfn><code>RTCDtlsFingerprint</code></dfn> dictionary are defined in [[!WEBRTC]] and [[!ORTC]].
+        The <dfn><code>WebTransport</code></dfn> interface is defined in [[!WEBTRANSPORT]] Section 5.
+        The <dfn><code>WebTransportSendStream</code></dfn> interface is defined in [[!WEBTRANSPORT]] Sections 6.
+        The <dfn><code>WebTransportReceiveStream</code></dfn> interface is defined in [[!WEBTRANSPORT]] Sections 7.
       </p>
   </section>
   <section id="rtcquic-transport*">

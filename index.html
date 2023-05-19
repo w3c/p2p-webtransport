@@ -19,8 +19,8 @@
   <section class="informative" id="intro">
     <h2>Introduction</h2>
     <p>
-      This specification extends the WebRTC [[WEBRTC]] and WebTransport [[WEBTRANSPORT]]
-      specifications to enable peer-to-peer operation using QUIC [[RFC9000]].
+      This specification extends the WebRTC [[WEBRTC]], ORTC [[ORTC]] and WebTransport
+      [[WEBTRANSPORT]] APIs to enable peer-to-peer operation using QUIC [[RFC9000]].
       This specification supports the exchange of arbitrary data with remote peers using
       NAT-traversal technologies such as ICE, STUN, and TURN. As specified in [[RFC7983bis]],
       QUIC can be multiplexed on the same port as RTP, RTCP, DTLS, STUN and TURN, allowing
@@ -29,9 +29,9 @@
       and SCTP data channels.
     </p>
     <p>
-      This specification defines an interface to QUIC streams as well as datagrams [[RFC9221]]. 
-      By utilizing a QUIC stream per message, it is possible to implement
-      support for message-based communications (such as {{RTCDataChannel}})
+      This specification defines an interface to QUIC streams [[RFC9000]] as well as
+      datagrams [[RFC9221]].  By utilizing a QUIC stream per message, it is possible
+      to implement support for message-based communications (such as {{RTCDataChannel}})
       on top.
     </p>
     <p class="note">This specification extends the WebTransport API [[WEBTRANSPORT]]
@@ -103,12 +103,13 @@
         The {{WebTransport/[[State]]}} internal slot is defined in [[!WEBTRANSPORT]] Section 5.1.
       </p>
   </section>
-  <section id="rtcquic-transport*">
+  <section id="rtcquictransport*">
     <h2><dfn>RTCQuicTransport</dfn> Interface</h2>
-    <p>The <code>RTCQuicTransport</code> is a specialization
-    of {{WebTransport}} focused on peer-to-peer use
-    cases. It includes information relating to use of a QUIC transport
-    with an ICE transport.</p>
+    <p>
+      The <code>RTCQuicTransport</code> interface extends the {{WebTransport}} interface
+      to support peer-to-peer use cases, by adding information relating to use of a
+      QUIC transport with an ICE transport.
+    </p>
     <section id="rtcquictransport-operation*">
       <h3>Operation</h3>
       <p>
@@ -145,11 +146,11 @@
         <pre class="idl">
 [Exposed=Window]
 interface RTCQuicTransport : WebTransport {
-    constructor(RTCIceTransport transport, optional sequence&lt;RTCCertificate&gt; certificates);
-    readonly attribute RTCIceTransport transport;
+    constructor({{RTCIceTransport}} transport, optional sequence&lt;{{RTCCertificate}}&gt; certificates);
+    readonly attribute {{RTCIceTransport}} transport;
     RTCQuicParameters     getLocalParameters ();
     RTCQuicParameters?    getRemoteParameters ();
-    sequence&lt;RTCCertificate&gt; getCertificates ();
+    sequence&lt;{{RTCCertificate}}&gt; getCertificates ();
     sequence&lt;ArrayBuffer&gt; getRemoteCertificates ();
     undefined start (RTCQuicParameters remoteParameters);
 };</pre>

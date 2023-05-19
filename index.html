@@ -353,13 +353,17 @@ interface RTCQuicTransport : WebTransport {
               <code>quicTransportB.start()</code> is called prior to having called
               <code>quicTransportA.stop()</code>, then [= exception/throw =] an
               <code>InvalidStateError</code>.</p>
-              <p>If <code>start</c[= exception/throw =]ode> is called after a previous <code>start</code>
-              call, or if <code>state</code> is <code>closed</code>, [= exception/throw =]
-              an <code>InvalidStateError</code>.</p>
-              <p>If all of the values of
-              <code><var>remoteParameters</var>.fingerprints[<var>j</var>].algorithm</code>
-              are unsupported, where <var>j</var> goes from 0 to the number of fingerprints,
-              [= exception/throw =] a <code>NotSupportedError</code>.</p>
+              <p>
+                If <code>start</code> is called after a previous <code>start</code>
+                call, or if <code>state</code> is <code>closed</code>, [= exception/throw =]
+                an <code>InvalidStateError</code>.
+              </p>
+              <p>
+                If all of the values of
+                <code><var>remoteParameters</var>.fingerprints[<var>j</var>].algorithm</code>
+                are unsupported, where <var>j</var> goes from 0 to the number of fingerprints,
+                [= exception/throw =] a <code>NotSupportedError</code>.
+              </p>
               <table class="parameters">
                 <tbody>
                   <tr>

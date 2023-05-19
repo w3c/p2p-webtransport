@@ -31,7 +31,7 @@
     <p>
       This specification defines an interface to QUIC streams as well as datagrams [[RFC9221]]. 
       By utilizing a QUIC stream per message, it is possible to implement
-      support for message-based communications (such as <code>RTCDataChannel</code>)
+      support for message-based communications (such as {{RTCDataChannel}})
       on top.
     </p>
     <p class="note">This specification extends the WebTransport API [[WEBTRANSPORT]]
@@ -106,7 +106,7 @@
   <section id="rtcquic-transport*">
     <h2><dfn>RTCQuicTransport</dfn> Interface</h2>
     <p>The <code>RTCQuicTransport</code> is a specialization
-    of <code><a>WebTransport</a></code> focused on peer-to-peer use
+    of {{WebTransport}} focused on peer-to-peer use
     cases. It includes information relating to use of a QUIC transport
     with an ICE transport.</p>
     <section id="rtcquictransport-operation*">

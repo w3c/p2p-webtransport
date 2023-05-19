@@ -97,8 +97,8 @@
         [[!ECMASCRIPT-6.0]].
       </p>
       <p>
-        The {{WebRTC/RTCIceTransport}} and {{WebRTC/RTCCertificate}} interfaces
-        and the {{WebRTC/RTCDtlsFingerprint}} dictionary are defined in [[!WEBRTC]] and [[!ORTC]].
+        The {{RTCIceTransport}} and {{RTCCertificate}} interfaces
+        and the {{RTCDtlsFingerprint}} dictionary are defined in [[!WEBRTC]] and [[!ORTC]].
         The {{WebTransport}} interface is defined in [[!WEBTRANSPORT]] Section 5.
         The {{WebTransport/[[State]]}} internal slot is defined in [[!WEBTRANSPORT]] Section 5.1.
       </p>
@@ -113,7 +113,7 @@
       <h3>Operation</h3>
       <p>
         A <code><a>RTCQuicTransport</a></code> instance is constructed
-        using an <code><a>RTCIceTransport</a></code> and an optional sequence of
+        using an {{RTCIceTransport}} and an optional sequence of
         <code><a>RTCCertificate</a></code> objects. A
         <code><a>RTCQuicTransport</a></code> object whose {{WebTransport/[[State]]}} internal
         slot is <code>"closed"</code> or <code>"failed"</code> can be
@@ -422,7 +422,7 @@ interface RTCQuicTransport : WebTransport {
               <p>The QUIC role, with a default of <code>auto</code>.</p>
             </dd>
             <dt><dfn><code>fingerprints</code></dfn> of type <span class=
-            "idlMemberType">sequence&lt;<a>RTCDtlsFingerprint</a>&gt;</span></dt>
+            "idlMemberType">sequence&lt;{{RTCDtlsFingerprint}}&gt;</span></dt>
             <dd>
               <p>Sequence of fingerprints, at least one fingerprint for each certificate
               (with one computed with the digest algorithm used in the certificate

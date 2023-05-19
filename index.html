@@ -84,8 +84,8 @@
         deserialization steps =] are defined in [[!HTML]].
       </p>
      <p>
-        When referring to exceptions, the terms [= exception/throw =] and [=
-        exception/created =] are defined in [[!WEBIDL]].
+        When referring to exceptions, the terms [= exception/throw =] and 
+       [= exception/created =] are defined in [[!WEBIDL]].
       </p>
       <p>
         The callback {{VoidFunction}} is defined in [[!WEBIDL]].
@@ -163,11 +163,11 @@ interface RTCQuicTransport : WebTransport {
           <ol>
             <li>Let <var>transport</var> be the first argument.</li>
             <li>If <var>transport</var> is in the <code>"closed"</code>
-            state, <a>throw</a> an <code>InvalidStateError</code> and abort
+            state, [= exception/throw =] an <code>InvalidStateError</code> and abort
             these steps.</li>
             <li>If <var>transport</var> has been used to construct another
             <code><a>RTCQuicTransport</a></code> whose <a>[[\WebTransportState]]</a> slot
-            is not <code>"closed"</code>, <a>throw</a> an <code>InvalidStateError</code>
+            is not <code>"closed"</code>, [= exception/throw =] an <code>InvalidStateError</code>
             and abort these steps.</li>
             <li>
               Let <var>certificates</var> be the second argument if provided,
@@ -176,7 +176,7 @@ interface RTCQuicTransport : WebTransport {
             <li>
               If <var>certificates</var> is non-null and is non-empty, check that the
               <code>expires</code> attribute of each <code><a>RTCCertificate</a></code>
-              object is in the future. If a certificate has expired, <a>throw</a> an
+              object is in the future. If a certificate has expired, [= exception/throw =] an
               <code>InvalidAccessError</code> and abort these steps.
             </li>
             <li>
@@ -190,10 +190,6 @@ interface RTCQuicTransport : WebTransport {
             <li>Let <var>quictransport</var> have a <dfn>[[\IncomingStreams]]</dfn>
             internal slot representing a sequence of <code><a>IncomingStream</a></code>
             objects, initialized to empty.
-            </li>
-            <li>
-              Let <var>quictransport</var> have a <dfn>[[\WebTransportState]]</dfn>
-              internal slot, initialized to <code>"connecting"</code>.
             </li>
             <li>Let <var>quictransport</var> have a <dfn>[[\ReceivedDatagrams]]</dfn>
               internal slot representing a queue of <code>Uint8Array</code>, initialized to empty.
@@ -355,15 +351,15 @@ interface RTCQuicTransport : WebTransport {
               previously used to construct another <code><a>RTCQuicTransport</a></code>
               object <var>quicTransportA</var>, then if
               <code>quicTransportB.start()</code> is called prior to having called
-              <code>quicTransportA.stop()</code>, then <a>throw</a> an
+              <code>quicTransportA.stop()</code>, then [= exception/throw =] an
               <code>InvalidStateError</code>.</p>
-              <p>If <code>start</code> is called after a previous <code>start</code>
-              call, or if <code>state</code> is <code>closed</code>, <a>throw</a>
+              <p>If <code>start</c[= exception/throw =]ode> is called after a previous <code>start</code>
+              call, or if <code>state</code> is <code>closed</code>, [= exception/throw =]
               an <code>InvalidStateError</code>.</p>
               <p>If all of the values of
               <code><var>remoteParameters</var>.fingerprints[<var>j</var>].algorithm</code>
               are unsupported, where <var>j</var> goes from 0 to the number of fingerprints,
-              <a>throw</a> a <code>NotSupportedError</code>.</p>
+              [= exception/throw =] a <code>NotSupportedError</code>.</p>
               <table class="parameters">
                 <tbody>
                   <tr>

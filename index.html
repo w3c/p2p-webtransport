@@ -106,8 +106,6 @@
         and the <dfn><code>RTCDtlsFingerprint</code></dfn> dictionary are defined in [[!WEBRTC]] and [[!ORTC]].
         The <dfn><code>WebTransport</code></dfn> interface is defined in [[!WEBTRANSPORT]] Section 5.
         The <dfn>[[\State]]</dfn> internal slot is defined in [[!WEBTRANSPORT]] Section 5.1.
-        The <dfn><code>WebTransportSendStream</code></dfn> interface is defined in [[!WEBTRANSPORT]] Section 6.
-        The <dfn><code>WebTransportReceiveStream</code></dfn> interface is defined in [[!WEBTRANSPORT]] Section 7.
       </p>
   </section>
   <section id="rtcquic-transport*">
@@ -193,25 +191,6 @@ interface RTCQuicTransport : WebTransport {
             <li>
               Let <var>quictransport</var> be a newly constructed
               <code><a>RTCQuicTransport</a></code> object.
-            </li>
-            <li>
-              Let <var>quictransport</var> have a <dfn>[[\OutgoingStreams]]</dfn>
-              internal slot representing a sequence of <code><a>OutgoingStream</a></code>
-              objects, initialized to empty.
-            </li>
-            <li>
-              Let <var>quictransport</var> have a <dfn>[[\IncomingStreams]]</dfn>
-              internal slot representing a sequence of <code><a>IncomingStream</a></code>
-              objects, initialized to empty.
-            </li>
-            <li>
-              Let <var>quictransport</var> have a <dfn>[[\ReceivedDatagrams]]</dfn>
-              internal slot representing a queue of <code>Uint8Array</code>, initialized to empty.
-            </li>
-            <li>
-              Let <var>quictransport</var> have a <dfn>[[\ReceiveDatagramsPromise]]</dfn>
-              internal slot representing a <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;?</code>,
-              initialized to null.
             </li>
             <li>
               Let <var>quictransport</var> have a <dfn>[[\Certificates]]</dfn>

@@ -106,7 +106,7 @@
   <section id="rtcquictransport*">
     <h2><dfn>RTCQuicTransport</dfn> Interface</h2>
     <p>
-      The <code>RTCQuicTransport</code> interface extends the {{WebTransport}} interface
+      The <code>RTCQuicTransport</code> interface extends the <code><a>WebTransport</a></code> interface
       to support peer-to-peer use cases, by adding information relating to use of a
       QUIC transport with an ICE transport.
     </p>
@@ -114,8 +114,8 @@
       <h3>Operation</h3>
       <p>
         A <code><a>RTCQuicTransport</a></code> instance is constructed
-        using an {{RTCIceTransport}} and an optional sequence of
-        {{RTCCertificate}} objects. A
+        using an <code><a>RTCIceTransport</a></code> and an optional sequence of
+        <code><a>RTCCertificate</a></code> objects. A
         <code><a>RTCQuicTransport</a></code> object whose {{WebTransport/[[State]]}} internal
         slot is <code>"closed"</code> or <code>"failed"</code> can be
         garbage-collected when it is no longer referenced.
@@ -146,11 +146,11 @@
         <pre class="idl">
 [Exposed=Window]
 interface RTCQuicTransport : WebTransport {
-    constructor({{RTCIceTransport}} transport, optional sequence&lt;{{RTCCertificate}}&gt; certificates);
-    readonly attribute {{RTCIceTransport}} transport;
+    constructor(<code><a>RTCIceTransport</a></code> transport, optional sequence&lt;<code><a>RTCCertificate</a></code>&gt; certificates);
+    readonly attribute <code><a>RTCIceTransport</a></code> transport;
     RTCQuicParameters     getLocalParameters ();
     RTCQuicParameters?    getRemoteParameters ();
-    sequence&lt;{{RTCCertificate}}&gt; getCertificates ();
+    sequence&lt;<code><a>RTCCertificate</a></code>&gt; getCertificates ();
     sequence&lt;ArrayBuffer&gt; getRemoteCertificates ();
     undefined start (RTCQuicParameters remoteParameters);
 };</pre>

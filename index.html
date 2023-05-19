@@ -97,8 +97,8 @@
         [[!ECMASCRIPT-6.0]].
       </p>
       <p>
-        The {{RTCIceTransport}} and {{RTCCertificate}} interfaces
-        and the {{RTCDtlsFingerprint}} dictionary are defined in [[!WEBRTC]] and [[!ORTC]].
+        The {{WebRTC/RTCIceTransport}} and {{WebRTC/RTCCertificate}} interfaces
+        and the {{WebRTC/RTCDtlsFingerprint}} dictionary are defined in [[!WEBRTC]] and [[!ORTC]].
         The {{WebTransport}} interface is defined in [[!WEBTRANSPORT]] Section 5.
         The {{WebTransport/[[State]]}} internal slot is defined in [[!WEBTRANSPORT]] Section 5.1.
       </p>
@@ -115,7 +115,7 @@
         A <code><a>RTCQuicTransport</a></code> instance is constructed
         using an <code><a>RTCIceTransport</a></code> and an optional sequence of
         <code><a>RTCCertificate</a></code> objects. A
-        <code><a>RTCQuicTransport</a></code> object whose {{WebTransport/[[\State]]}} internal
+        <code><a>RTCQuicTransport</a></code> object whose {{WebTransport/[[State]]}} internal
         slot is <code>"closed"</code> or <code>"failed"</code> can be
         garbage-collected when it is no longer referenced.
       </p>
@@ -254,16 +254,16 @@ interface RTCQuicTransport : WebTransport {
           <dl data-link-for="RTCQuicTransport" data-dfn-for="RTCQuicTransport" class=
           "attributes">
             <dt><dfn><code>transport</code></dfn> of type <span class=
-            "idlAttrType"><a>RTCIceTransport</a></span>, readonly</dt>
+            "idlAttrType">{{RTCIceTransport}}</span>, readonly</dt>
             <dd>
-              <p>The associated <code><a>RTCIceTransport</a></code> instance.
-              When the <code><a>RTCIceTransport</a></code>'s <code>state</code>
+              <p>The associated {{RTCIceTransport}} instance.
+              When the {{RTCIceTransport}}'s <code>state</code>
               attribute changes values, the user agent <em class="rfc2119" title="MUST">MUST</em>
               run the following steps:</p>
               <ol>
                  <li>
                    Let <var>transport</var> be the associated
-                   <code><a>RTCIceTransport</a></code> instance.
+                   {{RTCIceTransport}} instance.
                  </li>
                  <li>
                    If <var>transport</var>'s <code>state</code> attribute is not

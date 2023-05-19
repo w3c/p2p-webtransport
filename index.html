@@ -166,12 +166,13 @@ interface RTCQuicTransport : WebTransport {
             following steps:
           </p>
           <ol>
-            <li>Let <var>transport</var> be the first argument.</li>
             <li>
-              If <var>transport</var>'s <a>[[\State]]</a> internal slot is
-              <code>"closed"</code> state, [= exception/throw =] an
-              <code>InvalidStateError</code> and abort these steps.
+              Let <var>transport</var> be the first argument.
             </li>
+            <li>
+              If <var>transport</var>'s <code>state</code> attribute has the 
+              value <code>"closed"</code> [= exception/throw =] an
+              <code>InvalidStateError</code> and abort these steps.
             <li>
               If <var>transport</var> has been used to construct another
               <code><a>RTCQuicTransport</a></code> whose <a>[[\State]]</a> internal
@@ -193,7 +194,13 @@ interface RTCQuicTransport : WebTransport {
               <code><a>RTCQuicTransport</a></code> object.
             </li>
             <li>
-              Let <var>quictransport</var> have a <dfn>[[\Certificates]]</dfn>
+              Let <var>quictransport</var> have a
+              <dfn data-dfn-for="RTCQuicTransport">[[\State]]</dfn> internal slot,
+              initialized to <code>"connecting"</code>.
+            </li>
+            <li>
+              Let <var>quictransport</var> have a
+              <dfn data-dfn-for="RTCQuicTransport">[[\Certificates]]</dfn>
               internal slot.
             </li>
             <li>
@@ -268,10 +275,10 @@ interface RTCQuicTransport : WebTransport {
                    in the <code>"closed"</code> state, abort these steps.
                  </li>
                  <li>
-                   Let <var>quicTransport</var> be the <code><a>RTCQuicTransport</a></code>.
+                   Let <var>quictransport</var> be the <code><a>RTCQuicTransport</a></code>.
                 </li>
                  <li>
-                   Set <var>quicTransport</var>'s <a>[[\State]]</a> internal slot to
+                   Set <var>quictransport</var>'s <a>[[\State]]</a> internal slot to
                    <code>"closed"</code>.
                 </li>
               </ol>

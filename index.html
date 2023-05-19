@@ -80,8 +80,8 @@
         [[!hr-time]].
       </p>
       <p>
-        The terms <dfn class=fixme data-cite="HTML/structured-data.html#serializable-objects">serializable objects</dfn>, [= serialization steps =], and [=
-        deserialization steps =] are defined in [[!HTML]].
+        The terms <dfn class=fixme data-cite="HTML/structured-data.html#serializable-objects">serializable objects</dfn>, 
+        [= serialization steps =], and [= deserialization steps =] are defined in [[!HTML]].
       </p>
      <p>
         When referring to exceptions, the terms [= exception/throw =] and 
@@ -97,7 +97,7 @@
       <p>
         The terms <dfn data-lt="fulfill|fulfillment">fulfilled</dfn>,
         <dfn data-lt="reject|rejection|rejecting">rejected</dfn>, <dfn data-lt=
-        "resolve|resolves">resolved</dfn>,  and
+        "resolve|resolves">resolved</dfn>, and
         <dfn>settled</dfn> used in the context of Promises are defined in
         [[!ECMASCRIPT-6.0]].
       </p>
@@ -105,41 +105,46 @@
         The <dfn><code>RTCIceTransport</code></dfn> and <dfn><code>RTCCertificate</code></dfn> interfaces
         and the <dfn><code>RTCDtlsFingerprint</code></dfn> dictionary are defined in [[!WEBRTC]] and [[!ORTC]].
         The <dfn><code>WebTransport</code></dfn> interface is defined in [[!WEBTRANSPORT]] Section 5.
-        The <dfn><code>WebTransportSendStream</code></dfn> interface is defined in [[!WEBTRANSPORT]] Sections 6.
-        The <dfn><code>WebTransportReceiveStream</code></dfn> interface is defined in [[!WEBTRANSPORT]] Sections 7.
+        The <dfn>[[\State]]</dfn> internal slot is defined in [[!WEBTRANSPORT]] Section 5.1.
+        The <dfn><code>WebTransportSendStream</code></dfn> interface is defined in [[!WEBTRANSPORT]] Section 6.
+        The <dfn><code>WebTransportReceiveStream</code></dfn> interface is defined in [[!WEBTRANSPORT]] Section 7.
       </p>
   </section>
   <section id="rtcquic-transport*">
     <h2><dfn>RTCQuicTransport</dfn> Interface</h2>
     <p>The <code>RTCQuicTransport</code> is a specialization
     of <code><a>WebTransport</a></code> focused on peer-to-peer use
-    cases and includes information relating to use of a QUIC transport
+    cases. It includes information relating to use of a QUIC transport
     with an ICE transport.</p>
     <section id="rtcquictransport-operation*">
       <h3>Operation</h3>
       <p>
-      A <code><a>RTCQuicTransport</a></code> instance is constructed
-      using an <code><a>RTCIceTransport</a></code> and an optional sequence of
-      <code><a>RTCCertificate</a></code> objects.
-      An <code><a>RTCQuicTransport</a></code> object in the <code>"closed"</code> or
-      <code>"failed"</code> states can be garbage-collected when it is no longer
-      referenced.</p>
-      <p>The QUIC negotiation occurs between transport endpoints determined via ICE.
-      Multiplexing of QUIC with STUN, TURN, DTLS, RTP and RTCP
-      is supported within [[RFC7983bis]].</p>
-      <p>A newly constructed <code><a>RTCQuicTransport</a></code> <em class="rfc2119"
-      title="MUST">MUST</em> listen and respond to incoming QUIC packets before
-      <code>start()</code> is called. However, to complete the negotiation it is
-      necessary to verify the remote fingerprint by computing fingerprints for
-      the selected remote certificate using the digest algorithms provided
-      in <code><var>remoteParameters</var>.fingerprints[].algorithm</code>. If a
-      calculated fingerprint and algorithm matches a fingerprint and algorithm
-      included in <code><var>remoteParameters</var>.fingerprints[]</code>,
-      the remote fingerprint is verified. After the QUIC handshake exchange
-      completes (but before the remote fingerprint is verified) incoming media packets
-      may be received. A modest buffer <em class="rfc2119" title="MUST">MUST</em> be
-      provided to avoid loss of media prior to remote fingerprint validation (which can
-      begin after <code>start()</code> is called).</p>
+        A <code><a>RTCQuicTransport</a></code> instance is constructed
+        using an <code><a>RTCIceTransport</a></code> and an optional sequence of
+        <code><a>RTCCertificate</a></code> objects. A
+        <code><a>RTCQuicTransport</a></code> object whose <a>[[\State]]<\a> internal
+        slot is <code>"closed"</code> or <code>"failed"</code> can be
+        garbage-collected when it is no longer referenced.
+      </p>
+      <p>
+        The QUIC negotiation occurs between transport endpoints determined via ICE.
+        Multiplexing of QUIC with STUN, TURN, DTLS, RTP and RTCP is defined in [[RFC7983bis]].
+      </p>
+      <p>
+        A newly constructed <code><a>RTCQuicTransport</a></code> <em class="rfc2119"
+        title="MUST">MUST</em> listen and respond to incoming QUIC packets before
+        <code>start()</code> is called. However, to complete the negotiation it is
+        necessary to verify the remote fingerprint by computing fingerprints for
+        the selected remote certificate using the digest algorithms provided
+        in <code><var>remoteParameters</var>.fingerprints[].algorithm</code>. If a
+        calculated fingerprint and algorithm matches a fingerprint and algorithm
+        included in <code><var>remoteParameters</var>.fingerprints[]</code>,
+        the remote fingerprint is verified. After the QUIC handshake exchange
+        completes (but before the remote fingerprint is verified) incoming media packets
+        may be received. A modest buffer <em class="rfc2119" title="MUST">MUST</em> be
+        provided to avoid loss of media prior to remote fingerprint validation (which can
+        begin after <code>start()</code> is called).
+      </p>
     </section>
     <section id="rtcquictransport-interface-definition*">
       <h3>Interface Definition</h3>
@@ -148,27 +153,31 @@
 [Exposed=Window]
 interface RTCQuicTransport : WebTransport {
     constructor(RTCIceTransport transport, optional sequence&lt;RTCCertificate&gt; certificates);
-    readonly        attribute RTCIceTransport          transport;
+    readonly attribute RTCIceTransport transport;
     RTCQuicParameters     getLocalParameters ();
     RTCQuicParameters?    getRemoteParameters ();
     sequence&lt;RTCCertificate&gt; getCertificates ();
     sequence&lt;ArrayBuffer&gt; getRemoteCertificates ();
-    undefined                  start (RTCQuicParameters remoteParameters);
+    undefined start (RTCQuicParameters remoteParameters);
 };</pre>
         <section>
           <h2>Constructors</h2>
-          When <code><a>RTCQuicTransport</a>.constructor()</code> is invoked,
-          the user agent <em class="rfc2119" title="MUST">MUST</em> run the
-          following steps:
+          <p>
+            When <code><a>RTCQuicTransport</a>.constructor()</code> is invoked,
+            the user agent <em class="rfc2119" title="MUST">MUST</em> run the
+            following steps:
+          </p>
           <ol>
             <li>Let <var>transport</var> be the first argument.</li>
-            <li>If <var>transport</var> is in the <code>"closed"</code>
-            state, [= exception/throw =] an <code>InvalidStateError</code> and abort
-            these steps.</li>
-            <li>If <var>transport</var> has been used to construct another
-            <code><a>RTCQuicTransport</a></code> whose <a>[[\WebTransportState]]</a> slot
-            is not <code>"closed"</code>, [= exception/throw =] an <code>InvalidStateError</code>
-            and abort these steps.</li>
+            <li>
+              If <var>transport</var>'s <a>[[\State]]<\a> internal slot is
+              <code>"closed"</code> state, [= exception/throw =] an
+              <code>InvalidStateError</code> and abort these steps.</li>
+              <li>If <var>transport</var> has been used to construct another
+              <code><a>RTCQuicTransport</a></code> whose <a>[[\State]]</a> internal
+              slot is not <code>"closed"</code>, [= exception/throw =] an
+              <code>InvalidStateError</code> and abort these steps.
+            </li>
             <li>
               Let <var>certificates</var> be the second argument if provided,
               <code>null</code> otherwise.
@@ -176,25 +185,29 @@ interface RTCQuicTransport : WebTransport {
             <li>
               If <var>certificates</var> is non-null and is non-empty, check that the
               <code>expires</code> attribute of each <code><a>RTCCertificate</a></code>
-              object is in the future. If a certificate has expired, [= exception/throw =] an
-              <code>InvalidAccessError</code> and abort these steps.
+              object is in the future. If a certificate has expired, [= exception/throw =]
+              an <code>InvalidAccessError</code> and abort these steps.
             </li>
             <li>
               Let <var>quictransport</var> be a newly constructed
               <code><a>RTCQuicTransport</a></code> object.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\OutgoingStreams]]</dfn>
-            internal slot representing a sequence of <code><a>OutgoingStream</a></code>
-            objects, initialized to empty.
+            <li>
+              Let <var>quictransport</var> have a <dfn>[[\OutgoingStreams]]</dfn>
+              internal slot representing a sequence of <code><a>OutgoingStream</a></code>
+              objects, initialized to empty.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\IncomingStreams]]</dfn>
-            internal slot representing a sequence of <code><a>IncomingStream</a></code>
-            objects, initialized to empty.
+            <li>
+              Let <var>quictransport</var> have a <dfn>[[\IncomingStreams]]</dfn>
+              internal slot representing a sequence of <code><a>IncomingStream</a></code>
+              objects, initialized to empty.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\ReceivedDatagrams]]</dfn>
+            <li>
+              Let <var>quictransport</var> have a <dfn>[[\ReceivedDatagrams]]</dfn>
               internal slot representing a queue of <code>Uint8Array</code>, initialized to empty.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\ReceiveDatagramsPromise]]</dfn>
+            <li>
+              Let <var>quictransport</var> have a <dfn>[[\ReceiveDatagramsPromise]]</dfn>
               internal slot representing a <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;?</code>,
               initialized to null.
             </li>
@@ -261,19 +274,25 @@ interface RTCQuicTransport : WebTransport {
             "idlAttrType"><a>RTCIceTransport</a></span>, readonly</dt>
             <dd>
               <p>The associated <code><a>RTCIceTransport</a></code> instance.
-              When the <code><a>RTCIceTransport</a></code>'s <code>state</code> attribute
-              changes values, the user agent <em class="rfc2119" title="MUST">MUST</em>
+              When the <code><a>RTCIceTransport</a></code>'s <code>state</code>
+              attribute changes values, the user agent <em class="rfc2119" title="MUST">MUST</em>
               run the following steps:</p>
               <ol>
-                 <li>Let <var>transport</var> be the associated
+                 <li>
+                   Let <var>transport</var> be the associated
                    <code><a>RTCIceTransport</a></code> instance.
                  </li>
-                 <li>If <var>transport</var> is not in the <code>"closed"</code> state,
-                 abort these steps.
+                 <li>
+                   If <var>transport</var>'s <code>state</code> attribute is not
+                   in the <code>"closed"</code> state, abort these steps.
                  </li>
-                 <li>Let <var>quicTransport</var> be the <code><a>RTCQuicTransport</a></code>.</li>
-                 <li>Set <var>quicTransport</var>'s <a>[[\WebTransportState]]</a> to
-                 <code>"closed"</code>.</li>
+                 <li>
+                   Let <var>quicTransport</var> be the <code><a>RTCQuicTransport</a></code>.
+                </li>
+                 <li>
+                   Set <var>quicTransport</var>'s <a>[[\State]]</a> internal slot to
+                   <code>"closed"</code>.
+                </li>
               </ol>
             </dd>
           </dl>
@@ -284,13 +303,15 @@ interface RTCQuicTransport : WebTransport {
           "methods">
             <dt><code>getLocalParameters</code></dt>
             <dd>
-              <p><dfn>getLocalParameters()</dfn> obtains the QUIC parameters of
-              the local <code><a>RTCQuicTransport</a></code> upon construction.
-              If multiple certificates were provided in the constructor, then
-              multiple fingerprints will be returned, one for each certificate.
-              <code>getLocalParameters().role</code> always returns the default
-              role of a newly constructed <code><a>RTCQuicTransport</a></code>;
-              for a browser this will be <code>auto</code>.</p>
+              <p>
+                <dfn>getLocalParameters()</dfn> obtains the QUIC parameters of
+                the local <code><a>RTCQuicTransport</a></code> upon construction.
+                If multiple certificates were provided in the constructor, then
+                multiple fingerprints will be returned, one for each certificate.
+                <code>getLocalParameters().role</code> always returns the default
+                role of a newly constructed <code><a>RTCQuicTransport</a></code>;
+                for a browser this will be <code>auto</code>.
+              </p>
               <div>
                 <em>No parameters.</em>
               </div>
@@ -300,10 +321,12 @@ interface RTCQuicTransport : WebTransport {
             </dd>
             <dt><code>getRemoteParameters</code></dt>
             <dd>
-              <p><dfn>getRemoteParameters()</dfn> obtains
-              the remote QUIC parameters passed in the
-              <code>start()</code> method. Prior to calling
-              <code>start()</code>, null is returned.</p>
+              <p>
+                <dfn>getRemoteParameters()</dfn> obtains
+                the remote QUIC parameters passed in the
+                <code>start()</code> method. Prior to calling
+                <code>start()</code>, null is returned.
+              </p>
               <div>
                 <em>No parameters.</em>
               </div>
@@ -324,12 +347,13 @@ interface RTCQuicTransport : WebTransport {
             </dd>
             <dt><code>getRemoteCertificates</code></dt>
             <dd>
-              <p><dfn>getRemoteCertificates()</dfn> returns the certificate chain in use by the remote side, with each
-              certificate encoded in binary Distinguished Encoding Rules (DER) [[!X690]].
-              <code><a>getRemoteCertificates()</a></code> returns an empty list prior to
-              selection of the remote certificate, which is completed once
-              <code><a>WebTransportState</a></code> transitions to
-              <code>connected</code>.</p>
+              <p>
+                <dfn>getRemoteCertificates()</dfn> returns the certificate chain in use by the remote side, with each
+                certificate encoded in binary Distinguished Encoding Rules (DER) [[!X690]].
+                <code><a>getRemoteCertificates()</a></code> returns an empty list prior to
+                selection of the remote certificate, which is completed once <var>transport</var>'s
+                <a>[[\State]]</a> internal slot transitions to <code>connected</code>.
+              </p>
               <div>
                 <em>No parameters.</em>
               </div>
@@ -339,24 +363,27 @@ interface RTCQuicTransport : WebTransport {
             </dd>
             <dt><dfn><code>start</code></dfn></dt>
             <dd>
-              <p>Start QUIC transport negotiation with the parameters of the remote QUIC
-              transport, including verification of the remote fingerprint.
-              During connection establishment, use of this API must be indicated 
-              by selecting the ALPN token "q2q" in the crypto handshake.
-              <!-- TODO: register "q2q" with IANA. -->
-              Only a single QUIC transport can be multiplexed over an ICE transport.
-              Therefore if a <code><a>RTCQuicTransport</a></code> object
-              <var>quicTransportB</var> is constructed with an
-              <code><a>RTCIceTransport</a></code> object <var>iceTransport</var>
-              previously used to construct another <code><a>RTCQuicTransport</a></code>
-              object <var>quicTransportA</var>, then if
-              <code>quicTransportB.start()</code> is called prior to having called
-              <code>quicTransportA.stop()</code>, then [= exception/throw =] an
-              <code>InvalidStateError</code>.</p>
+              <p>
+                Start QUIC transport negotiation with the parameters of the remote QUIC
+                transport, including verification of the remote fingerprint.
+                During connection establishment, use of this API must be indicated 
+                by selecting the ALPN token "q2q" in the crypto handshake.
+                <!-- TODO: register "q2q" with IANA. -->
+              </p>
+              <p>
+                Only a single QUIC transport can be multiplexed over an ICE transport.
+                Therefore if a <code><a>RTCQuicTransport</a></code> object
+                <var>quicTransportB</var> is constructed with an
+                <code><a>RTCIceTransport</a></code> object <var>iceTransport</var>
+                previously used to construct another <code><a>RTCQuicTransport</a></code>
+                object <var>quicTransportA</var>, then if
+                <code>quicTransportB.start()</code> is called prior to having called
+                <code>quicTransportA.stop()</code>, then [= exception/throw =] an
+                <code>InvalidStateError</code>.</p>
               <p>
                 If <code>start</code> is called after a previous <code>start</code>
-                call, or if <code>state</code> is <code>closed</code>, [= exception/throw =]
-                an <code>InvalidStateError</code>.
+                call, or if <var>transport</var>'s <a>[[\State]]</a> internal slot is
+                <code>closed</code>, [= exception/throw = ] an <code>InvalidStateError</code>.
               </p>
               <p>
                 If all of the values of
@@ -398,7 +425,7 @@ interface RTCQuicTransport : WebTransport {
       relating to QUIC configuration.</p>
       <div>
         <pre class="idl">dictionary RTCQuicParameters {
-             RTCQuicRole                  role = "auto";
+             RTCQuicRole role = "auto";
              required sequence&lt;RTCDtlsFingerprint&gt; fingerprints;
 };</pre>
         <section>
@@ -463,58 +490,71 @@ interface RTCQuicTransport : WebTransport {
     </section>
     <section id="rtcquicroleinfo">
       <h3>QUIC role determination</h3>
-      <p>To diagnose QUIC role issues, an application may wish to determine
-      the desired and actual QUIC role of an <code><a>RTCQuicTransport</a></code>.
-      For a browser implementing ORTC, a <code><a>RTCQuicTransport</a></code>
-      object assumes a QUIC role of <code>auto</code> upon construction.
-      This implies that the QUIC role is determined by the ICE role.  Since
-      <code>getLocalParameters().role</code> always returns the role assigned
-      to an <code><a>RTCQuicTransport</a></code> object upon construction
-      (<code>auto</code> for a browser), the <code>getLocalParameters</code>
-      method cannot be used to determine the desired or actual role of an
-      <code><a>RTCQuicTransport</a></code>.</p>
-      <p>An application can determine the
-      desired role of an <code><a>RTCQuicTransport</a></code> from the value of
-      <code><var>remoteParameters</var>.role</code> passed to
-      <code><a>RTCQuicTransport</a>.start(<var>remoteParameters</var>)</code>.
-      If <code><var>remoteParameters</var>.role</code> is <code>server</code>
-      then the desired role of the <code><a>RTCQuicTransport</a></code>
-      is <code>client</code>. If <code><var>remoteParameters</var>.role</code>
-      is <code>client</code> then the desired role of the
-      <code><a>RTCQuicTransport</a></code> is <code>server</code>.</p>
-      <p>The <code>RTCQuicTransport.transport.onstatechange</code> EventHandler
-      can be used to determine whether an <code><a>RTCQuicTransport</a></code>
-      transitions to the desired role. When
-      <code><a>RTCQuicTransport</a>.transport.state</code> transitions to
-      <code>connected</code>, if <code><a>RTCQuicTransport</a>.transport.role</code>
-      is <code>controlled</code> then the role of the
-      <code><a>RTCQuicTransport</a></code> is <code>client</code>.
-      If <code><a>RTCQuicTransport</a>.transport.role</code>
-      is <code>controlling</code> then the role of the
-      <code><a>RTCQuicTransport</a></code> is <code>server</code>.</p>
+      <p>
+        To diagnose QUIC role issues, an application may wish to determine
+        the desired and actual QUIC role of an <code><a>RTCQuicTransport</a></code>.
+        For a browser implementing ORTC, a <code><a>RTCQuicTransport</a></code>
+        object assumes a QUIC role of <code>auto</code> upon construction.
+        This implies that the QUIC role is determined by the ICE role.  Since
+        <code>getLocalParameters().role</code> always returns the role assigned
+        to an <code><a>RTCQuicTransport</a></code> object upon construction
+        (<code>auto</code> for a browser), the <code>getLocalParameters</code>
+        method cannot be used to determine the desired or actual role of an
+        <code><a>RTCQuicTransport</a></code>.
+      </p>
+      <p>
+        An application can determine the desired role of an
+        <code><a>RTCQuicTransport</a></code> from the value of
+        <code><var>remoteParameters</var>.role</code> passed to
+        <code><a>RTCQuicTransport</a>.start(<var>remoteParameters</var>)</code>.
+        If <code><var>remoteParameters</var>.role</code> is <code>server</code>
+        then the desired role of the <code><a>RTCQuicTransport</a></code>
+        is <code>client</code>. If <code><var>remoteParameters</var>.role</code>
+        is <code>client</code> then the desired role of the
+        <code><a>RTCQuicTransport</a></code> is <code>server</code>.
+      </p>
+      <p>
+        The <code>RTCQuicTransport.transport.onstatechange</code> EventHandler
+        can be used to determine whether an <code><a>RTCQuicTransport</a></code>
+        transitions to the desired role. When
+        <code><a>RTCQuicTransport</a>.transport.state</code> transitions to
+        <code>connected</code>, if <code><a>RTCQuicTransport</a>.transport.role</code>
+        is <code>controlled</code> then the role of the
+        <code><a>RTCQuicTransport</a></code> is <code>client</code>.
+        If <code><a>RTCQuicTransport</a>.transport.role</code>
+        is <code>controlling</code> then the role of the
+        <code><a>RTCQuicTransport</a></code> is <code>server</code>.
+      </p>
     </section>
   </section>
   <section id="privacy-security">
     <h2>Privacy and Security Considerations</h2>
-    <p>This section is non-normative; it specifies no new behaviour, but
-    instead summarizes information already present in other parts of the
-    specification. The overall security considerations of the
-    APIs and protocols used in WebRTC are described in
-    [[RFC8827]].</p>
+    <p>
+      This section is non-normative; it specifies no new behaviour, but
+      instead summarizes information already present in other parts of the
+      specification. The overall security considerations of the
+      APIs and protocols used in WebRTC are described in [[RFC8827]].
+    </p>
     <section>
       <h2>Impact on same origin policy</h2>
-      <p>The QUIC API enables data to be communicated between
-      browsers and other devices, including other browsers.</p>
-      <p>This means that data can be shared between applications
-      running in different browsers, or between an application running in the
-      same browser and something that is not a browser.  This is an extension
-      to the Web model which has had barriers against sending data
-      between entities with different origins.</p>
-      <p>This specification provides no user prompts or chrome indicators
-      for communication; it assumes that once the Web page has been allowed to
-      access data, it is free to share that data with other entities as it
-      chooses. Peer-to-peer exchanges of data via QUIC can therefore
-      occur without any user explicit consent or involvement.</p>
+      <p>
+        The QUIC API enables data to be communicated between
+        browsers and other devices, including other browsers.
+      </p>
+      <p>
+        This means that data can be shared between applications
+        running in different browsers, or between an application running in the
+        same browser and something that is not a browser.  This is an extension
+        to the Web model which has had barriers against sending data
+        between entities with different origins.
+      </p>
+      <p>
+        This specification provides no user prompts or chrome indicators
+        for communication; it assumes that once the Web page has been allowed to
+        access data, it is free to share that data with other entities as it
+        chooses. Peer-to-peer exchanges of data via QUIC can therefore
+        occur without any user explicit consent or involvement.
+      </p>
     </section>
     <section>
       <h2>Impact on local network</h2>

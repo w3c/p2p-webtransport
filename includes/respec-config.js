@@ -2,7 +2,7 @@ var respecConfig = {
   specStatus: "CG-DRAFT",
   // if there a publicly available Editor's Draft, this is the link
   edDraftURI: "https://w3c.github.io/p2p-webtransport/",
-  shortName: "webrtc-quic",
+  shortName: "p2p-webtransport",
   editors: [
     { name: "Peter Thatcher", company: "Microsoft Corporation", w3cid: "68236" },
     { name: "Bernard Aboba", company: "Microsoft Corporation", w3cid: "65611" },

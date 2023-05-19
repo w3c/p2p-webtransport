@@ -20,13 +20,13 @@
     <h2>Introduction</h2>
     <p>
       This specification extends the WebRTC [[WEBRTC]] and WebTransport [[WEBTRANSPORT]]
-      specifications to enable peer-to-peer operation using QUIC [[RFC9000]].  This
-      specification supports the exchange of arbitrary data with remote peers using
+      specifications to enable peer-to-peer operation using QUIC [[RFC9000]].
+      This specification supports the exchange of arbitrary data with remote peers using
       NAT-traversal technologies such as ICE, STUN, and TURN. As specified in [[RFC7983bis]],
       QUIC can be multiplexed on the same port as RTP, RTCP, DTLS, STUN and TURN, allowing
       the API defined in this specification to be utilized along with the functionality
-      defined in [[WEBRTC]] and [[ORTC]] including communication using audio/video media and
-      SCTP data channels.
+      defined in [[WEBRTC]] and [[ORTC]] including communication using audio/video media
+      and SCTP data channels.
     </p>
     <p>
       This specification defines an interface to QUIC streams as well as datagrams [[RFC9221]]. 
@@ -36,15 +36,10 @@
     </p>
     <p class="note">This specification extends the WebTransport API [[WEBTRANSPORT]]
       under development within the W3C WebTransport WG. Since the WebTransport
-      specification is a work-in-progress, the API is likely to change significantly going
-      forward.</p>
+      specification is a work-in-progress, the API is likely to change significantly
+      going forward.</p>
   </section>
   <section id="conformance">
-      <p>
-        This specification defines conformance criteria that apply to a single
-        product: the <dfn>user agent</dfn> that implements the interfaces that
-        it contains.
-      </p>
       <p>
         Conformance requirements phrased as algorithms or specific steps may be
         implemented in any manner, so long as the end result is equivalent. (In

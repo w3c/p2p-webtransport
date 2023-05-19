@@ -31,6 +31,7 @@ var respecConfig = {
       ]
     }
   ],
+  lint: { "no-unused-dfns": false },
   localBiblio: {
     "IANA-STUN-6": {
       "title": "STUN Error Codes",

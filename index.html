@@ -122,7 +122,7 @@
         A <code><a>RTCQuicTransport</a></code> instance is constructed
         using an <code><a>RTCIceTransport</a></code> and an optional sequence of
         <code><a>RTCCertificate</a></code> objects. A
-        <code><a>RTCQuicTransport</a></code> object whose <a>[[\State]]<\a> internal
+        <code><a>RTCQuicTransport</a></code> object whose <a>[[\State]]</a> internal
         slot is <code>"closed"</code> or <code>"failed"</code> can be
         garbage-collected when it is no longer referenced.
       </p>
@@ -170,10 +170,12 @@ interface RTCQuicTransport : WebTransport {
           <ol>
             <li>Let <var>transport</var> be the first argument.</li>
             <li>
-              If <var>transport</var>'s <a>[[\State]]<\a> internal slot is
+              If <var>transport</var>'s <a>[[\State]]</a> internal slot is
               <code>"closed"</code> state, [= exception/throw =] an
-              <code>InvalidStateError</code> and abort these steps.</li>
-              <li>If <var>transport</var> has been used to construct another
+              <code>InvalidStateError</code> and abort these steps.
+            </li>
+            <li>
+              If <var>transport</var> has been used to construct another
               <code><a>RTCQuicTransport</a></code> whose <a>[[\State]]</a> internal
               slot is not <code>"closed"</code>, [= exception/throw =] an
               <code>InvalidStateError</code> and abort these steps.

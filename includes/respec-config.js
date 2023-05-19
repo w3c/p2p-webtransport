@@ -13,7 +13,7 @@ var respecConfig = {
   group: "ortc",
   wgPublicList: "public-ortc",
   github: {
-    repoURL: "https://github.com/w3c/webrtc-quic/",
+    repoURL: "https://github.com/w3c/p2p-webtransport",
     branch: "master"
   },
   otherLinks: [
@@ -25,8 +25,8 @@ var respecConfig = {
           href: "https://lists.w3.org/Archives/Public/public-ortc/"
         },
         {
-          value: "IETF QUIC Working Group",
-          href: "https://tools.ietf.org/wg/quic/"
+          value: "IETF AVTCORE Working Group",
+          href: "https://datatracker.ietf.org/wg/avtcore/"
         }
       ]
     }
@@ -45,7 +45,7 @@ var respecConfig = {
         "Bernard Aboba",
         "Justin Uberti"
       ],
-      "status": "20 January 2020 (work in progress)",
+      "status": "25 January 2021 (work in progress)",
       "publisher": "W3C"
     },
     "RFC9221": {

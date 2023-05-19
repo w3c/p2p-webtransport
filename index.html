@@ -100,7 +100,7 @@
         The <dfn><code>RTCIceTransport</code></dfn> and <dfn><code>RTCCertificate</code></dfn> interfaces
         and the <dfn><code>RTCDtlsFingerprint</code></dfn> dictionary are defined in [[!WEBRTC]] and [[!ORTC]].
         The <dfn><code>WebTransport</code></dfn> interface is defined in [[!WEBTRANSPORT]] Section 5.
-        The <code>[[\State]]</code> internal slot is defined in [[!WEBTRANSPORT]] Section 5.1.
+        The {{WebTransport/[[State]]}} internal slot is defined in [[!WEBTRANSPORT]] Section 5.1.
       </p>
   </section>
   <section id="rtcquic-transport*">
@@ -115,7 +115,7 @@
         A <code><a>RTCQuicTransport</a></code> instance is constructed
         using an <code><a>RTCIceTransport</a></code> and an optional sequence of
         <code><a>RTCCertificate</a></code> objects. A
-        <code><a>RTCQuicTransport</a></code> object whose <a>[[\State]]</a> internal
+        <code><a>RTCQuicTransport</a></code> object whose {{WebTransport/[[State]]}} internal
         slot is <code>"closed"</code> or <code>"failed"</code> can be
         garbage-collected when it is no longer referenced.
       </p>
@@ -190,7 +190,7 @@ interface RTCQuicTransport : WebTransport {
             </li>
             <li>
               Let <var>quictransport</var> have a
-              <dfn data-dfn-for="RTCQuicTransport">[[\State]]</dfn> internal slot,
+              {{WebTransport/[[State]]}} internal slot,
               initialized to <code>"connecting"</code>.
             </li>
             <li>
@@ -267,13 +267,13 @@ interface RTCQuicTransport : WebTransport {
                  </li>
                  <li>
                    If <var>transport</var>'s <code>state</code> attribute is not
-                   in the <code>"closed"</code> state, abort these steps.
+                   code>"closed"</code> state, abort these steps.
                  </li>
                  <li>
                    Let <var>quictransport</var> be the <code><a>RTCQuicTransport</a></code>.
                 </li>
                  <li>
-                   Set <var>quictransport</var>'s <a>[[\State]]</a> internal slot to
+                   Set <var>quictransport</var>'s {{WebTransport/[[State]]}} internal slot to
                    <code>"closed"</code>.
                 </li>
               </ol>
@@ -334,8 +334,8 @@ interface RTCQuicTransport : WebTransport {
                 <dfn>getRemoteCertificates()</dfn> returns the certificate chain in use by the remote side, with each
                 certificate encoded in binary Distinguished Encoding Rules (DER) [[!X690]].
                 <code><a>getRemoteCertificates()</a></code> returns an empty list prior to
-                selection of the remote certificate, which is completed once <var>transport</var>'s
-                <a>[[\State]]</a> internal slot transitions to <code>connected</code>.
+                selection of the remote certificate, which is completed once <var>quictransport</var>'s
+                {{WebTransport/[[State]]}} internal slot transitions to <code>"connected"</code>.
               </p>
               <div>
                 <em>No parameters.</em>
@@ -365,8 +365,8 @@ interface RTCQuicTransport : WebTransport {
                 <code>InvalidStateError</code>.</p>
               <p>
                 If <code>start</code> is called after a previous <code>start</code>
-                call, or if <var>transport</var>'s <a>[[\State]]</a> internal slot is
-                <code>closed</code>, [= exception/throw = ] an <code>InvalidStateError</code>.
+                call, or if <var>quictransport</var>'s {{WebTransport/[[State]]}} internal slot is
+                <code>"closed"</code>, [= exception/throw = ] an <code>InvalidStateError</code>.
               </p>
               <p>
                 If all of the values of
@@ -451,8 +451,8 @@ interface RTCQuicTransport : WebTransport {
               <td><dfn><code id="idl-def-RTCQuicRole.auto">auto</code></dfn></td>
               <td>
                 <p>The QUIC role is determined based on the resolved ICE role:
-                the ICE <code>controlled</code> role acts as the QUIC client and
-                the ICE <code>controlling</code> role acts as the QUIC server.</p>
+                the ICE <code>"controlled"</code> role acts as the QUIC client and
+                the ICE <code>"controlling"</code> role acts as the QUIC server.</p>
               </td>
             </tr>
             <tr>

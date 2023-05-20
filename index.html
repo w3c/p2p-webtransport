@@ -109,7 +109,7 @@
         <dfn>RTCDtlsFingerprint</dfn> is defined as the {{RTCDtlsFingerprint}} dictionary in [[!WEBRTC]] and [[!ORTC]].
       </p>
       <p>
-        <dfn>[[\State]]</dfn> is defined as the {{WebTransport/[[State]]}} internal slot in [[!WEBTRANSPORT]] Section 5.1.
+        <dfn data-dfn-for="RTCQuicTransport">[[\State]]</dfn> is defined as the {{WebTransport/[[State]]}} internal slot in [[!WEBTRANSPORT]] Section 5.1.
       </p>
   </section>
   <section id="rtcquictransport*">
@@ -125,7 +125,7 @@
         A <code><a>RTCQuicTransport</a></code> instance is constructed
         using an <code><a>RTCIceTransport</a></code> and an optional sequence of
         <code><a>RTCCertificate</a></code> objects. A
-        <code><a>RTCQuicTransport</a></code> object whose <a>[[\State]]</a> internal
+        <code><a>RTCQuicTransport</a></code> object whose {{RTCQuicTransport/[[State]]}} internal
         slot is <code>"closed"</code> or <code>"failed"</code> can be
         garbage-collected when it is no longer referenced.
       </p>
@@ -180,7 +180,7 @@ interface RTCQuicTransport : WebTransport {
               <code>InvalidStateError</code> and abort these steps.
             <li>
               If <var>transport</var> has been used to construct another
-              <code><a>RTCQuicTransport</a></code> whose <a>[[\State]]</a> internal
+              <code><a>RTCQuicTransport</a></code> whose {{RTCQuicTransport/[[State]]}} internal
               slot is not <code>"closed"</code>, [= exception/throw =] an
               <code>InvalidStateError</code> and abort these steps.
             </li>
@@ -199,9 +199,8 @@ interface RTCQuicTransport : WebTransport {
               <code><a>RTCQuicTransport</a></code> object.
             </li>
             <li>
-              Let <var>quictransport</var> have a
-              <a>[[\State]]</a> internal slot,
-              initialized to <code>"connecting"</code>.
+              Let <var>quictransport</var> have a {{RTCQuicTransport/[[State]]}}
+              internal slot, initialized to <code>"connecting"</code>.
             </li>
             <li>
               Let <var>quictransport</var> have a
@@ -283,8 +282,8 @@ interface RTCQuicTransport : WebTransport {
                    Let <var>quictransport</var> be the <code><a>RTCQuicTransport</a></code>.
                 </li>
                  <li>
-                   Set <var>quictransport</var>'s <a>[[\State]]</a> internal slot to
-                   <code>"closed"</code>.
+                   Set <var>quictransport</var>'s {{RTCQuicTransport/[[State]]}}
+                   internal slot to <code>"closed"</code>.
                 </li>
               </ol>
             </dd>
@@ -330,7 +329,7 @@ interface RTCQuicTransport : WebTransport {
             <dt><code>getCertificates</code></dt>
             <dd>
               <p><dfn>getCertificates()</dfn> returns the value of the <code><a>RTCQuicTransport</a></code>'s
-              <a>[[\Certificates]]</a> internal slot.</p>
+              {{RTCQuicTransport/[[Certificates]]}} internal slot.</p>
               <div>
                 <em>No parameters.</em>
               </div>
@@ -345,7 +344,7 @@ interface RTCQuicTransport : WebTransport {
                 certificate encoded in binary Distinguished Encoding Rules (DER) [[!X690]].
                 <code><a>getRemoteCertificates()</a></code> returns an empty list prior to
                 selection of the remote certificate, which is completed once <var>quictransport</var>'s
-                <a>[[\State]]</a> internal slot transitions to <code>"connected"</code>.
+                {{RTCQuicTransport/[[State]]}} internal slot transitions to <code>"connected"</code>.
               </p>
               <div>
                 <em>No parameters.</em>
@@ -375,7 +374,7 @@ interface RTCQuicTransport : WebTransport {
                 <code>InvalidStateError</code>.</p>
               <p>
                 If <code>start</code> is called after a previous <code>start</code>
-                call, or if <var>quictransport</var>'s <a>[[\State]]</a> internal slot is
+                call, or if <var>quictransport</var>'s {{RTCQuicTransport/[[State]]}} internal slot is
                 <code>"closed"</code>, [= exception/throw = ] an <code>InvalidStateError</code>.
               </p>
               <p>

@@ -210,13 +210,13 @@ interface RTCQuicTransport : WebTransport {
             </li>
             <li>
               If <var>certificates</var> is non-null and is non-empty,
-              initialize the <a>[[\Certificates]]</a> internal slot to
+              initialize the {{RTCQuicTransport/[[Certificates]]}} internal slot to
               <var>certificates</var>.
             </li>
             <li>
               If <var>certificates</var> is <code>null</code> or is empty,
               generate a certificate using the default key generation algorithm
-              and store it in the <a>[[\Certificates]]</a> internal slot.
+              and store it in the {{RTCQuicTransport/[[Certificates]]}} internal slot.
             </li> 
             <li>
               Return <var>quictransport</var>.

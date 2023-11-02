@@ -70,20 +70,20 @@ var respecConfig = {
       "status": "May 2021. RFC",
       "publisher": "IETF"
     },
-    "RFC7983bis": {
+    "RFC9443": {
       "title": "Multiplexing Scheme Updates for QUIC",
-      "href": "https://datatracker.ietf.org/html/draft-ietf-avtcore-rfc7983bis",
+      "href": "https://datatracker.ietf.org/doc/html/rfc9443",
       "authors": [
         "B. Aboba",
         "G. Salgueiro",
         "C. Perkins"
       ],
-      "status": "26 March 2023. Internet draft (work in progress)",
+      "status": "July 2023. RFC",
       "publisher": "IETF"
     },
     "RFC7675": {
       "title": "Session Traversal Utilities for NAT (STUN) Usage for Consent Freshness",
-      "href": "https://tools.ietf.org/html/rfc7675",
+      "href": "https://datatracker.ietf.org/doc/html/rfc7675",
       "authors": [
         "M. Perumal",
         "D. Wing",
@@ -96,7 +96,7 @@ var respecConfig = {
     },
     "RFC8446": {
       "title": "The Transport Layer Security (TLS) Protocol Version 1.3",
-      "href": "https://tools.ietf.org/html/rfc8446",
+      "href": "https://datatracker.ietf.org/doc/html/rfc8446",
       "authors": [
         "E. Rescorla"
       ],

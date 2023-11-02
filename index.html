@@ -517,6 +517,139 @@ interface RTCQuicTransport : WebTransport {
       </p>
     </section>
   </section>
+   <section id="examples*">
+    <h2>Examples</h2>
+      <pre class="example highlight">
+      </pre>
+       <section class="informative" id="rtcquicexample*">
+      <h2>Examples</h2>
+      <pre class="example highlight">
+function initiate(mySignaller) {
+  // Prepare the ICE gatherer
+  var gatherOptions = {
+    gatherPolicy: "all",
+    iceServers: [
+      { urls: "stun:stun1.example.net" },
+      { urls: "turn:turn.example.org", username: "user", credential: "myPassword",
+        credentialType: "password" }
+     ]
+  };
+  var iceGatherer = new RTCIceGatherer(gatherOptions);
+  // Handle state changes
+  iceGatherer.onstatechange = function(event) {
+    myIceGathererStateChange("iceGatherer", event.state);
+  };
+  // Handle errors
+  iceGatherer.onerror = errorHandler;
+  // Prepare to signal local candidates
+  iceGatherer.onlocalcandidate = function(event) {
+    mySignaller.mySendLocalCandidate(event.candidate);
+  };
+
+  // Start gathering
+  iceGatherer.gather();
+  // Create ICE transport
+  var ice = new RTCIceTransport(iceGatherer);
+  // Prepare to handle remote ICE candidates
+  mySignaller.onRemoteCandidate = function(remote) {
+    ice.addRemoteCandidate(remote.candidate);
+  };
+
+  // Create the DTLS certificate
+  var certs;
+  var keygenAlgorithm = { name: "ECDSA", namedCurve: "P-256" };
+  RTCCertificate.generateCertificate(keygenAlgorithm).then(function(certificate){
+    certs[0] = certificate;
+  }, function(){
+    trace('Certificate could not be created');
+  });
+
+  // Create DTLS and QUIC transport
+  var dtls = new RTCDtlsTransport(ice, certs);
+  var quic = new RTCQuicTransport(ice, certs);
+
+  mySignaller.sendInitiate({
+    ice: iceGatherer.getLocalParameters(),
+    dtls: dtls.getLocalParameters(),
+    quic: quic.getLocalParameters(),
+    // ... marshall RtpSender/RtpReceiver capabilities as illustrated in Section 6.5 Example 9.
+  }, function(remote) {
+    // Start the ICE, DTLS and QUIC transports
+    ice.start(iceGatherer, remote.ice, RTCIceRole.controlling);
+    dtls.start(remote.dtls);
+    quic.start(remote.quic);
+    // ... configure RtpSender/RtpReceiver objects as illustrated in Section 6.5 Example 9.
+  });
+}
+</pre>
+<pre class="example highlight">
+// This is an example of how to answer
+// Include some helper functions
+import {trace, errorHandler, mySendLocalCandidate, myIceGathererStateChange,
+  myIceTransportStateChange, myDtlsTransportStateChange} from 'helper';
+
+function accept(mySignaller, remote) {
+  var gatherOptions = {
+    gatherPolicy: "all",
+    iceServers: [
+      { urls: "stun:stun1.example.net" },
+      { urls: "turn:turn.example.org", username: "user", credential: "myPassword",
+        credentialType: "password" }
+     ]
+  };
+  var iceGatherer = new RTCIceGatherer(gatherOptions);
+  // Handle state changes
+  iceGatherer.onstatechange = function(event) {
+    myIceGathererStateChange("iceGatherer", event.state);
+  };
+  // Handle errors
+  iceGatherer.onerror = errorHandler;
+  // Prepare to signal local candidates
+  iceGatherer.onlocalcandidate = function(event) {
+    mySignaller.mySendLocalCandidate(event.candidate);
+  };
+
+   // Start gathering
+  iceGatherer.gather();
+  // Create ICE transport
+  var ice = new RTCIceTransport(iceGatherer);
+  // Prepare to handle remote ICE candidates
+  mySignaller.onRemoteCandidate = function(remote) {
+    ice.addRemoteCandidate(remote.candidate);
+  };
+
+   // Create the DTLS certificate
+  var certs;
+  var keygenAlgorithm = { name: "ECDSA", namedCurve: "P-256" };
+  RTCCertificate.generateCertificate(keygenAlgorithm).then(function(certificate){
+    certs[0] = certificate;
+  }, function(){
+    trace('Certificate could not be created');
+  });
+
+  // Create DTLS and SCTP transport
+  var dtls = new RTCDtlsTransport(ice, certs);
+  var quic = new RTCQuicTransport(ice, certs);
+
+  mySignaller.sendAccept({
+    ice: iceGatherer.getLocalParameters(),
+    dtls: dtls.getLocalParameters(),
+    quic: quic.getLocalParameters(),
+    // ... marshall RtpSender/RtpReceiver capabilities as illustrated in Section 6.5 Example 9.
+  });
+
+   // Start the ICE, DTLS and SCTP transports
+  ice.start(iceGatherer, remote.ice, RTCIceRole.controlled);
+  dtls.start(remote.dtls);
+  // Start the QuicTransport
+  quic.start(remote.quic);
+
+  // ... configure RtpSender/RtpReceiver objects as illustrated in Section 6.5 Example 9.
+
+}
+                </pre>
+    </section>  
+ </section>
   <section id="privacy-security">
     <h2>Privacy and Security Considerations</h2>
     <p>

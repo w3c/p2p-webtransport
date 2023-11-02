@@ -22,7 +22,7 @@
       This specification extends the WebRTC [[WEBRTC]], ORTC [[ORTC]] and WebTransport
       [[WEBTRANSPORT]] APIs to enable peer-to-peer operation using QUIC [[RFC9000]].
       This specification supports the exchange of arbitrary data with remote peers using
-      NAT-traversal technologies such as ICE, STUN, and TURN. As specified in [[RFC7983bis]],
+      NAT-traversal technologies such as ICE, STUN, and TURN. As specified in [[RFC9443]],
       QUIC can be multiplexed on the same port as RTP, RTCP, DTLS, STUN and TURN, allowing
       the API defined in this specification to be utilized along with the functionality
       defined in [[WEBRTC]] and [[ORTC]] including communication using audio/video media
@@ -131,7 +131,7 @@
       </p>
       <p>
         The QUIC negotiation occurs between transport endpoints determined via ICE.
-        Multiplexing of QUIC with STUN, TURN, DTLS, RTP and RTCP is defined in [[RFC7983bis]].
+        Multiplexing of QUIC with STUN, TURN, DTLS, RTP and RTCP is defined in [[RFC9443]].
       </p>
       <p>
         A newly constructed <code><a>RTCQuicTransport</a></code> <em class="rfc2119"

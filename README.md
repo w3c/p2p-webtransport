@@ -1,5 +1,8 @@
 ## P2P-WebTransport
 
+> [!WARNING]
+> The [ORTC (Object Real-time Communications) Community Group](https://www.w3.org/community/ortc/) was closed in April 2023. This document is no longer being pursued.
+
 This document defines a set of ECMAScript APIs in WebIDL to allow data to be sent
 and received from another browser or device implementing the WebTransport
 protocol. This specification is being developed in conjunction with a protocol
